@@ -44,7 +44,9 @@ export async function launch({port, width = 1280, height = 800, headless = true}
     goto: url => call('Page.navigate', {url}),
     eval: async (expr) => { const r = await call('Runtime.evaluate', {expression: expr, returnByValue: true, awaitPromise: true}); if (r.exceptionDetails) throw new Error('eval: ' + (r.exceptionDetails.exception?.description || r.exceptionDetails.text)); return r.result.value; },
     shot: async (file) => { const {data} = await call('Page.captureScreenshot', {format: 'png'}); const fs = await import('node:fs'); fs.writeFileSync(file, Buffer.from(data, 'base64')); return file; },
-    mouse: (type, x, y, button = 'left') => call('Input.dispatchMouseEvent', {type, x, y, button, clickCount: 1, buttons: type === 'mouseReleased' ? 0 : 1}),
+    // buttons defaults to the held-button bitmask for `button` (left 1, right 2, middle 4); 0 on release.
+    mouse: (type, x, y, button = 'left', buttons = type === 'mouseReleased' ? 0 : ({left: 1, right: 2, middle: 4}[button] ?? 0)) =>
+      call('Input.dispatchMouseEvent', {type, x, y, button, clickCount: 1, buttons}),
     front: () => call('Page.bringToFront'),
     kill: () => { try { proc.kill(); } catch {} },
   };

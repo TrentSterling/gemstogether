@@ -41,6 +41,20 @@ rep('<title>Gems Together</title>',
 
 rep("this.toast('No moves — reshuffling')", "this.toast('No moves, reshuffling')")
 
+# Internal names: the game is Gems Together. Save keys, the co-op appId (network namespace) and the
+# debug alias still said jewelbound (ChatGPT's working title); rename them. Resets pre-launch saves only.
+rep("jewelbound-", "gemstogether-", 15)
+rep("window.jewelbound=app;", "")
+
+# Right-click / long-press on the canvas opened Chrome's "Save image as" menu over the board.
+rep("bindInput(){const c=this.canvas;",
+    "bindInput(){const c=this.canvas;c.addEventListener('contextmenu',e=>e.preventDefault());")
+rep("#scene{display:block;", "#scene{-webkit-touch-callout:none;display:block;")
+# Browser shortcuts also fired game hotkeys (Ctrl+F = fullscreen, Ctrl+D = Showcase, Alt+Left swallowed).
+rep("let k=e.key.toLowerCase();if([' '", "if(e.ctrlKey||e.metaKey||e.altKey)return;let k=e.key.toLowerCase();if([' '")
+# Trackpad pinch / Ctrl+wheel over the board zoomed the page and cropped the GPU UI.
+rep("c.addEventListener('wheel',e=>{if(a.panelOpen){", "c.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();return;}if(a.panelOpen){")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

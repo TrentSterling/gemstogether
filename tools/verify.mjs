@@ -25,7 +25,7 @@ async function pill(page) {
 async function hits(page) { return (await page.eval(`${J}.ui()`)).hits || []; }
 
 // ---- desktop ----
-let page = await boot(1280, 800, 9413);
+let page = await boot(1280, 800, 9431);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
   ok('version 3.2.4', d.version === '3.2.4', d.version);
@@ -40,6 +40,40 @@ try {
   ok('About block injected', html.includes('tront-about:start') && html.includes('application/ld+json'));
   ok('no em dash in toasts', !html.includes("No moves —"));
 
+  // right-click regression: a real right click on a gem must not open Chrome's native
+  // "Save image as / Inspect" menu (contextmenu defaultPrevented) and must not grab/select/score.
+  // Capture listener (first) counts events; bubble listener registered LAST sees the final state.
+  await page.eval(`(()=>{const r=window.__ctx={fired:0,prevented:[],targets:[]};
+    window.addEventListener('contextmenu',e=>{r.fired++;r.targets.push(e.target?.id||e.target?.tagName||'?');},true);
+    setTimeout(()=>window.addEventListener('contextmenu',e=>r.prevented.push(e.defaultPrevented),false),0);})()`);
+  await sleep(50);
+  const probe = `(()=>{const a=${J}.app,s=${J}.state();return {score:s.score,moves:s.moves,phase:s.phase,selected:a.selected,grab:a.grab,down:!!a.down,panel:!!a.panelOpen}})()`;
+  const rightClick = async (x, y) => {
+    await page.mouse('mouseMoved', x, y, 'none', 0);
+    await page.mouse('mousePressed', x, y, 'right');
+    await sleep(30);
+    await page.mouse('mouseReleased', x, y, 'right');
+    await sleep(250);
+  };
+  const gi = 27, gp = await page.eval(`${J}.project(${gi})`);
+  const before = await page.eval(probe);
+  await rightClick(gp[0], gp[1]);
+  const c1 = await page.eval('window.__ctx'), after = await page.eval(probe);
+  ok('right click on gem fires contextmenu', c1.fired >= 1, `fired ${c1.fired} target ${c1.targets.join(',')}`);
+  ok('right click on gem: native menu suppressed', c1.prevented.length >= 1 && c1.prevented.every(Boolean), JSON.stringify(c1.prevented));
+  ok('right click on gem: no grab/select/score', after.selected === before.selected && after.grab < 0 && !after.down && after.score === before.score && after.moves === before.moves,
+    `before ${JSON.stringify(before)} after ${JSON.stringify(after)}`);
+  const btn = (await hits(page)).find(h => h.kind === 'button' && h.w > 4 && h.h > 4);
+  if (btn) {
+    await page.eval(`window.__ctx.fired=0;window.__ctx.prevented=[];window.__ctx.targets=[]`);
+    const b0 = await page.eval(probe);
+    await rightClick(btn.x + btn.w / 2, btn.y + btn.h / 2);
+    const c2 = await page.eval('window.__ctx'), b1 = await page.eval(probe);
+    ok(`right click on GPU button '${btn.id}': native menu suppressed`, c2.fired >= 1 && c2.prevented.every(Boolean) && c2.prevented.length >= 1,
+      `fired ${c2.fired} target ${c2.targets.join(',')} prevented ${JSON.stringify(c2.prevented)}`);
+    ok(`right click on GPU button '${btn.id}': does not activate`, b1.panel === b0.panel && b1.score === b0.score && b1.moves === b0.moves, `before ${JSON.stringify(b0)} after ${JSON.stringify(b1)}`);
+  } else ok('GPU button hit region found for right-click check', false, 'no button hits');
+
   // real pointer drag on the first legal move
   const m = s.legalMoves[0];
   const [a, b] = Array.isArray(m) ? m : [m.a ?? m.from, m.b ?? m.to];
@@ -52,7 +86,7 @@ try {
   ok('pointer drag scores', s2.score > 0 && s2.moves >= 1, `score ${s2.score} moves ${s2.moves} move ${JSON.stringify(m)}`);
   await sleep(2500);
   const p = await pill(page), hs = await hits(page);
-  const bad = hs.filter(h => h.w && overlap(p, h));
+  const bad = hs.filter(h => p && h.w && overlap(p, h));
   ok('About pill clear of GPU buttons (1280x800)', p && bad.length === 0, bad.map(h => h.id || h.label).join(','));
   await page.shot('tools/out/qa-desktop.png');
   const d2 = await page.eval(`${J}.diagnostics()`);
@@ -60,12 +94,12 @@ try {
 } finally { page.kill(); }
 
 // ---- phone ----
-page = await boot(390, 844, 9414);
+page = await boot(390, 844, 9432);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
   ok('phone boots clean', d.errors.length === 0);
   const p = await pill(page), hs = await hits(page);
-  const bad = hs.filter(h => h.w && overlap(p, h));
+  const bad = hs.filter(h => p && h.w && overlap(p, h));
   ok('About pill clear of GPU buttons (390x844)', p && bad.length === 0, bad.map(h => h.id || h.label).join(','));
   await page.shot('tools/out/qa-phone.png');
 } finally { page.kill(); }
