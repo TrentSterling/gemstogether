@@ -1093,7 +1093,7 @@ class CabinetUI {
  }
  draw(){const a=this.app,p=this.ink;p.begin(a.cssWidth,a.cssHeight);this.hits=[];
   this.floats=this.floats.filter(f=>a.time-f.birth<1.1);for(const f of this.floats){const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos,a.vp,a.cssWidth,a.cssHeight),alpha=Math.min(age*9,1)*clamp((1.1-age)*3,0,1);p.opacity=alpha;this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),f.special?22:24,f.special?UI_ART.aqua:UI_ART.highlight,'center',Math.min(300,a.cssWidth-40),.12,true);}p.opacity=1;
-  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.coopPresence();this.drawCursor();p.submit();
+  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawCursor();p.submit();
  }
 }
 
@@ -1389,7 +1389,10 @@ class JewelApp {
  toggleSound(){this.audio.start().catch(()=>{});this.prefs.muted=!this.prefs.muted;this.audio.setMute(this.prefs.muted);$('sound-btn').textContent=this.prefs.muted?'Sound off':'Sound on';this.savePreferences();}
  pick(clientX,clientY){const rect=this.canvas.getBoundingClientRect(),nx=(clientX-rect.left)/rect.width*2-1,ny=1-(clientY-rect.top)/rect.height*2;const dir=vnorm(vadd(this.forward,vadd(vmul(this.right,nx*this.cssWidth/this.cssHeight*this.tanFov),vmul(this.up,ny*this.tanFov))));const t=(.37-this.eye[2])/dir[2],p=vadd(this.eye,vmul(dir,t));let x=Math.round(p[0]/CELL+3.5),y=Math.round(3.5-p[1]/CELL);if(x<0||x>7||y<0||y>7)return -1;return y*8+x;}
  clickCell(i){if(this.aaCompare||i<0||this.phase!=='idle')return;if(this.auto)this.toggleDemo(false);if(this.selected===i){this.selected=-1;return;}if(this.selected>=0&&this.board.adjacent(this.selected,i)){this.trySwap(this.selected,i);return;}this.selected=i;this.audio.select(this.board.cells[i].type,cellXY(i)[0]);this.idleSince=this.time;}
- bindInput(){const c=this.canvas;c.addEventListener('contextmenu',e=>e.preventDefault());c.addEventListener('pointerdown',e=>{if(e.button!==0||this.panelOpen||this.aaCompare)return;this.audio.start().catch(()=>{});const i=this.pick(e.clientX,e.clientY);if(i<0)return;c.setPointerCapture(e.pointerId);this.down={i,x:e.clientX,y:e.clientY,id:e.pointerId,dragged:false};this.grab=this.phase==='idle'?i:-1;this.keyboardActive=false;});c.addEventListener('pointermove',e=>{if(this.panelOpen||this.aaCompare)return;this.keyboardActive=false;const i=this.pick(e.clientX,e.clientY);if(i!==this.hover){this.hover=i;if(i>=0&&this.phase==='idle')this.audio.hover(this.board.cells[i].type,cellXY(i)[0]);}if(this.down&&!this.down.dragged&&this.phase==='idle'){const dx=e.clientX-this.down.x,dy=e.clientY-this.down.y;if(Math.hypot(dx,dy)>12){const start=this.down.i,dir=Math.abs(dx)>Math.abs(dy)?(dx>0?1:-1):(dy>0?8:-8),target=start+dir;if(this.board.adjacent(start,target)){if(this.auto)this.toggleDemo(false);this.down.dragged=true;this.grab=-1;this.trySwap(start,target);}}}});
+ pointAt(i){if(!Number.isInteger(i)||i<0||i>=64||!this.board.cells[i])return false;this.pointSeq=(this.pointSeq||0)+1;this.point={i,seq:this.pointSeq,at:performance.now()};return true;}
+ activePoint(now=performance.now()){const p=this.point;return p&&now-p.at<COOP.pointMs?p:null;}
+ pointsInfo(){const now=performance.now(),p=this.activePoint(now),n=this.coop,remote=[];const add=(peer,r)=>{const q=r?.point;if(q&&now-q.at<COOP.pointMs)remote.push({peer,i:q.i,seq:q.seq,age:Math.round(now-q.at)});};if(n){if(n.publicRoom)for(const [id,r]of n.remotes)add(id,r);else if(n.connected)add(n.peer,n.remote);}return {local:p?{i:p.i,seq:p.seq,age:Math.round(now-p.at)}:null,remote};}
+ bindInput(){const c=this.canvas;c.addEventListener('contextmenu',e=>e.preventDefault());c.addEventListener('pointerdown',e=>{if(e.button!==2||e.pointerType==='touch'||this.panelOpen||this.aaCompare)return;if(this.ui?.find(e.clientX,e.clientY))return;const i=this.pick(e.clientX,e.clientY);if(i>=0)this.pointAt(i);});c.addEventListener('pointerdown',e=>{if(e.button!==0||this.panelOpen||this.aaCompare)return;this.audio.start().catch(()=>{});const i=this.pick(e.clientX,e.clientY);if(i<0)return;c.setPointerCapture(e.pointerId);this.down={i,x:e.clientX,y:e.clientY,id:e.pointerId,dragged:false};this.grab=this.phase==='idle'?i:-1;this.keyboardActive=false;});c.addEventListener('pointermove',e=>{if(this.panelOpen||this.aaCompare)return;this.keyboardActive=false;const i=this.pick(e.clientX,e.clientY);if(i!==this.hover){this.hover=i;if(i>=0&&this.phase==='idle')this.audio.hover(this.board.cells[i].type,cellXY(i)[0]);}if(this.down&&!this.down.dragged&&this.phase==='idle'){const dx=e.clientX-this.down.x,dy=e.clientY-this.down.y;if(Math.hypot(dx,dy)>12){const start=this.down.i,dir=Math.abs(dx)>Math.abs(dy)?(dx>0?1:-1):(dy>0?8:-8),target=start+dir;if(this.board.adjacent(start,target)){if(this.auto)this.toggleDemo(false);this.down.dragged=true;this.grab=-1;this.trySwap(start,target);}}}});
   const release=e=>{if(this.down&&e.pointerId===this.down.id){if(!this.down.dragged)this.clickCell(this.down.i);this.down=null;this.grab=-1;try{c.releasePointerCapture(e.pointerId);}catch{}}};c.addEventListener('pointerup',release);c.addEventListener('pointercancel',e=>{this.down=null;this.grab=-1;});c.addEventListener('pointerleave',()=>{this.hover=-1;});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'){if(this.aaCompare){this.finishAACompare();return;}if(this.panelOpen)this.closePanel();else{this.selected=-1;this.grab=-1;if(this.auto)this.toggleDemo(false);}return;}if(this.aaCompare)return;if(this.panelOpen&&e.key==='Tab'){const items=[...$('panel-scrim').querySelectorAll('button,input,select,a[href]')].filter(x=>!x.disabled&&x.getClientRects().length);const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}return;}if(this.panelOpen||e.target.matches('input,select,textarea,button,a'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;let k=e.key.toLowerCase();if([' ','enter','arrowleft','arrowright','arrowup','arrowdown'].includes(k))e.preventDefault();if(k==='h'){this.audio.start().catch(()=>{});this.hint();}else if(k==='d'){this.audio.start().catch(()=>{});this.toggleDemo();}else if(k==='m')this.toggleSound();else if(k==='f')this.fullscreen();else if(k.startsWith('arrow')){this.keyboardActive=true;let x=this.keyboardCell%8,y=this.keyboardCell/8|0;if(k==='arrowleft')x--;if(k==='arrowright')x++;if(k==='arrowup')y--;if(k==='arrowdown')y++;this.keyboardCell=clamp(y,0,7)*8+clamp(x,0,7);}else if(k===' '||k==='enter'){this.audio.start().catch(()=>{});this.keyboardActive=true;this.clickCell(this.keyboardCell);}});
   window.addEventListener('resize',()=>this.resize());document.addEventListener('visibilitychange',()=>{this.lastFrame=performance.now();if(document.hidden&&this.audio.ctx)this.audio.ctx.suspend().catch(()=>{});else if(this.audio.ctx)this.audio.ctx.resume().catch(()=>{});});
@@ -1416,7 +1419,7 @@ function mixColor(a,b,t){return a.map((v,i)=>mix(v,b[i],t));}
 const COOP = Object.freeze({appId:'gemstogether-coop',protocol:3,version:'3.1',
   module:'https://esm.sh/trystero@0.21.0/torrent?bundle',
   moduleFallback:'https://cdn.jsdelivr.net/npm/trystero@0.21.0/src/torrent.js/+esm',
-  alphabet:'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',cursorMs:40,heartbeatMs:350,timeoutMs:10000,
+  alphabet:'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',cursorMs:40,pointMs:2500,heartbeatMs:350,timeoutMs:10000,
   shared:['juice','key','livingLight','gemPolish','idleMotion'],ownerKey:'gemstogether-owner-v3',recordKey:'gemstogether-room-v3'});
 const netClone = x=>JSON.parse(JSON.stringify(x));
 function netID(n=20){const b=new Uint8Array(n);crypto.getRandomValues(b);return Array.from(b,x=>COOP.alphabet[x%COOP.alphabet.length]).join('');}
@@ -1689,13 +1692,16 @@ class CoopRoom {
  sendCursor(now){
   if(this.cursorBusy||now-this.lastCursor<COOP.cursorMs||!this.app.ui?.boardRect)return;this.lastCursor=now;
   const a=this.app,u=a.ui,m=u.mouse,r=u.boardRect,over=u.find(m.x,m.y),onBoard=!a.panelOpen&&!over;
-  const data=[++this.cursorSeq,clamp((m.x-r.x)/r.w,-2,3),clamp((m.y-r.y)/r.h,-2,3),onBoard?1:0,clamp(m.x/a.cssWidth,0,1),clamp(m.y/a.cssHeight,0,1),onBoard?a.hover:-1,onBoard?a.selected:-1,onBoard?a.grab:-1,m.inside?1:0,m.down?1:0];
+  const data=[++this.cursorSeq,clamp((m.x-r.x)/r.w,-2,3),clamp((m.y-r.y)/r.h,-2,3),onBoard?1:0,clamp(m.x/a.cssWidth,0,1),clamp(m.y/a.cssHeight,0,1),onBoard?a.hover:-1,onBoard?a.selected:-1,onBoard?a.grab:-1,m.inside?1:0,m.down?1:0,...this.pointFields()];
   const key=data.slice(1).join(',');if(key===this.lastCursorKey&&now-(this.cursorKeepAt||0)<600)return;this.cursorKeepAt=now;this.lastCursorKey=key;
   this.cursorBusy=true;const buffer=new Float32Array(data).buffer;this.stats.cursors++;
   Promise.resolve(this.sendCursorRaw(buffer,this.peer)).catch(e=>this.note('cursor-send',{message:e.message})).finally(()=>{this.cursorBusy=false;});
  }
- receiveCursor(buf,id){if(id!==this.peer||!this.connected)return;const bytes=buf instanceof ArrayBuffer?new Uint8Array(buf):buf;if(!ArrayBuffer.isView(bytes)||bytes.byteLength!==44)return;const f=new Float32Array(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));if(!Array.from(f).every(Number.isFinite)||f[0]<(this.remote?.seq||0))return;
-  const valid=i=>Number.isInteger(i)&&i>=0&&i<64?i:-1;const prev=this.remote||{};this.remote={...prev,seq:f[0],u:clamp(f[1],-2,3),v:clamp(f[2],-2,3),board:!!f[3],sx:clamp(f[4]),sy:clamp(f[5]),hover:valid(f[6]),selected:valid(f[7]),grab:valid(f[8]),visible:!!f[9],down:!!f[10],at:performance.now()};
+ pointFields(){const p=this.app.activePoint();return p&&!this.app.panelOpen?[p.i,p.seq]:[];}
+ readPoint(f,old){const i=f.length>12&&Number.isInteger(f[11])&&f[11]>=0&&f[11]<64?f[11]:-1;if(i<0)return null;const seq=f[12];if(old&&old.seq===seq&&old.i===i)return old;this.pointPing(i);return {i,seq,at:performance.now()};}
+ pointPing(i){const a=this.app,t=a.board.cells[i],au=a.audio;if(!t||document.hidden||!au?.started||!au.buffers?.glass)return;try{au.play(au.buffers.glass[t.type],1.25,.03,cellXY(i)[0]*.09);}catch{}}
+ receiveCursor(buf,id){if(id!==this.peer||!this.connected)return;const bytes=buf instanceof ArrayBuffer?new Uint8Array(buf):buf;if(!ArrayBuffer.isView(bytes)||bytes.byteLength!==44&&bytes.byteLength!==52)return;const f=new Float32Array(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));if(!Array.from(f).every(Number.isFinite)||f[0]<(this.remote?.seq||0))return;
+  const valid=i=>Number.isInteger(i)&&i>=0&&i<64?i:-1;const prev=this.remote||{};this.remote={...prev,seq:f[0],u:clamp(f[1],-2,3),v:clamp(f[2],-2,3),board:!!f[3],sx:clamp(f[4]),sy:clamp(f[5]),hover:valid(f[6]),selected:valid(f[7]),grab:valid(f[8]),visible:!!f[9],down:!!f[10],at:performance.now(),point:this.readPoint(f,prev.point)};
  }
  diagnostics(){return {role:this.role,code:this.code,status:this.status,connected:this.connected,mirror:this.mirror,peer:this.peer,hostID:this.hostID,epoch:this.epoch,revision:this.revision,seq:this.seq,lastSeq:this.lastSeq,lastApplied:this.lastApplied,queued:this.events.length,pending:this.pending,ping:this.ping,hash:netHash(this.app.board),stats:{...this.stats},rtc:this.room?Object.entries(this.room.getPeers()).map(([id,pc])=>({id,state:pc.connectionState,ice:pc.iceConnectionState})):[],log:this.log.slice(),error:this.error};}
 }
@@ -1936,15 +1942,15 @@ class GlobalCoopRoom extends CoopRoom {
   if(!this.slot||this.electing||this.cursorBusy||now-this.lastCursor<COOP.cursorMs||!this.app.ui?.boardRect)return;
   const targets=this.roster.filter(x=>x.id!==this.selfId&&this.room?.getPeers()[x.id]).map(x=>x.id);if(!targets.length)return;
   this.lastCursor=now;const a=this.app,u=a.ui,m=u.mouse,r=u.boardRect,onBoard=!a.panelOpen&&!u.find(m.x,m.y);
-  const data=[++this.cursorSeq,clamp((m.x-r.x)/r.w,-2,3),clamp((m.y-r.y)/r.h,-2,3),onBoard?1:0,clamp(m.x/a.cssWidth),clamp(m.y/a.cssHeight),onBoard?a.hover:-1,onBoard?a.selected:-1,onBoard?a.grab:-1,m.inside?1:0,m.down?1:0];
+  const data=[++this.cursorSeq,clamp((m.x-r.x)/r.w,-2,3),clamp((m.y-r.y)/r.h,-2,3),onBoard?1:0,clamp(m.x/a.cssWidth),clamp(m.y/a.cssHeight),onBoard?a.hover:-1,onBoard?a.selected:-1,onBoard?a.grab:-1,m.inside?1:0,m.down?1:0,...this.pointFields()];
   const key=data.slice(1).join(',');if(key===this.lastCursorKey&&now-(this.cursorKeepAt||0)<600)return;this.cursorKeepAt=now;this.lastCursorKey=key;this.cursorBusy=true;this.stats.cursors++;
   Promise.resolve(this.sendCursorRaw(new Float32Array(data).buffer,targets)).catch(e=>this.note('public-cursor-error',{message:e.message})).finally(()=>{this.cursorBusy=false;});
  }
  receiveCursor(buf,id){
   if(!this.publicRoom)return super.receiveCursor(buf,id);if(!this.roster.some(x=>x.id===id&&x.slot>0))return;
-  const bytes=buf instanceof ArrayBuffer?new Uint8Array(buf):buf;if(!ArrayBuffer.isView(bytes)||bytes.byteLength!==44)return;
+  const bytes=buf instanceof ArrayBuffer?new Uint8Array(buf):buf;if(!ArrayBuffer.isView(bytes)||bytes.byteLength!==44&&bytes.byteLength!==52)return;
   const f=new Float32Array(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));const prev=this.remotes.get(id)||{};if(!Array.from(f).every(Number.isFinite)||f[0]<(prev.seq||0))return;
-  const cell=i=>Number.isInteger(i)&&i>=0&&i<64?i:-1;this.remotes.set(id,{...prev,seq:f[0],u:clamp(f[1],-2,3),v:clamp(f[2],-2,3),board:!!f[3],sx:clamp(f[4]),sy:clamp(f[5]),hover:cell(f[6]),selected:cell(f[7]),grab:cell(f[8]),visible:!!f[9],down:!!f[10],at:performance.now()});
+  const cell=i=>Number.isInteger(i)&&i>=0&&i<64?i:-1;this.remotes.set(id,{...prev,seq:f[0],u:clamp(f[1],-2,3),v:clamp(f[2],-2,3),board:!!f[3],sx:clamp(f[4]),sy:clamp(f[5]),hover:cell(f[6]),selected:cell(f[7]),grab:cell(f[8]),visible:!!f[9],down:!!f[10],at:performance.now(),point:this.readPoint(f,prev.point)});
  }
  pump(){
   if(!this.publicRoom)return super.pump();if(this.departing)return;
@@ -2088,6 +2094,24 @@ CabinetUI.prototype.coopPresence=function(){
  if(n.slot&&this.mouse.inside)this.cursorTag(n.playerLabel(),this.mouse.x,this.mouse.y,n.playerColor());
  if(n.pending)ring(n.pending.b,n.playerColor(),true);
 };
+CabinetUI.prototype.pointMark=function(i,col,age){
+ const a=this.app,p=this.ink,T=COOP.pointMs,actor=a.getActor(i);if(!actor||actor.pop||actor.pos[1]>3.75||age<0||age>=T)return;
+ const q=actor.pos,lo=project([q[0]-.5,q[1]+.5,.68],a.vp,a.cssWidth,a.cssHeight),hi=project([q[0]+.5,q[1]-.5,.68],a.vp,a.cssWidth,a.cssHeight);
+ const cx=(lo[0]+hi[0])/2,cy=(lo[1]+hi[1])/2,s=Math.max(8,Math.min(hi[0]-lo[0],hi[1]-lo[1])/2),t=age/T,f=Math.min(1,age/90)*(1-t*t*t);
+ const e=Math.min(1,age/280),beat=.5+.5*Math.cos(age/2600*Math.PI*2*5.5),al=f*(.72+.28*beat),R=s*1.02*(1+.45*Math.pow(1-e,3))*(1+.07*beat);
+ const circ=(r)=>{const pts=[];for(let j=0;j<=36;j++){const an=j/36*Math.PI*2;pts.push(cx+Math.cos(an)*r,cy+Math.sin(an)*r);}return pts;};
+ for(const k of [0,.5]){const ph=(age/900+k)%1;if(age<k*900)continue;const pts=circ(s*(1.1+.7*ph)),ra=f*(1-ph);p.poly(pts,6,UI_ART.ink,.3*ra);p.poly(pts,3.8,col,.9*ra);}
+ const ring=circ(R);p.poly(ring,8,UI_ART.ink,.55*f);p.poly(ring,4,col,al);
+ const tk=s*.34,g=R+3+4*(1-beat);for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){const pts=[cx+dx*g,cy+dy*g,cx+dx*(g+tk),cy+dy*(g+tk)];p.poly(pts,7.5,UI_ART.ink,.55*f);p.poly(pts,3.6,col,al);}
+ const bob=Math.sin(age/130)*5,up=cy-R-tk-28>18,dir=up?1:-1,ty=up?cy-R-tk-17-bob:cy+R+tk+17+bob,ch=[cx-10,ty-11*dir,cx,ty,cx+10,ty-11*dir];p.poly(ch,8,UI_ART.ink,.6*f);p.poly(ch,3.8,col,al);
+};
+CabinetUI.prototype.pointMarkers=function(){
+ const a=this.app,n=a.coop;if(a.panelOpen)return;const now=performance.now(),T=COOP.pointMs,lp=a.activePoint(now);
+ if(lp)this.pointMark(lp.i,n?.publicRoom?n.playerColor():n?.connected&&n.role!=='host'?COOP_PALETTE.peer:COOP_PALETTE.host,now-lp.at);
+ if(!n)return;
+ if(n.publicRoom){for(const [id,r]of n.remotes)if(r.point&&now-r.point.at<T&&n.roster.some(x=>x.id===id&&x.slot>0))this.pointMark(r.point.i,n.playerColor(id),now-r.point.at);}
+ else if(n.connected&&n.remote?.point&&now-n.remote.point.at<T)this.pointMark(n.remote.point.i,n.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host,now-n.remote.point.at);
+};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;
 CabinetUI.prototype.coopBadge=function(){
  const a=this.app,n=a.coop;if(!n?.publicRoom)return privateCoopBadge.call(this);
@@ -2148,7 +2172,7 @@ CabinetUI.prototype.activate=function(id){if(id==='coop-public'){this.app.audio.
  stage='scene and gameplay';$('load-status').textContent='Loading scene...';
  app=new JewelApp(renderer);
  stage='GPU interface';$('load-status').textContent='Loading controls...';
- const ink=await new UIInk(renderer).init();app.ui=new CabinetUI(app,ink);app.coop=new GlobalCoopRoom(app);window.__jewel.net=()=>app.coop.diagnostics();
+ const ink=await new UIInk(renderer).init();app.ui=new CabinetUI(app,ink);app.coop=new GlobalCoopRoom(app);window.__jewel.net=()=>app.coop.diagnostics();window.__jewel.point=i=>app.pointAt(i);window.__jewel.points=()=>app.pointsInfo();
  stage='first complete frame';app.draw();
  if(renderer.device)await renderer.device.queue.onSubmittedWorkDone();
  if(renderer.gl&&renderer.readError())throw Error('OpenGL reported an error in the first frame.');

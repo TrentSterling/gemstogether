@@ -25,7 +25,7 @@ async function pill(page) {
 async function hits(page) { return (await page.eval(`${J}.ui()`)).hits || []; }
 
 // ---- desktop ----
-let page = await boot(1280, 800, 9431);
+let page = await boot(1280, 800, 9476);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
   ok('version 3.2.4', d.version === '3.2.4', d.version);
@@ -63,8 +63,14 @@ try {
   ok('right click on gem: native menu suppressed', c1.prevented.length >= 1 && c1.prevented.every(Boolean), JSON.stringify(c1.prevented));
   ok('right click on gem: no grab/select/score', after.selected === before.selected && after.grab < 0 && !after.down && after.score === before.score && after.moves === before.moves,
     `before ${JSON.stringify(before)} after ${JSON.stringify(after)}`);
+  // point ping: the same right press drops a local point marker on that gem (nothing else changes).
+  const pt1 = await page.eval(`${J}.points()`);
+  ok('right click on gem creates local point', pt1.local && pt1.local.i === gi && pt1.local.age < 1500, JSON.stringify(pt1));
+  const pointAt = Date.now();
+  await page.shot('tools/out/qa-point.png');
   const btn = (await hits(page)).find(h => h.kind === 'button' && h.w > 4 && h.h > 4);
   if (btn) {
+    const seqBefore = (await page.eval(`${J}.points()`)).local?.seq;
     await page.eval(`window.__ctx.fired=0;window.__ctx.prevented=[];window.__ctx.targets=[]`);
     const b0 = await page.eval(probe);
     await rightClick(btn.x + btn.w / 2, btn.y + btn.h / 2);
@@ -72,7 +78,13 @@ try {
     ok(`right click on GPU button '${btn.id}': native menu suppressed`, c2.fired >= 1 && c2.prevented.every(Boolean) && c2.prevented.length >= 1,
       `fired ${c2.fired} target ${c2.targets.join(',')} prevented ${JSON.stringify(c2.prevented)}`);
     ok(`right click on GPU button '${btn.id}': does not activate`, b1.panel === b0.panel && b1.score === b0.score && b1.moves === b0.moves, `before ${JSON.stringify(b0)} after ${JSON.stringify(b1)}`);
+    const seqAfter = (await page.eval(`${J}.points()`)).local?.seq;
+    ok(`right click on GPU button '${btn.id}': no point`, seqAfter === seqBefore, `seq ${seqBefore} -> ${seqAfter}`);
   } else ok('GPU button hit region found for right-click check', false, 'no button hits');
+
+  await sleep(Math.max(0, 3000 - (Date.now() - pointAt)));
+  const pt2 = await page.eval(`${J}.points()`);
+  ok('point expires after ~3 s', pt2.local === null, JSON.stringify(pt2));
 
   // real pointer drag on the first legal move
   const m = s.legalMoves[0];
@@ -94,7 +106,7 @@ try {
 } finally { page.kill(); }
 
 // ---- phone ----
-page = await boot(390, 844, 9432);
+page = await boot(390, 844, 9477);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
   ok('phone boots clean', d.errors.length === 0);
