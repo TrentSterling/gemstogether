@@ -117,6 +117,73 @@ rep("this.coopPresence();this.drawCursor();", "this.pointMarkers();this.coopPres
 rep("window.__jewel.net=()=>app.coop.diagnostics();",
     "window.__jewel.net=()=>app.coop.diagnostics();window.__jewel.point=i=>app.pointAt(i);window.__jewel.points=()=>app.pointsInfo();")
 
+# Tront patch: Resonance FX (Andre on Discord: "up the particles/fx even more for a kind of Tetris Effect-like
+# experience"). The class, uniform packing and shader snippets live in tools/resonance.js; the pairs below wire
+# them into the drop. Uniform slots used: uForward.w, uAA.z, uAA.w, uLife.w (all unread by the drop).
+FX = (ROOT / 'tools' / 'resonance.js').read_text(encoding='utf-8')
+rep("const SKY_GL_FS=`", FX + "\nconst SKY_GL_FS=`")
+# Sky: aurora bands and an expanding tinted wave behind everything.
+rep("void main(){outColor=vec4(skyColor(vUV,uParams.z,uParams.x),1.0);}",
+    "${FX_TINT_GL}${FX_SKY_GL}void main(){outColor=vec4(skyColor(vUV,uParams.z,uParams.x)+fxSky(vUV,uParams.z),1.0);}")
+rep("@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x),1.0);}",
+    "${FX_TINT_WG}${FX_SKY_WG}@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x)+fxSky(vec2f(a.uv.x,1.0-a.uv.y),U.params.z),1.0);}")
+# Particle vertex motion for kinds 9-12 (WebGL2, then WebGPU).
+rep("out vec3 vCol;out vec3 vNorm;out vec2 vUV;out vec3 vData;\nvoid main(){",
+    "out vec3 vCol;out vec3 vNorm;out vec2 vUV;out vec3 vData;\n${FX_TINT_GL}\nvoid main(){")
+rep("\n else {p=iOrigin.xyz+vec3(aPos.xy,0.0)*size*(1.0-t*0.82);}",
+    "\n else if(kind>8.5&&kind<9.5){float sw=uForward.w;float ang=iOrigin.y+sw*iVelocity.x;float r=iOrigin.x*(1.0+uAA.w*0.10*sin(seed*3.0))+uAA.w*1.1;"
+    "p=vec3(cos(ang)*r,sin(ang)*r*0.62+sin(sw*0.9+seed)*iVelocity.y,iOrigin.z);p+=(uRight.xyz*aPos.x+uUp.xyz*aPos.y)*size*(0.8+uAA.z*0.3+uAA.w*0.35);}"
+    "\n else if(kind>9.5&&kind<10.5){vec3 dv=iVelocity.xyz*exp(-age*0.7)+vec3(0.0,iMisc.w*age,0.0);vec3 f=uForward.xyz;vec3 sv=dv-f*dot(dv,f);float sl=length(sv);"
+    "vec3 dir=sl>0.0001?sv/sl:uRight.xyz;vec3 side=normalize(cross(dir,f));p+=dir*aPos.x*size*(1.0+sl*1.2)*(1.0-t*0.4)+side*aPos.y*size*0.32*(1.0-t*0.5);}"
+    "\n else if(kind>10.5&&kind<11.5){float ca=seed+age*iVelocity.z;float cr=iVelocity.y*(0.3+t);p=iOrigin.xyz+vec3(cos(ca)*cr,age*iVelocity.x,sin(ca)*cr*0.5);"
+    "p+=(uRight.xyz*aPos.x+uUp.xyz*aPos.y)*size*(1.0-t*0.5);}"
+    "\n else if(kind>11.5&&kind<12.5){p=iOrigin.xyz+vec3(aPos.xy,0.0)*(size+age*iVelocity.x);}"
+    "\n else {p=iOrigin.xyz+vec3(aPos.xy,0.0)*size*(1.0-t*0.82);}")
+rep("if(kind>4.5&&kind<5.5)fade=sin(t*3.14159265)*0.6;",
+    "if(kind>4.5&&kind<5.5)fade=sin(t*3.14159265)*0.6;"
+    "if(kind>8.5&&kind<9.5){fade=(0.12+uAA.z*0.38+uAA.w*0.45)*(0.6+0.4*sin(uParams.x*(1.3+fract(seed)*2.0)+seed*7.0));vCol=mix(iColor.rgb,fxTint(uLife.w),0.15+min(uAA.z,1.0)*0.35);}"
+    "if(kind>10.5&&kind<11.5)fade=sin(t*3.14159265);")
+rep("const PARTICLE_WG=`${WG_UNIFORMS}${toWGSL(PARTICLE_SHARED)}", "const PARTICLE_WG=`${WG_UNIFORMS}${toWGSL(PARTICLE_SHARED)}${FX_TINT_WG}")
+rep("\n else {p=a.origin.xyz+vec3f(a.pos.xy,0.0)*size*(1.0-t*0.82);}",
+    "\n else if(kind>8.5&&kind<9.5){let sw=U.forward.w;let ang=a.origin.y+sw*a.vel.x;let r=a.origin.x*(1.0+U.aa.w*0.10*sin(seed*3.0))+U.aa.w*1.1;"
+    "p=vec3f(cos(ang)*r,sin(ang)*r*0.62+sin(sw*0.9+seed)*a.vel.y,a.origin.z);p+=(U.right.xyz*a.pos.x+U.up.xyz*a.pos.y)*size*(0.8+U.aa.z*0.3+U.aa.w*0.35);}"
+    "\n else if(kind>9.5&&kind<10.5){let dv=a.vel.xyz*exp(-age*0.7)+vec3f(0.0,a.misc.w*age,0.0);let f=U.forward.xyz;let sv=dv-f*dot(dv,f);let sl=length(sv);"
+    "var dir=U.right.xyz;if(sl>0.0001){dir=sv/sl;}let side=normalize(cross(dir,f));p+=dir*a.pos.x*size*(1.0+sl*1.2)*(1.0-t*0.4)+side*a.pos.y*size*0.32*(1.0-t*0.5);}"
+    "\n else if(kind>10.5&&kind<11.5){let ca=seed+age*a.vel.z;let cr=a.vel.y*(0.3+t);p=a.origin.xyz+vec3f(cos(ca)*cr,age*a.vel.x,sin(ca)*cr*0.5);"
+    "p+=(U.right.xyz*a.pos.x+U.up.xyz*a.pos.y)*size*(1.0-t*0.5);}"
+    "\n else if(kind>11.5&&kind<12.5){p=a.origin.xyz+vec3f(a.pos.xy,0.0)*(size+age*a.vel.x);}"
+    "\n else {p=a.origin.xyz+vec3f(a.pos.xy,0.0)*size*(1.0-t*0.82);}")
+rep("if(kind>4.5&&kind<5.5){fade=sin(t*3.14159265)*0.6;}o.col=a.col.rgb;",
+    "if(kind>4.5&&kind<5.5){fade=sin(t*3.14159265)*0.6;}o.col=a.col.rgb;"
+    "if(kind>8.5&&kind<9.5){fade=(0.12+U.aa.z*0.38+U.aa.w*0.45)*(0.6+0.4*sin(U.params.x*(1.3+fract(seed)*2.0)+seed*7.0));o.col=mix(a.col.rgb,fxTint(U.life.w),0.15+min(U.aa.z,1.0)*0.35);}"
+    "if(kind>10.5&&kind<11.5){fade=sin(t*3.14159265);}")
+# Particle fragment shapes (shared GLSL, converted to WGSL by the drop): ring for 12, soft capsule for 10, round mote for 9.
+rep("if((kind>1.5&&kind<2.5)||(kind>7.5&&kind<8.5)){float d=", "if(kind>11.5&&kind<12.5){float d=(length(q)-0.80)*70.0;a=exp(-d*d)*0.9;}\n else if((kind>1.5&&kind<2.5)||(kind>7.5&&kind<8.5)){float d=")
+rep("  else if(kind>3.5&&kind<4.5){a=exp(-q.y*q.y*42.0)*2.7*pow(max(0.0,1.0-abs(q.x)),0.2);}",
+    "  else if(kind>3.5&&kind<4.5){a=exp(-q.y*q.y*42.0)*2.7*pow(max(0.0,1.0-abs(q.x)),0.2);}"
+    "\n else if(kind>9.5&&kind<10.5){a=exp(-q.y*q.y*6.0)*max(1.0-q.x*q.x,0.0)*0.9;}"
+    "\n else if(kind>8.5&&kind<9.5){a=exp(-dot(q,q)*6.0)*0.7;}")
+# Final pass: the screen rim glows in the last cleared colour on every hit.
+rep("${SHARED_SHADER}\nvoid main(){vec2 uv=vUV;", "${SHARED_SHADER}\n${FX_TINT_GL}\nvoid main(){vec2 uv=vUV;")
+rep("c=tone(c*uSettings.x);c*=1.0-dot(q,q)*0.32;", "c=tone(c*uSettings.x);c*=1.0-dot(q,q)*0.32;c+=fxTint(uLife.w)*dot(q,q)*(uAA.w*0.32+min(uAA.z,1.2)*0.05);")
+rep("${toWGSL(SHARED_SHADER)}\n@group(1)@binding(0)var tScene", "${toWGSL(SHARED_SHADER)}${FX_TINT_WG}\n@group(1)@binding(0)var tScene")
+rep("c=tone(c*U.settings.x);c*=1.0-dot(q,q)*0.32;", "c=tone(c*U.settings.x);c*=1.0-dot(q,q)*0.32;c+=fxTint(U.life.w)*dot(q,q)*(U.aa.w*0.32+min(U.aa.z,1.2)*0.05);")
+# Bigger pools, fatter bursts.
+rep("sparks=new ParticlePool(renderer,quad.data(),24000,true),shards=new ParticlePool(renderer,shard.data(),6000,false)",
+    "sparks=new ParticlePool(renderer,quad.data(),60000,true),shards=new ParticlePool(renderer,shard.data(),10000,false)")
+rep("n=Math.floor(10+power*16);", "n=Math.floor(14+power*22);")
+rep("const sparks=Math.floor(17+power*32);", "const sparks=Math.floor(28+power*48);")
+# Wiring: create, per-frame step + uniforms, field draw, and the event hooks.
+rep("this.world=buildWorld(renderer);this.audio=new JewelAudio();", "this.world=buildWorld(renderer);this.audio=new JewelAudio();this.fx=new ResonanceFX(this);")
+rep("u.set([this.living.clock,this.living.light,this.living.polish,0],48);", "u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.fx.uniforms(u);")
+rep("const particles=this.prefs.particles?[this.world.shards.mesh,", "const particles=this.prefs.particles?[this.fx.field.mesh,this.world.shards.mesh,")
+rep("this.presentation.feed(center,this.cascade,mode,result.points);",
+    "this.fx.match(center,typ,this.cascade,result.removed.length,mode,magnitude,result.removed);this.presentation.feed(center,this.cascade,mode,result.points);")
+rep("finish(cascade){if(cascade<3)return;const a=this.app;this.payoffs", "finish(cascade){this.app.fx?.finish(cascade);if(cascade<3)return;const a=this.app;this.payoffs")
+rep("this.audio.swap((pa[0]+pb[0])*.5);", "this.audio.swap((pa[0]+pb[0])*.5);this.fx.swap(pa,pb);")
+rep("if(this.phase!=='intro')this.audio.land(a.at%8,distance);", "if(this.phase!=='intro'){this.audio.land(a.at%8,distance);this.fx.land(m.to,a.tile.type,distance);}")
+rep("window.__jewel={ready:false,app:a,", "window.__jewel={ready:false,app:a,fx:()=>a.fx.info(),")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')
