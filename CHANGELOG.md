@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.2.4 hosting patch 15 (2026-09-28) x5 crosses a line
+
+From the deep research on Tetris Effect and Lumines ("make 5x cross a state boundary that 1x cannot access"):
+
+- **x4 warns you:** a riser climbs toward the next step.
+- **Your first x5 is the climax:** the music drops out for a heartbeat, then slams back with a fanfare phrase you only hear here, a crash and a sub hit. Time slows to 0.3x for almost half a second while gold shock rings roll out.
+- **Then it breathes:** after a big chain the soundtrack falls back to the pad for two bars before building again.
+- **Resonance payouts have names now:** RADIANT RESONANCE, PRISMATIC RESONANCE and SUPERNOVA.
+
+## 3.2.4 hosting patch 14 (2026-09-28) The board breathes to the beat
+
+- The frame glows in the stage colour on every beat (harder on downbeats and as your flow rises) and the gems bump with it. A chain of x3 or more holds a glowing aura in the tier colour, rainbow during Resonance. Reduced motion turns the bump off.
+
 ## 3.2.4 hosting patch 13 (2026-09-28) Optional run end
 
 - **Settings > Display > Out of moves: Reshuffle or End run.** Reshuffle is the default and works exactly as before. With End run on, running out of moves dims the board and shows an OUT OF MOVES card: your score counts up, the stage you reached, NEW BEST! with fireworks, and a Play again button. It only applies when no partner is connected, so it never ends a shared board.

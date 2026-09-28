@@ -69,6 +69,10 @@ class ResonanceFX {
   if(au?.analyser&&au.ctx?.state==='running'&&!au.muted){if(!this.bins)this.bins=new Uint8Array(au.analyser.frequencyBinCount);au.analyser.getByteFrequencyData(this.bins);let s=0;for(let i=1;i<8;i++)s+=this.bins[i];bass=s/(7*255);}
   this.bass=bass>this.bass?mix(this.bass,bass,.6):this.bass*Math.exp(-dt*5);
   this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);this.resTick();
+  // Beat (patch 14): the soundtrack's own beat times when it is playing, else a game-time clock at the stage tempo.
+  {const mu=a.music,ac=a.audio?.ctx;let fire=0;if(mu&&mu.beats&&ac&&mu.ctx===ac&&ac.state==='running'&&!a.audio.muted&&!a.audio.loadedTrack){const now=ac.currentTime;while(mu.beats.length&&mu.beats[0].t<=now)fire=Math.max(fire,mu.beats.shift().down?1:.7);}
+   else{const bpm=this.stageInfo().bpm,b=Math.floor(a.time*bpm/60);if(b!==this.lastBeat){fire=b%4===0?1:.7;this.lastBeat=b;}}
+   if(fire){this.beat=Math.max(this.beat||0,fire);this.beats=(this.beats||0)+1;}this.beat=(this.beat||0)*Math.exp(-dt*7);a.beatBump=a.prefs.motion?this.beat*.022*(.45+Math.min(this.flow,1)):0;}
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -133,7 +137,7 @@ class ResonanceFX {
    sp.emit(p,[Math.cos(an)*r*s,Math.sin(an)*r*s,u*s*.6],vmul(i%4?bright:[1,.96,.88],1.2+Math.random()*1.2),.04+Math.random()*.07,t,.8+Math.random()*.9,i%3?1:10,Math.random()*100,-1.8);}
   sp.emit(p,[9,0,0],vmul(bright,.8),.3,t,.5,12,0,0);sp.emit(p,[0,0,0],vmul(bright,1.1),1.6,t,.22,8,0,0);
  }
- finish(cascade){if(cascade<3)return;const a=this.a,t=a.time,j=this.j;this.flow=Math.min(1.5,this.flow+.2);this.pulse=Math.min(1.5,this.pulse+.55);if(!this.on)return;this.stats.fountains++;
+ finish(cascade){this.climaxed=false;this.risered=false;if(cascade>=5)this.a.music?.exhale?.();if(cascade<3)return;const a=this.a,t=a.time,j=this.j;this.flow=Math.min(1.5,this.flow+.2);this.pulse=Math.min(1.5,this.pulse+.55);if(!this.on)return;this.stats.fountains++;
   const sp=a.world.sparks;this.fountain(Math.round(Math.min(1100,120*cascade)*j),t);
   if(cascade>=6)for(let k=0;k<6;k++)sp.emit([0,0,-3.4],[13+k*2.4,0,0],vmul(mixColor(GEM_COLORS[k],[1,1,1],.2),.8),1,t+k*.09,1.4,12,0,0);
  }
@@ -192,7 +196,21 @@ class ResonanceFX {
  // Combo ladder (patch 6). Every tier keeps everything below it and ADDS a new kind of response:
  // x3 a centre-stage callout + chord sting, x4 a bigger callout + sub boom, x5+ nightclub lasers in the sky,
  // speed lines and a flash (the callout and burst are drawn by CabinetUI).
- tier(c){if(c<3)return;const a=this.a;this.stats.tiers=(this.stats.tiers||0)+1;
+ // Research pass (patch 15, research/DEEP-RESEARCH-COMBO-SPECTACLE.md): 'make 5x cross a state boundary 1x cannot
+ // access'. x4 = transformation warning (a riser). The first x5 of a chain = climax with EXCLUSIVE assets: the music
+ // ducks then slams back with a fanfare phrase, crash and sub impact, a 0.45 s slow-motion presentation hold, and gold
+ // shock rings. After a x5+ chain the music exhales (pad only for two bars) before building again.
+ climax(c){const a=this.a,au=a.audio,t=a.time;if(c===4&&!this.risered){this.risered=true;this.riser();}
+  if(c>=5&&!this.climaxed){this.climaxed=true;this.stats.climaxes=(this.stats.climaxes||0)+1;a.slowUntil=performance.now()+450;a.music?.duck?.();this.fanfare();a.rumble?.(1,1,700);
+   this.pulse=1.5;this.flow=1.5;if(this.on){const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,.4-r*1.5],[9+r*7,0,0],[1,.86,.5],1.2,t+.05+r*.07,.9,12,0,0);}}}
+ riser(){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime,s=x.createBufferSource(),f=x.createBiquadFilter(),g=x.createGain(),n=x.sampleRate,b=x.createBuffer(1,n,n),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;s.buffer=b;f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(350,t);f.frequency.exponentialRampToValueAtTime(6000,t+.85);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16*Math.min(1.3,this.j),t+.8);g.gain.exponentialRampToValueAtTime(.0001,t+.95);s.connect(f);f.connect(g);g.connect(au.sfx);s.start(t);s.stop(t+1);}
+ fanfare(){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.27,j=Math.min(1.3,this.j),key=(au.key||62)+12,hz=m=>440*Math.pow(2,(m-69)/12);
+  const out=x.createGain();out.gain.value=.55*j;out.connect(au.sfx);[0,3,7,10,12,15,19,24].forEach((iv,i)=>{for(const [ty,det,v] of [['square',-6,.05],['sawtooth',6,.05]]){const o=x.createOscillator(),e=x.createGain();o.type=ty;o.frequency.value=hz(key+iv);o.detune.value=det;const s=t+i*.045;e.gain.setValueAtTime(0,s);e.gain.linearRampToValueAtTime(v,s+.01);e.gain.exponentialRampToValueAtTime(.0005,s+.9);o.connect(e);e.connect(out);o.start(s);o.stop(s+1);}});
+  const o=x.createOscillator(),e=x.createGain();o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(30,t+.6);e.gain.setValueAtTime(.5*j,t);e.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(e);e.connect(au.sfx);o.start(t);o.stop(t+.85);
+  const n=x.sampleRate*1.4,b=x.createBuffer(1,n,x.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(x.sampleRate*.35));const s=x.createBufferSource(),f=x.createBiquadFilter(),cg=x.createGain();s.buffer=b;f.type='highpass';f.frequency.value=4500;cg.gain.value=.22*j;s.connect(f);f.connect(cg);cg.connect(au.sfx);s.start(t);
+  setTimeout(()=>{try{out.disconnect();}catch{}},2500);}
+ tier(c){if(c<3)return;const a=this.a;this.stats.tiers=(this.stats.tiers||0)+1;this.climax(c);
   if(c>=5)this.laser=Math.min(1.5,Math.max(this.laser,.8)+.25+(c-5)*.1);a.ui?.callout?.(c);this.sting(c);}
  sting(c){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.01+(this.a.music?.snapWait?.(.01)||0),j=Math.min(1.3,this.j);
   const root=196*Math.pow(2,Math.min(c-3,9)*2/12),notes=[1,1.25,1.5,2,2.5,3].slice(0,Math.min(6,c));

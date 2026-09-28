@@ -303,7 +303,7 @@ rep(r"""this.coopPresence();this.drawCursor();p.submit();""", r"""this.coopPrese
 rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
     r"""const TIER_NAMES=['','','','SPARKLING','RADIANT','DAZZLING','BRILLIANT','PRISMATIC','LEGENDARY','TRANSCENDENT'];
 const TIER_COLS=['#8ff7ff','#8ff7ff','#8ff7ff','#8ff7ff','#ffe27a','#ff8ff0','#b9a4ff','#7dffb0','#ffb347','#ffffff'];
-CabinetUI.prototype.callout=function(c){const a=this.app;this.co={c,birth:a.time,name:TIER_NAMES[Math.min(c,9)]};if(c>=5)this.burst={birth:a.time,c};};
+CabinetUI.prototype.callout=function(c){const a=this.app;this.co={c,birth:a.time,name:TIER_NAMES[Math.min(c,9)]};if(c>=5)this.burst={birth:a.time,real:performance.now(),c};};
 CabinetUI.prototype.boardBox=function(){const a=this.app,p0=project(cellXY(0),a.vp,a.cssWidth,a.cssHeight),p1=project(cellXY(63),a.vp,a.cssWidth,a.cssHeight);return {cx:(p0[0]+p1[0])/2,cy:(p0[1]+p1[1])/2,bw:Math.abs(p1[0]-p0[0])*8/7};};
 CabinetUI.prototype.drawBurst=function(){const a=this.app,p=this.ink,b=this.burst;if(!b||a.panelOpen)return;const age=a.time-b.birth,L=.5;if(age<0)return;if(age>L){this.burst=null;return;}
  const {cx,cy,bw}=this.boardBox(),k=age/L,w=a.cssWidth,h=a.cssHeight,col=TIER_COLS[Math.min(b.c,9)];p.opacity=1;
@@ -390,7 +390,7 @@ rep(r"""this.toggle('particles','Particles',!!a.prefs.particles,x,yy+187,w);this
 rep(r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});""",
     r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});if(id==='flash'){const o=['full','low','off'];a.prefs.flash=o[(o.indexOf(a.prefs.flash||'full')+1)%3];a.savePreferences();a.toast('Flashes: '+({full:'Full',low:'Low',off:'Off'})[a.prefs.flash]);return;}""")
 rep(r"""if(a.prefs.motion&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f);}""",
-    r"""const FL=a.fx?a.fx.F:1;if(a.prefs.motion&&FL>0&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f*FL);}""")
+    r"""const FL=a.fx?a.fx.F:1,ra=(performance.now()-(b.real||0))/1000;if(a.prefs.motion&&FL>0&&ra<.16){const f=1-ra/.16;p.box(0,0,w,h,ra<.05?'#ffffff':col,0,.5*f*f*FL);}""")
 
 # Tront patch 11 (S94 gauntlet R6): Resonance, a shared Zone-style meter (logic in resonance.js). Here: the hook,
 # the meter under the stage bar (two colours in co-op: yours and your partner's), the callout, the golden edge
@@ -440,6 +440,21 @@ CabinetUI.prototype.drawGameOver=function(){const a=this.app,g=a.gameOver,p=this
  if(age>.8){p.opacity=1;this.button('again','Play again',cx-W*.32,y+H*.76,W*.64,Math.max(40,H*.15));}p.opacity=1;};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.drawComets();this.drawPadCursor();""", r"""this.drawComets();this.drawGameOver();this.drawPadCursor();""")
+
+# Tront patch 14 (S94 gauntlet R10): the board breathes to the beat. The frame glows in the stage colour on every
+# beat (downbeats harder, more with flow), gems bump on the beat, and a chain of x3+ holds a tier-coloured aura.
+rep(r"""const hs=1+a.hover*.095;""", r"""const hs=(1+a.hover*.095)*(1+(this.beatBump||0));""")
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""CabinetUI.prototype.drawBeat=function(){const a=this.app,fx=a.fx,p=this.ink;if(!fx||a.panelOpen||a.gameOver)return;const {cx,cy,bw}=this.boardBox(),b=fx.beat||0,flow=Math.min(fx.flow,1.2),chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=fx.res&&fx.res.on;
+ const col=res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(fx.stageInfo()),al=(.14+.6*b)*(.45+.55*Math.min(1,flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0);if(al<.02)return;
+ const h=bw*.5+16;p.opacity=1;for(const [d,th,k] of [[0,6,1],[10,16,.45],[24,30,.2]]){const r=h+d,x0=cx-r,y0=cy-r,x1=cx+r,y1=cy+r;p.poly([x0,y0,x1,y0,x1,y1,x0,y1,x0,y0],th,col,Math.min(1,al*k));}};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.coopPresence();this.drawStage();this.drawRes();""", r"""this.coopPresence();this.drawBeat();this.drawStage();this.drawRes();""")
+
+# Tront patch 15 (S94, from the deep research): x5 presentation hold (slow motion) and named Resonance payouts.
+rep(" update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}", " update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}if(this.slowUntil>performance.now())dt*=.3;")
+rep(r"""this.text((q.team?'TEAM ':'')+'RESONANCE COMPLETE',cx,cy+bw*.06,bw*.055,'#ffffff','center',bw*1.3,.14,true);""",
+    r"""this.text((q.team?'TEAM ':'')+(q.count>=90?'SUPERNOVA':q.count>=60?'PRISMATIC RESONANCE':q.count>=35?'RADIANT RESONANCE':'RESONANCE COMPLETE'),cx,cy+bw*.06,bw*.055,q.count>=60?gemHex(((a.time*10)|0)%6):'#ffffff','center',bw*1.3,.14,true);""")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

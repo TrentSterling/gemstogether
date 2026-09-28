@@ -307,5 +307,72 @@
       "probe: swaps are blocked while the card is up; clicking Play again clears it and deals a fresh board (16 legal moves), 0 errors",
       "verify 22/22"
     ]
+  },
+  {
+    "title": "Round 10 (patch 14): the board breathes to the beat",
+    "why": "Tetris Effect's pieces pulse with the music (its Mino Strobe setting), and the research says the environment should join in from x3. Before this, the board ignored the soundtrack.",
+    "before": "r8-cascade",
+    "beforeLabel": "patch 13",
+    "after": "r10-cascade",
+    "afterLabel": "patch 14 (same fixture)",
+    "changes": [
+      "The frame glows in the stage colour on every beat: harder on downbeats and as flow rises. It uses the soundtrack's own beat times, or a game-time clock when the sound is off.",
+      "Gems bump about 2% on the beat (off with reduced motion).",
+      "A chain of x3 or more holds a tier-coloured aura around the frame; it goes rainbow during Resonance."
+    ],
+    "frames": [
+      [
+        40,
+        "idle beat"
+      ],
+      [
+        112,
+        "x3 aura (aqua)"
+      ],
+      [
+        150,
+        "x4 aura (gold)"
+      ]
+    ],
+    "checks": [
+      "verify 22/22"
+    ]
+  },
+  {
+    "title": "Round 11 (patch 15): the research pass, x5 crosses a state boundary",
+    "why": "Deep research (research/DEEP-RESEARCH-COMBO-SPECTACLE.md): 'Do not make 5x merely five times as loud as 1x. Make 5x cross a state boundary that 1x cannot access.' Recommended: x4 = transformation warning; x5 = exclusive phrase, a short mix duck then impact, slow-time or a presentation hold, a distinct haptic envelope; cycle excitation and relaxation; unique names for exceptional results (Dodecatris).",
+    "before": "r10-cascade",
+    "beforeLabel": "patch 14",
+    "after": "r15-cascade",
+    "afterLabel": "patch 15 (same fixture; x5 lands at about 5.3 s)",
+    "changes": [
+      "x4: a noise riser climbs toward the next step (the transformation warning).",
+      "The first x5 of a chain is the climax, with assets nothing else uses: the music ducks for a quarter second, then slams back with an exclusive eight-note fanfare, a crash and a sub impact; game time drops to 0.3x for 0.45 s (a presentation hold); gold shock rings; the longest rumble.",
+      "The strobe runs on real time, so it stays a sharp 160 ms hit even inside the slow motion.",
+      "After any x5+ chain the soundtrack exhales: pad only for two bars, then it builds again.",
+      "Resonance payouts are named by size: RADIANT RESONANCE (35+), PRISMATIC RESONANCE (60+), SUPERNOVA (90+)."
+    ],
+    "frames": [
+      [
+        150,
+        "x4 with riser"
+      ],
+      [
+        162,
+        "x5 strobe"
+      ],
+      [
+        168,
+        "slow-motion hold"
+      ],
+      [
+        176,
+        "release"
+      ]
+    ],
+    "checks": [
+      "clip log: game time runs at 0.3x through the x5 hold (0.04 s per 4 frames against 0.133), then recovers",
+      "verify 22/22"
+    ]
   }
 ]
