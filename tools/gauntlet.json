@@ -392,5 +392,28 @@
       "verify 22/22 (includes the 390x844 phone boot and About pill clearance)",
       "phone clip: strip readable, RESONANCE and x4 callouts fit the board, 0 errors"
     ]
+  },
+  {
+    "title": "Round 13: a fresh link preview image",
+    "why": "The old preview showed the launch-day look. The new one sells the concert: a x5 callout, a stage change, lasers, Resonance glow.",
+    "before": "r0-cascade",
+    "beforeLabel": "(reference)",
+    "after": "ogres-res",
+    "afterLabel": "the real-play Resonance run the new preview was taken from",
+    "changes": [
+      "og-image.png is now frame 174 of a real-play 1280x1000 capture (x5 DAZZLING over STAGE 2 TIDEPOOL, a red-gold aura, fireworks, lasers, the Resonance edge glow), cropped to a full-bleed 1200x630 band.",
+      "Cache bumped to ?v=2 in the page meta, the tront.xyz games card and the GitHub profile README."
+    ],
+    "frames": [],
+    "images": [
+      [
+        "og-image.png",
+        "The new link preview (1200x630)"
+      ]
+    ],
+    "checks": [
+      "no letterbox bars, fills the 16:9 card crop",
+      "real play (shows Score, not Lab score)"
+    ]
   }
 ]

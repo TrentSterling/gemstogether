@@ -2,6 +2,8 @@
 
 ## 3.2.4 hosting patch 16 (2026-09-28) Phones get the journey
 
+- New link preview image: a x5 DAZZLING over a stage change, with lasers and the Resonance glow.
+
 - On phones, a strip under the Co-op Room button now shows your stage and its progress bar, plus the Resonance meter (your share and your partner's in co-op, rainbow while it runs).
 
 ## 3.2.4 hosting patch 15 (2026-09-28) x5 crosses a line
