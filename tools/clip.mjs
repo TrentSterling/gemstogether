@@ -25,6 +25,7 @@ try {
   await page.eval(`document.getElementById('trontAbout')?.style.setProperty('display','none')`);
   await until(() => page.eval(`${J}.app.phase==='idle'`), {timeout: 30000, label: 'idle'});
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
+  if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
   const step = n => page.eval(`(()=>{for(let i=0;i<${n};i++){window.__fake+=1000/60;${J}.advance(1/60);}return 1})()`);
   if (scene === 'cascade') {
     await page.eval(`${J}.fixture('cascade')`);

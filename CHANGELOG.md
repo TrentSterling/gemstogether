@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.4 hosting patch 10 (2026-09-28) Flashes setting
+
+- **Settings > Display > Flashes: Full, Low or Off.** Full is the default and nothing changes for it. Low and Off calm the x5 strobe, the sky and rim flash, the bloom swell and the glow on every match, and dim the lasers. Callouts, speed lines, particles and music stay. Measured over the same combo: Full has 5 hard flashes, Low 3 softer ones, Off none.
+
 ## 3.2.4 hosting patch 9 (2026-09-28) Gamepad support
 
 - **Plug in a controller and play** (Discord: "add gamepad support"). The D-pad or left stick moves a cursor, with key repeat. Tap A to select (or to swap with the selected neighbour), or hold A and push a direction to swap that way. B deselects, X shows a hint and Y points a gem out to your co-op partners. Start opens Settings and Back/Select opens the Co-op Room.

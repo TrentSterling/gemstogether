@@ -59,6 +59,8 @@ class ResonanceFX {
   this.field.flush();
  }
  get on(){return !!this.a.prefs.particles;}
+ // Flashes setting (patch 10): full (default) 1, low .35, off 0. Scales the sky/rim flash, bloom swell and the drop's juice glow.
+ get F(){const v=({full:1,low:.35,off:0})[this.a.prefs.flash||'full'];return v===undefined?1:v;}
  get j(){return (this.a.prefs.juice||100)/100;}
  pick(){return mixColor(GEM_COLORS[(Math.random()*6)|0],this.tint,.45);}
  frame(){
@@ -90,8 +92,8 @@ class ResonanceFX {
    for(let k=0;k<7;k++)sp.emit(a0,a1,vmul(bright,2.2-k*.25),.95-k*.11,b+k*.0045,dur,6,e*7+k,0);}
   for(const q of c){sp.emit([q[0],q[1],1.5],[0,0,0],bright,1.1,t+dur*4,.3,8,0,0);sp.emit([q[0],q[1],1.5],[0,0,0],vmul(bright,2),1.6,t+dur*4,.35,1,0,0);}}
  uniforms(u){
-  const on=this.on?1:0,calm=this.a.prefs.motion?1:.45,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
-  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
+  const on=this.on?1:0,calm=(this.a.prefs.motion?1:.45)*this.F,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
+  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5)*(.35+.65*this.F);u[29]*=.4+.6*this.F;const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }

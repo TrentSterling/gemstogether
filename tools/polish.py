@@ -383,6 +383,15 @@ rep(r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9
     r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}this.rumble?.(special||this.cascade>=5?.9:this.cascade>=3?.5:.12,.3+.1*Math.min(this.cascade,6),special?260:110+this.cascade*20);""")
 rep(r"""if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);}""", r"""if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);this.rumble?.(0,.45,70);}""")
 
+# Tront patch 10 (S94 gauntlet R5): Flashes setting (Display tab): Full (default), Low, Off. A comfort OPTION;
+# the default stays full juice. Scales the strobe, sky and rim flash, bloom swell, the drop's juice glow and lasers.
+rep(r"""this.toggle('particles','Particles',!!a.prefs.particles,x,yy+187,w);this.lineDivider(x,yy+247,w);this.button('fullscreen','Fullscreen',x,yy+268,w,42);this.button('new-board','New board',x,yy+324,w,42);end=yy+395;""",
+    r"""this.toggle('particles','Particles',!!a.prefs.particles,x,yy+187,w);this.text('Flashes',x,yy+259,15);this.button('flash',({full:'Full',low:'Low',off:'Off'})[a.prefs.flash||'full']+' >',x+w-126,yy+246,126,39);this.lineDivider(x,yy+306,w);this.button('fullscreen','Fullscreen',x,yy+327,w,42);this.button('new-board','New board',x,yy+383,w,42);end=yy+454;""")
+rep(r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});""",
+    r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});if(id==='flash'){const o=['full','low','off'];a.prefs.flash=o[(o.indexOf(a.prefs.flash||'full')+1)%3];a.savePreferences();a.toast('Flashes: '+({full:'Full',low:'Low',off:'Off'})[a.prefs.flash]);return;}""")
+rep(r"""if(a.prefs.motion&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f);}""",
+    r"""const FL=a.fx?a.fx.F:1;if(a.prefs.motion&&FL>0&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f*FL);}""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

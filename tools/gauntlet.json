@@ -175,5 +175,44 @@
       "scripted pad: cursor 27 -> 2 by D-pad taps, hold A + down swapped 2<->10 (1 move, +150), rumble fired, X showed a 2-cell hint, Y placed a point ping on the cursor cell, 0 errors",
       "not tested with a physical controller here: needs a real pad on Tront's machine"
     ]
+  },
+  {
+    "title": "Round 5 (patch 10): Flashes setting (comfort option, full juice stays the default)",
+    "why": "aFoolsDuty: a sweet combo 'probably gave someone in the world an epileptic fit'. Tetris Effect has MIN, MID and MAX effect settings. Direction: comfort is an OPTION, the default never gets toned down.",
+    "before": "r5full-cascade",
+    "beforeLabel": "Flashes: Full (the default, unchanged)",
+    "after": "r5off-cascade",
+    "afterLabel": "Flashes: Off (same combo)",
+    "changes": [
+      "Settings > Display > Flashes: Full (default), Low, Off. Saved with your settings.",
+      "It scales the x5 strobe, the sky and rim flash, the bloom swell and the drop's juice glow; lasers dim to 35% at Off. Callouts, speed lines, particles and music are untouched."
+    ],
+    "frames": [
+      [
+        112,
+        "x3"
+      ],
+      [
+        166,
+        "x5"
+      ]
+    ],
+    "images": [
+      [
+        "tools/out/clips/r5-settings.png",
+        "The new Flashes row in Settings > Display"
+      ]
+    ],
+    "videos": [
+      [
+        "r5low-cascade",
+        "Flashes: Low"
+      ]
+    ],
+    "checks": [
+      "measured over the same 6 s combo (frame mean brightness): Full 5 flashes, biggest jump 91; Low 3 flashes, biggest jump 36; Off 0 flashes, biggest jump 4",
+      "clicking the row cycles Full -> Low and saves to gemstogether-settings-v1",
+      "verify 22/22"
+    ]
   }
 ]
