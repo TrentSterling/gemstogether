@@ -9,6 +9,14 @@
    uLife.w = tint packed as r*65536 + g*256 + b (exact in fp32).
    New particle kinds: 9 field mote (orbits forever), 10 velocity streak, 11 curling ember,
    12 ring with its own expansion speed (vel.x). */
+// Journey stages (patch 8). Derived from the shared score, so co-op partners are always on the same stage.
+// Stage k starts at 5000*k*(k+1)/2 points (5K, 15K, 30K, 50K...): every stage is a little longer than the last.
+// tint = sky grade as a multiplier * 128 (128 = unchanged), packed into uUp.w. After stage 6 it loops 2..6.
+const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:84,prog:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:92,prog:1},
+ {name:'EMBER REEF',tint:[210,112,78],bpm:104,prog:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:116,prog:3},
+ {name:'STARFALL',tint:[70,96,204],bpm:96,prog:1},{name:'PRISM HEART',tint:[214,94,178],bpm:128,prog:2}];
+const FX_STAGE_GL=`vec3 fxStage(vec3 c,vec2 uv){float p=uUp.w;if(p<1.0)return c;float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;vec3 m=vec3(r,g,b)/128.0;return c*m+max(m-1.0,vec3(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
+const FX_STAGE_WG=`fn fxStage(c:vec3f,uv:vec2f)->vec3f{let p=U.up.w;if(p<1.0){return c;}let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;let m=vec3f(r,g,b)/128.0;return c*m+max(m-1.0,vec3f(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_FIELD=7000;
 const FX_MILESTONES=[5000,10000,25000,50000,100000,250000,500000,1000000];
 const FX_TINT_GL=`vec3 fxTint(float p){float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;return vec3(r,g,b)/255.0;}`;
@@ -36,7 +44,7 @@ class ResonanceFX {
  constructor(app){
   // The drop's stroke font has no '!'; milestones need one (same stroke + dot as its '?').
   if(typeof JEWEL_LETTERS==='object'&&!JEWEL_LETTERS['!'])JEWEL_LETTERS['!']=[.28,[[.14,0,.14,.68],[.14,.97,.14,1]]];
-  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.laser=0;this.bins=null;this.last=performance.now();
+  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.laser=0;this.stage=undefined;this.stTint=[128,128,128];this.bins=null;this.last=performance.now();
   this.tint=[.45,.82,1];this.target=this.tint.slice();this.stats={matches:0,fireworks:0,fountains:0};
   const q=new Geo();q.quad([-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,.5,0],[1,1,1],0,[[0,0],[1,0],[1,1],[0,1]]);
   this.field=new ParticlePool(app.renderer,q.data(),FX_FIELD,true);const rng=new SeededRandom(5150);
@@ -58,7 +66,7 @@ class ResonanceFX {
   const au=a.audio;let bass=0;
   if(au?.analyser&&au.ctx?.state==='running'&&!au.muted){if(!this.bins)this.bins=new Uint8Array(au.analyser.frequencyBinCount);au.analyser.getByteFrequencyData(this.bins);let s=0;for(let i=1;i<8;i++)s+=this.bins[i];bass=s/(7*255);}
   this.bass=bass>this.bass?mix(this.bass,bass,.6):this.bass*Math.exp(-dt*5);
-  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));
+  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -83,7 +91,7 @@ class ResonanceFX {
   for(const q of c){sp.emit([q[0],q[1],1.5],[0,0,0],bright,1.1,t+dur*4,.3,8,0,0);sp.emit([q[0],q[1],1.5],[0,0,0],vmul(bright,2),1.6,t+dur*4,.35,1,0,0);}}
  uniforms(u){
   const on=this.on?1:0,calm=this.a.prefs.motion?1:.45,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
-  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);
+  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }
@@ -153,6 +161,17 @@ class ResonanceFX {
  bump(pa,pb){if(!this.on)return;const sp=this.a.world.sparks,t=this.a.time,j=this.j,dx=pb[0]-pa[0],dy=pb[1]-pa[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
   for(const [p,s] of [[pb,1],[pa,-1]]){const e=[p[0]+ux*s*.44,p[1]+uy*s*.44,.62];
    for(let i=0;i<Math.round(22*j);i++){const side=(i&1?1:-1)*(.6+Math.random()*2.2),fw=(Math.random()*.8+.2)*s;sp.emit([e[0]+(Math.random()-.5)*.1,e[1]+(Math.random()-.5)*.1,e[2]],[-uy*side+ux*fw*.7,ux*side+uy*fw*.7,.3+Math.random()*.8],vmul([.9,.92,1],.8+Math.random()*.5),.34+Math.random()*.3,t,.28+Math.random()*.22,1,Math.random()*100,-1.5);}}}
+ stageAt(s){let k=0;while(k<60&&5000*(k+1)*(k+2)/2<=s)k++;return k;}
+ stageInfo(k=this.stage||0){const s=FX_STAGES[k<6?k:1+((k-6)%5)];return {...s,n:k+1,loop:k>=6,start:k?5000*k*(k+1)/2:0,end:5000*(k+1)*(k+2)/2};}
+ stageTick(dt){const a=this.a,k=this.stageAt(a.board?.score||0);
+  if(this.stage===undefined||k<this.stage){this.stage=k;this.stTint=this.stageInfo(k).tint.slice();}
+  else if(k>this.stage){this.stage=k;if(!a.practice)this.stageShow(k);}
+  const tg=this.stageInfo(this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
+ stageShow(k){const a=this.a,t=a.time,info=this.stageInfo(k);this.stats.stages=(this.stats.stages||0)+1;this.flow=Math.max(this.flow,1.1);this.pulse=1.5;this.laser=Math.max(this.laser,1.2);
+  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);
+  if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
+  for(let b=0;b<8;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.5),-3+Math.random()*7,-.8+Math.random()*1.2],GEM_COLORS[b%6],t+.2+b*.12,1.2);}
+  this.trace(col,t,.9);}
  // Combo ladder (patch 6). Every tier keeps everything below it and ADDS a new kind of response:
  // x3 a centre-stage callout + chord sting, x4 a bigger callout + sub boom, x5+ nightclub lasers in the sky,
  // speed lines and a flash (the callout and burst are drawn by CabinetUI).

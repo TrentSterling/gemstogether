@@ -8,7 +8,11 @@
      lead    a pentatonic phrase while the x5+ sky lasers are on
    Loading your own track (Settings > Sound) silences it; removing the track brings it back.
    The same scheduler renders offline (OfflineAudioContext) for receipts: tools/music-render.mjs. */
-const MUSIC_PROGS=[[[0,3,7],[8,12,15],[3,7,10],[10,14,17]],[[0,3,7],[5,8,12],[8,12,15],[10,14,17]]];
+// One pair of 8-bar progressions per stage family (patch 8); the pair alternates every 8 bars.
+const MUSIC_PROGS=[[[[0,3,7],[8,12,15],[3,7,10],[10,14,17]],[[0,3,7],[5,8,12],[8,12,15],[10,14,17]]],
+ [[[0,3,7],[10,14,17],[8,12,15],[10,14,17]],[[0,3,7],[7,10,14],[8,12,15],[5,8,12]]],
+ [[[0,3,7],[5,9,12],[0,3,7],[10,14,17]],[[8,12,15],[5,9,12],[3,7,10],[10,14,17]]],
+ [[[8,12,15],[10,14,17],[0,3,7],[0,3,7]],[[5,8,12],[8,12,15],[10,14,17],[7,10,14]]]];
 const MUSIC_PENTA=[0,3,5,7,10,12,15,17];
 class ResonanceMusic {
  constructor(app){this.a=app;this.bpm=84;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
@@ -27,7 +31,7 @@ class ResonanceMusic {
  hit(t,fq,type,q,peak,rel,out){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.noise;f.type=type;f.frequency.value=fq;f.Q.value=q;this.env(g,t,.002,peak,0,rel);s.connect(f);f.connect(g);g.connect(out);s.start(t,Math.random()*.5);s.stop(t+rel+.05);}
  // One 16th step at time t with layer levels lv.
  play(i,t,lv,key,flow){
-  const c=this.ctx,sp=60/this.bpm/4,bar=Math.floor(i/16),beat=i%16,prog=MUSIC_PROGS[Math.floor(bar/8)%2],chord=prog[Math.floor(bar/2)%4],root=key-12;
+  const c=this.ctx,sp=60/this.bpm/4,bar=Math.floor(i/16),beat=i%16,prog=MUSIC_PROGS[this.prog||0][Math.floor(bar/8)%2],chord=prog[Math.floor(bar/2)%4],root=key-12;
   if(lv[0]>.02&&beat===0&&bar%2===0){const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=500+Math.min(flow,1.2)*1600;lp.Q.value=.7;lp.connect(this.bus);const len=sp*32;
    for(const n of chord)for(const det of [-9,9]){this.osc('sawtooth',this.hz(root+n),t,len,.022*lv[0],1.1,1.6,lp,det);}this.osc('triangle',this.hz(root+chord[0]-12),t,len,.05*lv[0],1.1,1.6,lp);}
   if(lv[1]>.02&&(beat===0||beat===8||(flow>.8&&(beat===6||beat===14)))){const o=this.osc('triangle',this.hz(root-12+chord[0]),t,sp*3,.2*lv[1],.008,.25,this.bus);o.frequency.setValueAtTime(this.hz(root-12+chord[0]),t);}
@@ -40,6 +44,7 @@ class ResonanceMusic {
  tick(){const au=this.a.audio;const live=au?.ctx&&au.ctx.state==='running'&&!au.muted&&!au.loadedTrack&&au.music;
   if(!live){if(this.ctx&&au?.ctx===this.ctx)this.next=0;return;}
   if(this.ctx!==au.ctx)this.build(au.ctx,au.music);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
+  const info=this.a.fx?.stageInfo?.();if(info){this.prog=info.prog;if(info.bpm!==this.bpm){this.bpm=info.bpm;this.delay.delayTime.setTargetAtTime(60/this.bpm*.75,now,.1);}}
   const tg=this.targets(this.state()),ahead=document.hidden?1.2:.15;
   while(this.next<now+ahead){for(let k=0;k<5;k++)this.lv[k]=mix(this.lv[k],tg[k],k===3?.35:.08);this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
  // Offline: schedule [0, seconds) from a state curve fn(t) -> {flow, laser, cascade}.

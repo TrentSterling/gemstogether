@@ -486,6 +486,14 @@ const QUAD_WG=`struct QOut{@builtin(position) pos:vec4f,@location(0) uv:vec2f};@
    uLife.w = tint packed as r*65536 + g*256 + b (exact in fp32).
    New particle kinds: 9 field mote (orbits forever), 10 velocity streak, 11 curling ember,
    12 ring with its own expansion speed (vel.x). */
+// Journey stages (patch 8). Derived from the shared score, so co-op partners are always on the same stage.
+// Stage k starts at 5000*k*(k+1)/2 points (5K, 15K, 30K, 50K...): every stage is a little longer than the last.
+// tint = sky grade as a multiplier * 128 (128 = unchanged), packed into uUp.w. After stage 6 it loops 2..6.
+const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:84,prog:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:92,prog:1},
+ {name:'EMBER REEF',tint:[210,112,78],bpm:104,prog:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:116,prog:3},
+ {name:'STARFALL',tint:[70,96,204],bpm:96,prog:1},{name:'PRISM HEART',tint:[214,94,178],bpm:128,prog:2}];
+const FX_STAGE_GL=`vec3 fxStage(vec3 c,vec2 uv){float p=uUp.w;if(p<1.0)return c;float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;vec3 m=vec3(r,g,b)/128.0;return c*m+max(m-1.0,vec3(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
+const FX_STAGE_WG=`fn fxStage(c:vec3f,uv:vec2f)->vec3f{let p=U.up.w;if(p<1.0){return c;}let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;let m=vec3f(r,g,b)/128.0;return c*m+max(m-1.0,vec3f(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_FIELD=7000;
 const FX_MILESTONES=[5000,10000,25000,50000,100000,250000,500000,1000000];
 const FX_TINT_GL=`vec3 fxTint(float p){float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;return vec3(r,g,b)/255.0;}`;
@@ -513,7 +521,7 @@ class ResonanceFX {
  constructor(app){
   // The drop's stroke font has no '!'; milestones need one (same stroke + dot as its '?').
   if(typeof JEWEL_LETTERS==='object'&&!JEWEL_LETTERS['!'])JEWEL_LETTERS['!']=[.28,[[.14,0,.14,.68],[.14,.97,.14,1]]];
-  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.laser=0;this.bins=null;this.last=performance.now();
+  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.laser=0;this.stage=undefined;this.stTint=[128,128,128];this.bins=null;this.last=performance.now();
   this.tint=[.45,.82,1];this.target=this.tint.slice();this.stats={matches:0,fireworks:0,fountains:0};
   const q=new Geo();q.quad([-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,.5,0],[1,1,1],0,[[0,0],[1,0],[1,1],[0,1]]);
   this.field=new ParticlePool(app.renderer,q.data(),FX_FIELD,true);const rng=new SeededRandom(5150);
@@ -535,7 +543,7 @@ class ResonanceFX {
   const au=a.audio;let bass=0;
   if(au?.analyser&&au.ctx?.state==='running'&&!au.muted){if(!this.bins)this.bins=new Uint8Array(au.analyser.frequencyBinCount);au.analyser.getByteFrequencyData(this.bins);let s=0;for(let i=1;i<8;i++)s+=this.bins[i];bass=s/(7*255);}
   this.bass=bass>this.bass?mix(this.bass,bass,.6):this.bass*Math.exp(-dt*5);
-  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));
+  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -560,7 +568,7 @@ class ResonanceFX {
   for(const q of c){sp.emit([q[0],q[1],1.5],[0,0,0],bright,1.1,t+dur*4,.3,8,0,0);sp.emit([q[0],q[1],1.5],[0,0,0],vmul(bright,2),1.6,t+dur*4,.35,1,0,0);}}
  uniforms(u){
   const on=this.on?1:0,calm=this.a.prefs.motion?1:.45,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
-  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);
+  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }
@@ -630,6 +638,17 @@ class ResonanceFX {
  bump(pa,pb){if(!this.on)return;const sp=this.a.world.sparks,t=this.a.time,j=this.j,dx=pb[0]-pa[0],dy=pb[1]-pa[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
   for(const [p,s] of [[pb,1],[pa,-1]]){const e=[p[0]+ux*s*.44,p[1]+uy*s*.44,.62];
    for(let i=0;i<Math.round(22*j);i++){const side=(i&1?1:-1)*(.6+Math.random()*2.2),fw=(Math.random()*.8+.2)*s;sp.emit([e[0]+(Math.random()-.5)*.1,e[1]+(Math.random()-.5)*.1,e[2]],[-uy*side+ux*fw*.7,ux*side+uy*fw*.7,.3+Math.random()*.8],vmul([.9,.92,1],.8+Math.random()*.5),.34+Math.random()*.3,t,.28+Math.random()*.22,1,Math.random()*100,-1.5);}}}
+ stageAt(s){let k=0;while(k<60&&5000*(k+1)*(k+2)/2<=s)k++;return k;}
+ stageInfo(k=this.stage||0){const s=FX_STAGES[k<6?k:1+((k-6)%5)];return {...s,n:k+1,loop:k>=6,start:k?5000*k*(k+1)/2:0,end:5000*(k+1)*(k+2)/2};}
+ stageTick(dt){const a=this.a,k=this.stageAt(a.board?.score||0);
+  if(this.stage===undefined||k<this.stage){this.stage=k;this.stTint=this.stageInfo(k).tint.slice();}
+  else if(k>this.stage){this.stage=k;if(!a.practice)this.stageShow(k);}
+  const tg=this.stageInfo(this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
+ stageShow(k){const a=this.a,t=a.time,info=this.stageInfo(k);this.stats.stages=(this.stats.stages||0)+1;this.flow=Math.max(this.flow,1.1);this.pulse=1.5;this.laser=Math.max(this.laser,1.2);
+  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);
+  if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
+  for(let b=0;b<8;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.5),-3+Math.random()*7,-.8+Math.random()*1.2],GEM_COLORS[b%6],t+.2+b*.12,1.2);}
+  this.trace(col,t,.9);}
  // Combo ladder (patch 6). Every tier keeps everything below it and ADDS a new kind of response:
  // x3 a centre-stage callout + chord sting, x4 a bigger callout + sub boom, x5+ nightclub lasers in the sky,
  // speed lines and a flash (the callout and burst are drawn by CabinetUI).
@@ -656,7 +675,11 @@ class ResonanceFX {
      lead    a pentatonic phrase while the x5+ sky lasers are on
    Loading your own track (Settings > Sound) silences it; removing the track brings it back.
    The same scheduler renders offline (OfflineAudioContext) for receipts: tools/music-render.mjs. */
-const MUSIC_PROGS=[[[0,3,7],[8,12,15],[3,7,10],[10,14,17]],[[0,3,7],[5,8,12],[8,12,15],[10,14,17]]];
+// One pair of 8-bar progressions per stage family (patch 8); the pair alternates every 8 bars.
+const MUSIC_PROGS=[[[[0,3,7],[8,12,15],[3,7,10],[10,14,17]],[[0,3,7],[5,8,12],[8,12,15],[10,14,17]]],
+ [[[0,3,7],[10,14,17],[8,12,15],[10,14,17]],[[0,3,7],[7,10,14],[8,12,15],[5,8,12]]],
+ [[[0,3,7],[5,9,12],[0,3,7],[10,14,17]],[[8,12,15],[5,9,12],[3,7,10],[10,14,17]]],
+ [[[8,12,15],[10,14,17],[0,3,7],[0,3,7]],[[5,8,12],[8,12,15],[10,14,17],[7,10,14]]]];
 const MUSIC_PENTA=[0,3,5,7,10,12,15,17];
 class ResonanceMusic {
  constructor(app){this.a=app;this.bpm=84;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
@@ -675,7 +698,7 @@ class ResonanceMusic {
  hit(t,fq,type,q,peak,rel,out){const c=this.ctx,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=this.noise;f.type=type;f.frequency.value=fq;f.Q.value=q;this.env(g,t,.002,peak,0,rel);s.connect(f);f.connect(g);g.connect(out);s.start(t,Math.random()*.5);s.stop(t+rel+.05);}
  // One 16th step at time t with layer levels lv.
  play(i,t,lv,key,flow){
-  const c=this.ctx,sp=60/this.bpm/4,bar=Math.floor(i/16),beat=i%16,prog=MUSIC_PROGS[Math.floor(bar/8)%2],chord=prog[Math.floor(bar/2)%4],root=key-12;
+  const c=this.ctx,sp=60/this.bpm/4,bar=Math.floor(i/16),beat=i%16,prog=MUSIC_PROGS[this.prog||0][Math.floor(bar/8)%2],chord=prog[Math.floor(bar/2)%4],root=key-12;
   if(lv[0]>.02&&beat===0&&bar%2===0){const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=500+Math.min(flow,1.2)*1600;lp.Q.value=.7;lp.connect(this.bus);const len=sp*32;
    for(const n of chord)for(const det of [-9,9]){this.osc('sawtooth',this.hz(root+n),t,len,.022*lv[0],1.1,1.6,lp,det);}this.osc('triangle',this.hz(root+chord[0]-12),t,len,.05*lv[0],1.1,1.6,lp);}
   if(lv[1]>.02&&(beat===0||beat===8||(flow>.8&&(beat===6||beat===14)))){const o=this.osc('triangle',this.hz(root-12+chord[0]),t,sp*3,.2*lv[1],.008,.25,this.bus);o.frequency.setValueAtTime(this.hz(root-12+chord[0]),t);}
@@ -688,6 +711,7 @@ class ResonanceMusic {
  tick(){const au=this.a.audio;const live=au?.ctx&&au.ctx.state==='running'&&!au.muted&&!au.loadedTrack&&au.music;
   if(!live){if(this.ctx&&au?.ctx===this.ctx)this.next=0;return;}
   if(this.ctx!==au.ctx)this.build(au.ctx,au.music);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
+  const info=this.a.fx?.stageInfo?.();if(info){this.prog=info.prog;if(info.bpm!==this.bpm){this.bpm=info.bpm;this.delay.delayTime.setTargetAtTime(60/this.bpm*.75,now,.1);}}
   const tg=this.targets(this.state()),ahead=document.hidden?1.2:.15;
   while(this.next<now+ahead){for(let k=0;k<5;k++)this.lv[k]=mix(this.lv[k],tg[k],k===3?.35:.08);this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
  // Offline: schedule [0, seconds) from a state curve fn(t) -> {flow, laser, cascade}.
@@ -695,8 +719,8 @@ class ResonanceMusic {
 }
 
 const SKY_GL_FS=`#version 300 es
-precision highp float;${GL_UNIFORMS}in vec2 vUV;out vec4 outColor;${SHARED_SHADER}${FX_TINT_GL}${FX_SKY_GL}void main(){outColor=vec4(skyColor(vUV,uParams.z,uParams.x)+fxSky(vUV,uParams.z),1.0);}`;
-const SKY_WG=`${WG_UNIFORMS}${QUAD_WG}${toWGSL(SHARED_SHADER)}${FX_TINT_WG}${FX_SKY_WG}@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x)+fxSky(vec2f(a.uv.x,1.0-a.uv.y),U.params.z),1.0);}`;
+precision highp float;${GL_UNIFORMS}in vec2 vUV;out vec4 outColor;${SHARED_SHADER}${FX_TINT_GL}${FX_SKY_GL}${FX_STAGE_GL}void main(){outColor=vec4(fxStage(skyColor(vUV,uParams.z,uParams.x),vUV)+fxSky(vUV,uParams.z),1.0);}`;
+const SKY_WG=`${WG_UNIFORMS}${QUAD_WG}${toWGSL(SHARED_SHADER)}${FX_TINT_WG}${FX_SKY_WG}${FX_STAGE_WG}@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(fxStage(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x),vec2f(a.uv.x,1.0-a.uv.y))+fxSky(vec2f(a.uv.x,1.0-a.uv.y),U.params.z),1.0);}`;
 const PARTICLE_GL_VS=`#version 300 es
 precision highp float;
 layout(location=0)in vec3 aPos;layout(location=1)in vec3 aNormal;layout(location=4)in vec2 aUV;
@@ -1209,10 +1233,10 @@ class CabinetUI {
   const tan=Math.tan(21*PI/180),aspect=w/h,framing=cabinetFraming(w,h),z=framing.distance;const stable=matMul(perspective(42*PI/180,aspect,.1,150),lookAt([0,.62,z],[0,0,0],[0,1,0]));const screen=pos=>project(pos,stable,w,h);
   const [left,top]=screen([-3.98,4.02,.15]),[right,bottom]=screen([3.98,-4.1,.15]);this.boardRect={x:left,y:top,w:right-left,h:bottom-top};const wide=framing.wide;this.wide=wide;
   if(wide){const nw=Math.min(350,(right-left)*.77),nh=h<460?34:43,ny=Math.max(5,top-nh-5);this.plaque(w/2-nw/2,ny,nw,nh);this.text(GAME_BRAND.wordmark,w/2,ny+9,h<460?18:23,UI_ART.highlight,'center',nw-34,.12,true);
-   const sw=Math.min(208,left-54),sx=left-sw-25,sy=top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
+   const sw=Math.min(208,left-54),sx=left-sw-25,sy=top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
   }else{
    const nw=Math.min(w-28,350),titleY=Math.max(10,top-93);this.plaque(w/2-nw/2,titleY,nw,40);this.text(GAME_BRAND.wordmark,w/2,titleY+11,21,UI_ART.highlight,'center',nw-30,.12,true);
-   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
+   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
   }
   const gap=7,railW=Math.min(w-24,528),bw=(railW-gap*3)/4,rx=(w-railW)/2,ry=Math.min(h-57,bottom+28);if(a.aaCompare){const cw=(railW-gap*2)/3;this.button('aa-on','AA on',rx,ry,cw,42,!a.aaCompareBypass);this.button('aa-off','AA off',rx+cw+gap,ry,cw,42,a.aaCompareBypass);this.button('aa-done','Done',rx+2*(cw+gap),ry,cw,42);this.text('Frozen frame / '+(a.aaCompareBypass?'AA off':({off:'Off',fxaa:'FXAA',msaa:'4x MSAA',hybrid:'MSAA + FXAA'})[a.effectiveAA]),w/2,Math.min(h-17,ry+55),11,UI_ART.aqua,'center',w-24);}else{this.coopRail(bottom);this.coopBadge();}
   if(w>=600&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0&&!a.practice&&!a.coop?.code){this.text('Drag a gem to its neighbour',w/2,Math.min(h-17,ry+55),11,UI_ART.dim,'center',w-28);}
@@ -1325,7 +1349,7 @@ class CabinetUI {
  }
  draw(){const a=this.app,p=this.ink;p.begin(a.cssWidth,a.cssHeight);this.hits=[];
   this.floats=this.floats.filter(f=>a.time-f.birth<(f.life||1.1));for(const f of this.floats){const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos,a.vp,a.cssWidth,a.cssHeight),alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);p.opacity=alpha;this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40),.12,true);}p.opacity=1;
-  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();
+  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();
  }
 }
 
@@ -2397,6 +2421,16 @@ CabinetUI.prototype.drawCallout=function(){const a=this.app,o=this.co;if(!o||a.p
  p.opacity=al;const y=cy-size*.72*s,rise=-(age>.8?(age-.8)*40:0);
  this.text('x'+c,cx+shake,y+rise,size*s,col,'center',Infinity,.2,true);
  this.text(o.name,cx-shake*.5,cy+size*.36*s+rise,size*.3*Math.max(1,s*.9),'#ffffff','center',bw*1.25,.16,true);p.opacity=1;};
+const stageHex=info=>'#'+info.tint.map(v=>Math.round(clamp(v/170,.35,1)*255).toString(16).padStart(2,'0')).join('');
+CabinetUI.prototype.stageCallout=function(info){this.sc={...info,birth:this.app.time};};
+CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||fx.stage===undefined||a.panelOpen)return;const info=fx.stageInfo(),col=stageHex(info);p.opacity=1;
+ if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
+  this.text('STAGE '+info.n+(info.loop?'  ENCORE':''),x+4,yy,11,col,'left',w,.12,true);this.text(info.name,x+4,yy+15,15,'#ffffff','left',w-8,.14,true);
+  p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);}
+ const o=this.sc;if(!o)return;const age=a.time-o.birth,L=2.6;if(age<0)return;if(age>L){this.sc=null;return;}
+ const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
+ p.opacity=clamp(inn*3,0,1)*(1-out);const Y=cy+bw*.04;p.box(cx-bw*.62+dx,Y,bw*1.24,bw*.34,'#071418',10,.85);p.box(cx-bw*.62+dx,Y,bw*1.24,5,oc,2,1);p.box(cx-bw*.62+dx,Y+bw*.34-5,bw*1.24,5,oc,2,1);
+ this.text('STAGE '+o.n+(o.loop?'  ENCORE':''),cx+dx,Y+bw*.035,bw*.07,oc,'center',bw*1.2,.14,true);this.text(o.name,cx+dx*1.15,Y+bw*.13,bw*.14,'#ffffff','center',bw*1.2,.18,true);p.opacity=1;};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;
 CabinetUI.prototype.coopBadge=function(){
  const a=this.app,n=a.coop;if(!n?.publicRoom)return privateCoopBadge.call(this);

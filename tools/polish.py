@@ -326,6 +326,28 @@ rep("this.fx=new ResonanceFX(this);", "this.fx=new ResonanceFX(this);this.music=
 rep("this.fx.frame();this.fx.uniforms(u);", "this.fx.frame();this.music?.tick();this.fx.uniforms(u);")
 rep("fx:()=>a.fx.info(),", "fx:()=>a.fx.info(),music:()=>({...a.music.stats,lv:a.music.lv.map(v=>+v.toFixed(2)),step:a.music.step,live:!!a.music.ctx}),")
 
+# Tront patch 8 (S94 gauntlet R3): journey stages. Stage logic + sky grade in resonance.js, tempo/progression in
+# music.js; here: the sky multiply, the stage card, and a stage line + progress bar under the score plaque.
+rep(r"""${FX_TINT_GL}${FX_SKY_GL}void main(){outColor=vec4(skyColor(vUV,uParams.z,uParams.x)+fxSky(""",
+    r"""${FX_TINT_GL}${FX_SKY_GL}${FX_STAGE_GL}void main(){outColor=vec4(fxStage(skyColor(vUV,uParams.z,uParams.x),vUV)+fxSky(""")
+rep(r"""${FX_TINT_WG}${FX_SKY_WG}@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x)+fxSky(""",
+    r"""${FX_TINT_WG}${FX_SKY_WG}${FX_STAGE_WG}@fragment fn fs(a:QOut)->@location(0) vec4f{return vec4f(fxStage(skyColor(vec2f(a.uv.x,1.0-a.uv.y),U.params.z,U.params.x),vec2f(a.uv.x,1.0-a.uv.y))+fxSky(""")
+rep(r"""this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];""", r"""this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];""")
+rep(r"""this.scoreAt=[w/2-40,sy+17];""", r"""this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;""")
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""const stageHex=info=>'#'+info.tint.map(v=>Math.round(clamp(v/170,.35,1)*255).toString(16).padStart(2,'0')).join('');
+CabinetUI.prototype.stageCallout=function(info){this.sc={...info,birth:this.app.time};};
+CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||fx.stage===undefined||a.panelOpen)return;const info=fx.stageInfo(),col=stageHex(info);p.opacity=1;
+ if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
+  this.text('STAGE '+info.n+(info.loop?'  ENCORE':''),x+4,yy,11,col,'left',w,.12,true);this.text(info.name,x+4,yy+15,15,'#ffffff','left',w-8,.14,true);
+  p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);}
+ const o=this.sc;if(!o)return;const age=a.time-o.birth,L=2.6;if(age<0)return;if(age>L){this.sc=null;return;}
+ const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
+ p.opacity=clamp(inn*3,0,1)*(1-out);const Y=cy+bw*.04;p.box(cx-bw*.62+dx,Y,bw*1.24,bw*.34,'#071418',10,.85);p.box(cx-bw*.62+dx,Y,bw*1.24,5,oc,2,1);p.box(cx-bw*.62+dx,Y+bw*.34-5,bw*1.24,5,oc,2,1);
+ this.text('STAGE '+o.n+(o.loop?'  ENCORE':''),cx+dx,Y+bw*.035,bw*.07,oc,'center',bw*1.2,.14,true);this.text(o.name,cx+dx*1.15,Y+bw*.13,bw*.14,'#ffffff','center',bw*1.2,.18,true);p.opacity=1;};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();""", r"""this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

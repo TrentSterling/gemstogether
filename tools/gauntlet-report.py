@@ -55,8 +55,13 @@ for r in rounds:
         if src.exists():
             shutil.copy(src, G / 'media' / src.name)
             extra += f'<figure><img src="media/{src.name}" alt="{cap}"><figcaption>{cap}</figcaption></figure>'
+    for v, cap in r.get('videos', []):
+        src = CL / f'{v}.mp4'
+        if src.exists():
+            shutil.copy(src, G / 'media' / src.name)
+            extra += f'<figure><video src="media/{src.name}" autoplay loop muted playsinline controls></video><figcaption>{cap}</figcaption></figure>'
     if extra:
-        pairs += '<h3>Listen</h3>' + extra
+        pairs += '<h3>More</h3>' + extra
     checks = ''.join(f'<li>{c}</li>' for c in r.get('checks', []))
     notes = ''.join(f'<li>{n}</li>' for n in r.get('changes', []))
     secs.append(f'<section><h2>{r["title"]}</h2><p class="why">{r.get("why", "")}</p><h3>What changed</h3><ul>{notes}</ul>'

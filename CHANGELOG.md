@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.2.4 hosting patch 8 (2026-09-28) The journey
+
+Zen/endless now travels (Discord: "switch up the stage/background/theme/music after each XX points, like progressing a level"). Endless is still endless; the journey rides on top.
+
+- **Six stages:** DAWN SHALLOWS, TIDEPOOL, EMBER REEF, AURORA DEEP, STARFALL and PRISM HEART, then ENCORE laps. The stage lines sit at 5K, 15K, 30K, 50K, 75K and so on, each stage a little longer than the last. The stage comes from the shared score, so co-op partners always travel together.
+- **Every stage grades the whole sky** (with a glow along the horizon in its colour) and crossfades over a few seconds.
+- **Every stage changes the music:** its own tempo, from 84 to 128 BPM, and its own chord progressions.
+- **Crossing a stage line is a show:** a stage card slides in, lasers, world rings, fireworks and a light chase around the frame.
+- **Under the score:** the stage number, its name and a progress bar to the next one.
+
 ## 3.2.4 hosting patch 7 (2026-09-28) Resonance music
 
 The game now has a soundtrack that plays along with you (Discord: "next up is ambient music").

@@ -110,5 +110,50 @@
       "live path: after one real click the realtime scheduler is producing notes (pad level 0.64 at 2.5 s)",
       "not verified by ear: I cannot listen, so the musical taste is Tront's call"
     ]
+  },
+  {
+    "title": "Round 3 (patch 8): the journey, zen/endless moves through stages",
+    "why": "Andre: 'for zen/endless to also feel like progression you can switch up the stage/background/theme/music after each XX points', and 'animating the background so it feels like a journey'. Endless stays endless (Jennifer's favourite); the journey rides on top.",
+    "before": "r2-stage",
+    "beforeLabel": "patch 7: crossing 5,000 points (only the 5K milestone)",
+    "after": "r3-stage",
+    "afterLabel": "patch 8: the same move, now STAGE 2 TIDEPOOL",
+    "changes": [
+      "Six stages, set by the shared score (so co-op partners always match): DAWN SHALLOWS, TIDEPOOL, EMBER REEF, AURORA DEEP, STARFALL, PRISM HEART, then ENCORE loops. Stage lines at 5K, 15K, 30K, 50K, 75K...; every stage is a little longer than the last.",
+      "Each stage grades the whole sky (a colour multiply plus a stage-coloured horizon glow) and crossfades over a few seconds.",
+      "Each stage changes the music: its own tempo (84 to 128 BPM) and chord progression family.",
+      "Crossing a stage line is a show: a stage card slides in under the board centre (so a milestone banner can share the moment), lasers, three world rings, eight fireworks and a frame light chase.",
+      "Under the score: STAGE n, its name and a progress bar to the next stage."
+    ],
+    "frames": [
+      [
+        20,
+        "just before the line"
+      ],
+      [
+        45,
+        "crossing"
+      ],
+      [
+        90,
+        "card sliding out"
+      ],
+      [
+        140,
+        "settled in the new stage"
+      ]
+    ],
+    "images": [],
+    "checks": [
+      "verify 22/22",
+      "journey tour clip (tools/out/clips/r3-tour.mp4): all six stages plus ENCORE, each with a distinct sky, 0 errors",
+      "stage is a pure function of score, so both co-op screens show the same stage"
+    ],
+    "videos": [
+      [
+        "r3-tour",
+        "Journey tour: every stage line in turn (score jumped to each line every 2 s)"
+      ]
+    ]
   }
 ]

@@ -17,6 +17,7 @@ mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
 const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H});
 const log = [];
+let tour = false;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
@@ -31,11 +32,20 @@ try {
     await step(30);
     await page.eval(`(()=>{const a=${J}.app,b=a.board,legal=new Set(b.legalMoves().flatMap(m=>[m.join(','),[m[1],m[0]].join(',')]));
       for(const i of [27,28,35,36,26,29,34,37]){const j=i+1;if(!legal.has(i+','+j)&&b.cells[i].type!==b.cells[j].type)return ${J}.swap(i,j);}})()`);
+  } else if (scene === 'stage') {
+    // Sit just under the first stage line (5,000) and play a real legal move across it.
+    await page.eval(`(()=>{const a=${J}.app;a.board.score=4970;a.displayScore=4970;})()`);
+    await step(20);
+    await page.eval(`(()=>{const m=${J}.app.board.legalMoves()[0];return ${J}.swap(m[0],m[1])})()`);
+  } else if (scene === 'tour') {
+    // All six journey stages: jump the score to each stage line every 2 s (drives the real stage shows).
+    tour = true;
   } else if (scene === 'showcase') {
     await page.eval(`${J}.showcase()`);
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if (tour && f % 60 === 10) await page.eval(`(()=>{const a=${J}.app,k=${Math.floor(f / 60) + 1},s=5000*k*(k+1)/2+10;a.board.score=s;a.displayScore=s;})()`);
     await page.shot(`${dir}/${String(f).padStart(3, '0')}.png`);
     const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);
     log.push(s);
