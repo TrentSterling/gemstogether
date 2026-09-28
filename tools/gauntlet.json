@@ -449,5 +449,76 @@
       "tools/music-latch.mjs on both builds (the same scripted burst)",
       "verify 22/22"
     ]
+  },
+  {
+    "title": "Round 15 (patch 19): viz pass, every light grounded to its thing",
+    "why": "Tront: 'line up these lights... I love perspective 3d camera, I just don't want things offset or inset. If the gems are the flashing light thing, make it the thing and ground it to the thing.' The frame light chase ran on a smaller square (3.62) floated at z 1.5 and relied on parallax, so its corner flashes landed inside the corner orbs, worst on phones.",
+    "before": "r10-cascade",
+    "beforeLabel": "(see the corner sheets)",
+    "after": "al1280-cascade",
+    "afterLabel": "patch 19 at 1280x800",
+    "changes": [
+      "The light chase and corner flashes are pinned to the real cabinet: rails at +-4.08, corner orbs at (+-4.10, +-4.10), riding just in front of the gold (z .56 top, .66 bottom), so they land on the orbs at every window size.",
+      "The beat aura is drawn through the camera on the real rails (4.08, 4.24, 4.44), so it keeps the frame's perspective instead of a guessed screen square.",
+      "The gamepad cursor sits at gem depth instead of floating in front."
+    ],
+    "frames": [],
+    "images": [
+      [
+        "tools/out/align/before-sheet.png",
+        "Before: corner flashes vs the true orb centre (green cross) at 1280x800, 1920x1080 and 390x844"
+      ],
+      [
+        "tools/out/align/after-sheet.png",
+        "After: every flash centred on its orb at all three sizes"
+      ]
+    ],
+    "videos": [
+      [
+        "al390-cascade",
+        "Phone: the aura hugs the rails"
+      ]
+    ],
+    "checks": [
+      "tools/align-audit.mjs + tools/align-sheet.py at 3 window sizes",
+      "verify 22/22"
+    ]
+  },
+  {
+    "title": "Round 16 (patch 20): stage backgrounds swap",
+    "why": "Tront on Discord: 'maybe do the background swaps we talked about / level up progression'. Stages only re-tinted the sky.",
+    "before": "r3-tour",
+    "beforeLabel": "patch 8 tour (tint only)",
+    "after": "r20-tour",
+    "afterLabel": "patch 20 tour",
+    "changes": [
+      "Each stage rebuilds the 7,000-mote background field into its own form under the stage flash: DAWN the six-arm spiral, TIDEPOOL concentric ripples, EMBER REEF a dense ember core with drifting sparks, AURORA DEEP wavy curtains, STARFALL a wide sparse starfield with big bright stars, PRISM HEART a tight twelve-arm rainbow. A new board rebuilds silently for its stage."
+    ],
+    "frames": [
+      [
+        55,
+        "TIDEPOOL"
+      ],
+      [
+        115,
+        "EMBER REEF"
+      ],
+      [
+        175,
+        "AURORA DEEP"
+      ],
+      [
+        235,
+        "STARFALL"
+      ],
+      [
+        295,
+        "PRISM HEART"
+      ]
+    ],
+    "checks": [
+      "verify 22/22",
+      "tour clip, 0 errors"
+    ]
   }
 ]

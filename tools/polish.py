@@ -373,7 +373,7 @@ rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
  snap();};
 JewelApp.prototype.rumble=function(strong,weak,ms){const g=this.pad!=null&&navigator.getGamepads?navigator.getGamepads()[this.pad]:null,v=g&&g.vibrationActuator;if(!v||this.prefs.juice<=0)return;try{v.playEffect('dual-rumble',{duration:ms,strongMagnitude:clamp(strong,0,1),weakMagnitude:clamp(weak,0,1)});}catch{}};
 CabinetUI.prototype.drawPadCursor=function(){const a=this.app,p=this.ink;if(!a.keyboardActive||a.panelOpen||a.auto)return;const i=a.keyboardCell,ac=a.getActor(i);if(!ac)return;
- const pos=ac.pos,q0=project([pos[0]-.5,pos[1]+.5,.7],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.5,pos[1]-.5,.7],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
+ const pos=ac.pos,q0=project([pos[0]-.47,pos[1]+.47,.3],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.47,pos[1]-.47,.3],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
  const pulse=.5+.5*Math.sin(performance.now()*.008),col=armed?'#86e5ed':'#ffd98a',th=3+pulse*1.5,L=w*.34;p.opacity=1;
  for(const [px,py,sx,sy] of [[x,y,1,1],[X,y,-1,1],[x,Y,1,-1],[X,Y,-1,-1]])p.poly([px+sx*L,py,px,py,px,py+sy*L],th,col,.95);
  p.box(x-3,y-3,w+6,Y-y+6,col,8,.10+.08*pulse);
@@ -453,7 +453,10 @@ rep(r"""const hs=1+a.hover*.095;""", r"""const hs=(1+a.hover*.095)*(1+(this.beat
 rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
     r"""CabinetUI.prototype.drawBeat=function(){const a=this.app,fx=a.fx,p=this.ink;if(!fx||a.panelOpen||a.gameOver)return;const {cx,cy,bw}=this.boardBox(),b=fx.beat||0,flow=Math.min(fx.flow,1.2),chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=fx.res&&fx.res.on;
  const col=res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(fx.stageInfo()),al=(.14+.6*b)*(.45+.55*Math.min(1,flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0);if(al<.02)return;
- const h=bw*.5+16;p.opacity=1;for(const [d,th,k] of [[0,6,1],[10,16,.45],[24,30,.2]]){const r=h+d,x0=cx-r,y0=cy-r,x1=cx+r,y1=cy+r;p.poly([x0,y0,x1,y0,x1,y1,x0,y1,x0,y0],th,col,Math.min(1,al*k));}};
+ p.opacity=1;const P=(x,y,z)=>project([x,y,z],a.vp,a.cssWidth,a.cssHeight);
+ // Pinned to the real rails (patch 19): the gold frame runs at +-4.08 (outer rim 4.22), front near z .3. Projected
+ // through the camera, so the glow keeps the frame's perspective at every window size instead of a guessed square.
+ for(const [E,th,k] of [[4.08,6,1],[4.24,16,.45],[4.44,30,.2]]){const q=[P(-E,E,.3),P(E,E,.3),P(E,-E,.36),P(-E,-E,.36)];p.poly([q[0][0],q[0][1],q[1][0],q[1][1],q[2][0],q[2][1],q[3][0],q[3][1],q[0][0],q[0][1]],th,col,Math.min(1,al*k));}};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.coopPresence();this.drawStage();this.drawRes();""", r"""this.coopPresence();this.drawBeat();this.drawStage();this.drawRes();""")
 

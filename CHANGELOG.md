@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.4 hosting patch 20 (2026-09-28) Every stage gets its own sky
+
+- **Backgrounds swap with the stage.** Behind the cabinet, the field of light rebuilds into a new shape at every stage line: TIDEPOOL ripples, EMBER REEF embers, AURORA DEEP curtains, STARFALL stars, PRISM HEART's twelve-arm rainbow.
+
+## 3.2.4 hosting patch 19 (2026-09-28) Lights sit where they belong
+
+- The light that races around the frame, and the flashes on its corners, now ride the real gold rails and land exactly on the corner orbs at every window size (they were slightly off on desktop and well off on phones). The beat glow follows the rails through the camera's perspective, and the gamepad cursor sits on the gems instead of floating in front.
+
 ## 3.2.4 hosting patch 18 (2026-09-28) The music holds what you earn
 
 From Andre on Discord: "the increase in intensity and layering is cool, it should probably not drop back to base layer so quickly" and "not sure about the speed up".
