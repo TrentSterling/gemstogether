@@ -462,6 +462,14 @@ rep(" update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}", " update(dt)
 rep(r"""this.text((q.team?'TEAM ':'')+'RESONANCE COMPLETE',cx,cy+bw*.06,bw*.055,'#ffffff','center',bw*1.3,.14,true);""",
     r"""this.text((q.team?'TEAM ':'')+(q.count>=90?'SUPERNOVA':q.count>=60?'PRISMATIC RESONANCE':q.count>=35?'RADIANT RESONANCE':'RESONANCE COMPLETE'),cx,cy+bw*.06,bw*.055,q.count>=60?gemHex(((a.time*10)|0)%6):'#ffffff','center',bw*1.3,.14,true);""")
 
+# Tront patch 17 (bug from Andre on Discord): Animation speed was never saved; the slider only set app.animSpeed.
+# Now it saves to prefs.animSpeed and restores at boot (and the slider shows it). Co-op still follows the host's speed.
+rep(r"""$('anim-speed').oninput=e=>{this.animSpeed=+e.target.value/100;};""", r"""$('anim-speed').oninput=e=>{this.animSpeed=+e.target.value/100;this.prefs.animSpeed=this.animSpeed;this.savePreferences();};""")
+rep(r"""readStorage('gemstogether-settings-v1',{}));
+  this.applyPreferences();""", r"""readStorage('gemstogether-settings-v1',{}));
+  this.animSpeed=clamp(Number(this.prefs.animSpeed)||1,.35,1.5);this.applyPreferences();""")
+rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

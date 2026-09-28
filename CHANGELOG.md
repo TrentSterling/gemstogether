@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.4 hosting patch 17 (2026-09-28) Animation speed is saved
+
+- **Settings > Lab > Animation speed now sticks** between visits, like every other setting (reported by Andre on Discord). In co-op the board still follows the host's speed.
+
 ## 3.2.4 hosting patch 16 (2026-09-28) Phones get the journey
 
 - New link preview image: a x5 DAZZLING over a stage change, with lasers and the Resonance glow.
