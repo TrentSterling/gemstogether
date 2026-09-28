@@ -62,4 +62,10 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 ## Done
 
+- Patch 6: combo ladder (callouts SPARKLING..TRANSCENDENT, chord stings, x5+ sky lasers, speed lines, strobe).
+- Patch 7: Resonance music (generative soundtrack that layers in with play).
+- Patch 8: the journey (six score-driven stages: sky grade, tempo, progressions, stage show, progress bar).
+- Patch 9: gamepad support + rumble + bold cursor.
+- Patch 10: Flashes setting (Full/Low/Off).
+
 - Patch 5 (2026-09-28): Bejeweled-style invalid swap in solo AND co-op (the regression André and Tront hit); red brackets gone; hitstop + camera punch; squash and stretch; score comets; milestone meme removed.
