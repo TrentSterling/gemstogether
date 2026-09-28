@@ -341,6 +341,8 @@ CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(
  if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
   this.text('STAGE '+info.n+(info.loop?'  ENCORE':''),x+4,yy,11,col,'left',w,.12,true);this.text(info.name,x+4,yy+15,15,'#ffffff','left',w-8,.14,true);
   p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);}
+ else if(!a.practice){this.stripAt=null;const bt=this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight){const x=bt.x,w=bt.w,yy=bt.y+bt.h+12,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);this.stripAt=[x,yy,w];
+  this.text('STAGE '+info.n+'  '+info.name,x+4,yy,12,col,'left',w*.62,.12,true);p.box(x+w*.64,yy+4,w*.36-2,8,'#071418',4,.95);p.box(x+w*.64+2,yy+6,(w*.36-6),4,col,2,.22);if(f>0)p.box(x+w*.64+2,yy+6,Math.max(4,(w*.36-6)*f),4,col,2,1);}}
  const o=this.sc;if(!o)return;const age=a.time-o.birth,L=2.6;if(age<0)return;if(age>L){this.sc=null;return;}
  const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
  p.opacity=clamp(inn*3,0,1)*(1-out);const Y=cy+bw*.04;p.box(cx-bw*.62+dx,Y,bw*1.24,bw*.34,'#071418',10,.85);p.box(cx-bw*.62+dx,Y,bw*1.24,5,oc,2,1);p.box(cx-bw*.62+dx,Y+bw*.34-5,bw*1.24,5,oc,2,1);
@@ -406,6 +408,10 @@ CabinetUI.prototype.drawRes=function(){const a=this.app,p=this.ink,fx=a.fx;if(!f
   if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+4+(w-8)*f*k/6,yy+19,(w-8)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+2,yy+15,w-4,15,'#ffffff',5,.12*glow);}
   else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+4,yy+19,(w-8)*fm,7,mineCol,2,1);if(ft>0)p.box(x+4+(w-8)*fm,yy+19,(w-8)*ft,7,theirCol,2,1);
    if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+2,yy+15,w-4,15,'#ffd98a',5,.18*pu);}}}
+ if(!this.plaqueAt&&this.stripAt&&!a.practice){const [x,y0,w]=this.stripAt,yy=y0+22,cap=fx.resCap(),on=R&&R.on,mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
+  this.text(on?'RESONANCE!':'RESONANCE',x+4,yy,12,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w*.62,.12,true);const bx=x+w*.64,bw2=w*.36-2;p.box(bx,yy+4,bw2,8,'#071418',4,.95);
+  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(bx+2+(bw2-4)*f*k/6,yy+6,(bw2-4)*f/6+1,4,gemHex((k+((t*10)|0))%6),2,.95);}
+  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(bx+2,yy+6,(bw2-4)*fm,4,mineCol,2,1);if(ft>0)p.box(bx+2+(bw2-4)*fm,yy+6,(bw2-4)*ft,4,theirCol,2,1);}}
  if(R&&R.on){const w=a.cssWidth,h=a.cssHeight,pu=.55+.45*Math.sin(t*6.5),g='#ffc861',FL=fx.F;for(let k=0;k<6;k++){const d=6+k*10,al=(.11-.016*k)*pu*(.4+.6*FL);p.box(0,0,d,h,g,0,al);p.box(w-d,0,d,h,g,0,al);p.box(0,0,w,d,g,0,al);p.box(0,h-d,w,d,g,0,al);}}
  const {cx,cy,bw}=this.boardBox(),o=this.rc;
  if(o){const age=t-o.birth,L=1.6;if(age>L)this.rc=null;else if(age>=0){const s=1+1.2*Math.exp(-age*12),al=Math.min(1,age*16)*clamp((L-age)/.35,0,1);p.opacity=al;

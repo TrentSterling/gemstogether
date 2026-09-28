@@ -374,5 +374,23 @@
       "clip log: game time runs at 0.3x through the x5 hold (0.04 s per 4 frames against 0.133), then recovers",
       "verify 22/22"
     ]
+  },
+  {
+    "title": "Round 12 (patch 16): phones get the journey and Resonance too",
+    "why": "The stage line and the Resonance meter only drew in the wide layout; on a phone you could not see your stage or the meter.",
+    "before": "r10-cascade",
+    "beforeLabel": "(desktop reference)",
+    "after": "r11-res",
+    "afterLabel": "patch 16 at 390x844: strip under Co-op Room, callouts and edge glow",
+    "changes": [
+      "On narrow screens, a compact strip under the Co-op Room button shows STAGE n with its name and progress bar, and the RESONANCE meter (your share and your partner's in co-op; rainbow while it runs). It anchors to the real button position."
+    ],
+    "frames": [],
+    "images": [],
+    "videos": [],
+    "checks": [
+      "verify 22/22 (includes the 390x844 phone boot and About pill clearance)",
+      "phone clip: strip readable, RESONANCE and x4 callouts fit the board, 0 errors"
+    ]
   }
 ]
