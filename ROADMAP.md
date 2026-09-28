@@ -2,6 +2,27 @@
 
 Every idea from the 2026-09-28 playtest thread on Discord, plus Tront's calls. Research backing: `research/TETRIS-EFFECT-DEEP-DIVE.md` (short pass; a deeper research handoff is coming from a separate run).
 
+## 0. Andre's feedback (the north star)
+
+Tront: "log andres feedback its basically our north star to impress him". Andre plays it, spots real bugs and has the taste call. Every item he raises goes here first.
+
+| When | Andre said | Status |
+|---|---|---|
+| 09-28 02:36 | the "it's over 9000" reference has to go | done (patch 5) |
+| 09-28 02:36 | next: ambient music, and a background that animates like a journey | done (patches 7, 8, 14) |
+| 09-28 02:39 | add gamepad support | done (patch 9) |
+| 09-28 02:40 | hold-and-drag nearly gave him carpal tunnel | partly (pad and keyboard play, patch 9); click-swap discoverability still open |
+| 09-28 02:43 | stages and themes like Tetris Effect + meta progression + online co-op + a banger soundtrack = sells on Steam | stages, co-op, soundtrack done; meta progression open |
+| 09-28 02:43 | zen/endless should switch stage, background, theme and music every XX points | done (patch 8) |
+| 09-28 02:45 | some kind of fail state, "out of moves" | done as an option (patch 13) |
+| 09-28 02:46 | combos need to feel like "ooh yes I got a freaking 5x combo!" | done (patches 6, 15) |
+| 09-28 02:46 | do a deep dive on Tetris Effect or Lumines Arise | done (research/) |
+| 09-28 14:11 | Animation speed isn't saved in settings | fixed (patch 17) |
+| 09-28 14:14 | "cool dynamic music... the increase in intensity and layering is cool, **it should probably not drop back to base layer so quickly once a higher layer is reached**" | **open, next** |
+| 09-28 14:14 | "I'm not sure about the speed up" (the tempo jump between stages, 84 to 128 BPM, or the arps doubling to 16ths when flow is high; ask which) | **open, ask** |
+
+Next music fix (from the 14:14 note): layers should latch. Once a layer is earned it holds for at least 8 bars and fades out over 2 to 4 bars instead of following flow straight down; the base layer returns only after a long quiet stretch. Keep the patch 15 exhale after x5, but make it a 2-bar breath that comes back to the latched layers, not to the pad.
+
 ## Standing direction (Tront's calls, these override research)
 
 - **MORE juice, never less.** Don't tone things down. When something reads weak, make it bigger. When something reads wrong, change its shape, not its volume.
