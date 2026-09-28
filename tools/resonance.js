@@ -10,7 +10,7 @@
    New particle kinds: 9 field mote (orbits forever), 10 velocity streak, 11 curling ember,
    12 ring with its own expansion speed (vel.x). */
 const FX_FIELD=7000;
-const FX_MILESTONES=[5000,9001,25000,50000,100000,250000,500000,1000000];
+const FX_MILESTONES=[5000,10000,25000,50000,100000,250000,500000,1000000];
 const FX_TINT_GL=`vec3 fxTint(float p){float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;return vec3(r,g,b)/255.0;}`;
 const FX_TINT_WG=`fn fxTint(p:f32)->vec3f{let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;return vec3f(r,g,b)/255.0;}`;
 const FX_SKY_GL=`vec3 fxSky(vec2 uv,float aspect){float fl=min(uAA.z,1.5);float pu=uAA.w;vec3 tc=fxTint(uLife.w);vec2 q=(uv-vec2(0.5,0.55))*vec2(aspect,1.0);float d=length(q);
@@ -118,14 +118,14 @@ class ResonanceFX {
  fountain(n,t){const sp=this.a.world.sparks;
   for(let i=0;i<n;i++)sp.emit([(Math.random()-.5)*.7,4.95,.45],[(Math.random()-.5)*7.5,3+Math.random()*5.5,Math.random()*2.2+.3],vmul(mixColor(GEM_COLORS[i%6],[1,1,1],.25),1.1+Math.random()*1.1),.045+Math.random()*.075,t+Math.random()*.35,1.3+Math.random()*1.1,i%4?1:10,Math.random()*100,-5.2);
  }
- // Score milestones (Tront, on Discord: "OVER 9000!!!!"). Crossing one throws the biggest show in the game.
+ // Score milestones. Crossing one throws the biggest show in the game.
  // Milestones already behind you when you join or load are skipped; a new board starts the list again.
  milestones(){const a=this.a,s=a.board?.score||0;
   if(this.ms===undefined||s<this.msScore){this.ms=FX_MILESTONES.filter(v=>v<=s).length;}this.msScore=s;
   if(a.practice)return;const next=this.ms<FX_MILESTONES.length?FX_MILESTONES[this.ms]:(Math.floor(s/1e6)+1)*1e6;
   if(s>=next){this.ms++;this.celebrate(next);}}
- celebrate(v){const a=this.a,t=a.time,j=this.j,over=v===9001;this.stats.milestones=(this.stats.milestones||0)+1;
-  const label=over?"IT'S OVER 9000!":v>=1e6?(v/1e6)+' MILLION!':(v/1000)+'K!';
+ celebrate(v){const a=this.a,t=a.time,j=this.j,over=v===10000;this.stats.milestones=(this.stats.milestones||0)+1;
+  const label=v>=1e6?(v/1e6)+' MILLION!':(v/1000)+'K!';
   this.flow=1.5;this.pulse=1.5;this.target=over?[1,.42,.08]:[1,.82,.36];this.lastMilestone={v,label,time:t};
   a.toast(label+' '+(a.coop?.connected?'Team score ':'Score ')+Math.floor(a.board.score).toLocaleString('en-US'));
   if(a.ui)a.ui.floats.push({text:label,pos:[0,1.35,1.3],special:true,size:over?50:46,col:over?'#ffb347':UI_ART.highlight,life:2.6,birth:t});
@@ -137,6 +137,10 @@ class ResonanceFX {
   this.trace(over?[1,.5,.1]:[1,.8,.35],t,.8);this.trace(over?[1,.8,.2]:[.4,.9,1],t+.45,1.1);}
  swap(pa,pb){if(!this.on)return;const sp=this.a.world.sparks,t=this.a.time,d=[pb[0]-pa[0],pb[1]-pa[1]];
   for(let i=0;i<10;i++){const from=i&1?pa:pb,s=(i&1?1:-1)*(1.5+Math.random()*2.5);sp.emit([from[0],from[1],.75],[d[0]*s+(Math.random()-.5)*.6,d[1]*s+(Math.random()-.5)*.6,.4],vmul([1,.93,.78],.9),.035,t+Math.random()*.08,.28+Math.random()*.15,10,Math.random()*100,0);}}
+ // Invalid swap turnaround: both gems pressed into the wrong cell kick dust off their leading edges.
+ bump(pa,pb){if(!this.on)return;const sp=this.a.world.sparks,t=this.a.time,j=this.j,dx=pb[0]-pa[0],dy=pb[1]-pa[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
+  for(const [p,s] of [[pb,1],[pa,-1]]){const e=[p[0]+ux*s*.44,p[1]+uy*s*.44,.62];
+   for(let i=0;i<Math.round(22*j);i++){const side=(i&1?1:-1)*(.6+Math.random()*2.2),fw=(Math.random()*.8+.2)*s;sp.emit([e[0]+(Math.random()-.5)*.1,e[1]+(Math.random()-.5)*.1,e[2]],[-uy*side+ux*fw*.7,ux*side+uy*fw*.7,.3+Math.random()*.8],vmul([.9,.92,1],.8+Math.random()*.5),.34+Math.random()*.3,t,.28+Math.random()*.22,1,Math.random()*100,-1.5);}}}
  land(to,type,dist){if(!this.on||dist<1.8||Math.random()<.35)return;const sp=this.a.world.sparks,t=this.a.time,c=vmul(GEM_COLORS[type],.7);
   for(let i=0;i<3;i++){const s=(i-1)*1.3+(Math.random()-.5)*.6;sp.emit([to[0]+s*.12,to[1]-.38,.55],[s,.25+Math.random()*.4,.3],c,.035,t,.28,1,Math.random()*100,-2);}}
 }

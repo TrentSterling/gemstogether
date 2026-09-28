@@ -1,10 +1,21 @@
 # Changelog
 
-## 3.2.4 hosting patch 4 (2026-09-27) Easing audit + OVER 9000
+## 3.2.4 hosting patch 5 (2026-09-28) Bejeweled-style invalid swap + combo juice
+
+- **An illegal swap now swaps and swaps back, like Bejeweled, everywhere.** The pair trades places at normal swap speed, bumps into the wrong cell (squash, a quick rattle, a puff of dust, the reject sound) and swaps back on the same curve. About half a second in all.
+- **Why patch 4 didn't fix it:** tront.xyz puts everyone in the public co-op room, and in a room the drop turned an illegal move down before it ever moved: no motion, flat red corner brackets that didn't fit the gems, and a "No match" toast. Patch 4 only fixed solo play (the old half swap that snapped back). Now solo, host and joining players all get the same bounce, and a joining player's bounce starts instantly (checked against their own copy of the board, no network round trip). The bounce is presentation only: nothing is sent and the board stays in sync. The red brackets are gone, and "No match" no longer toasts.
+- **Hitstop + camera punch:** cascades of x4 and up and every blast or prism freeze the frame for 45 to 80 ms and push the camera in, then spring back. Reduced motion turns the punch off.
+- **Squash and stretch:** swaps stretch along the direction they travel (the drop squeezed every move sideways), and landings squash a little harder.
+- **Score comets:** every cleared gem throws a comet that curves into the score, which punches and flashes a ring when they land. In solo they carry the gem colour; in co-op they carry the colour of whoever made the move, so you can see your partner's points arrive.
+- **Milestones keep the show, lose the meme:** 5K, 10K, 25K, 50K, 100K, 250K, 500K, 1 MILLION, then every million. 10K gets the extra-big show.
+- Receipts: `tools/swap-audit.mjs` (solo frame-stepped, plus a real two-browser private room with real mouse drags on host and peer) and `tools/swap-report.py` write `tools/out/swap/index.html`, comparing ChatGPT's drop, patch 4 and patch 5.
+- New `ROADMAP.md` logs the playtest ideas from Discord; `research/TETRIS-EFFECT-DEEP-DIVE.md` has a short Tetris Effect / Lumines study.
+
+## 3.2.4 hosting patch 4 (2026-09-27) Easing audit + score milestones
 
 - **An invalid swap no longer teleports back.** The drop never updates a failed swap's home cells, so the gems were drawn at home for one frame between the slide and the return, and the return then eased home to home. Now they hold the swapped spot and bounce back off an invisible wall (back-out, about 11% overshoot, .34 s). Receipts: `tools/easing-audit.mjs` + `tools/easing-report.py` write a frame-stepped before/after report to `tools/out/easing/index.html`.
 - **Combo plaque** slides in with overshoot, the number punches on each new step, and it fades out instead of vanishing. **Toasts** fade and rise in and out. **Score floats** pop in at 1.5x.
-- **Score milestones:** 5K, OVER 9000, 25K, 50K, 100K, 250K, 500K, 1 MILLION, then every million. Each one throws the biggest show in the game: a big banner, six rainbow world rings, a ring of fireworks, a nova, a crown fountain and two light chases around the frame. Crossing 9,000 says IT'S OVER 9000! (the GPU font gained a "!" for it).
+- **Score milestones:** 5K, 9K (replaced by 10K in patch 5), 25K, 50K, 100K, 250K, 500K, 1 MILLION, then every million. Each one throws the biggest show in the game: a big banner, six rainbow world rings, a ring of fireworks, a nova, a crown fountain and two light chases around the frame. The GPU font gained a "!" for the banners.
 - **Light chase:** from cascade x2 on, comets race both ways around the gold frame and flash the corners.
 - Falling gems leave light trails, the selected gem sheds curling motes, and embers are big enough to actually see.
 

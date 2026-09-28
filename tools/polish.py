@@ -185,17 +185,7 @@ rep("if(this.phase!=='intro')this.audio.land(a.at%8,distance);", "if(this.phase!
 rep("window.__jewel={ready:false,app:a,", "window.__jewel={ready:false,app:a,fx:()=>a.fx.info(),")
 
 # Tront patch: easing audit (S93). Receipts: tools/easing-audit.mjs -> tools/out/easing/index.html.
-# 1. Invalid swap snapped. board.swap() returns null, so the actors keep their home cell (a.at). The swap slide
-#    ends at FEEL.swap (.205 s) but the reject starts at the phase deadline (+.014 s); in between the actor is drawn
-#    at cellXY(a.at) = home, a one-frame teleport. The reject then eased home -> home (only the wobble moved).
-#    Fix: a failed swap's slide runs to the deadline, and the return starts from the swapped spot with a back-out
-#    overshoot (a bounce off an invisible wall) over .34 s instead of a .23 s quintic.
-rep("this.swapResult=this.board.swap(a,b);this.cascade=0;",
-    "this.swapResult=this.board.swap(a,b);if(!this.swapResult){aa.move.duration=bb.move.duration=FEEL.swap+FEEL.swapSettle;}this.cascade=0;")
-rep("this.swapActors.forEach((a,i)=>this.motion(a,this.swapPositions[i],'reject',.23,0,i?1:-1));",
-    "this.swapActors.forEach((a,i)=>{this.motion(a,this.swapPositions[i],'reject',.34,0,i?1:-1);a.move.from=this.swapPositions[1-i].slice();});")
-rep("this.phase='reject';this.deadline=this.time+.24;", "this.phase='reject';this.deadline=this.time+.35;")
-rep("e=m.type==='swap'?smooth(t):easeIO(t);", "e=m.type==='swap'?smooth(t):m.type==='reject'?1+2.7*(t-1)**3+1.7*(t-1)**2:easeIO(t);")
+# 1. (Invalid swap: superseded by patch 5 below.)
 # 2. Combo plaque popped on and off. Now: slides in from the right with overshoot, the number punches on every
 #    new step, and it fades and drifts out over .3 s after the combo ends.
 rep("const privateCoopBadge=CabinetUI.prototype.coopBadge;",
@@ -225,6 +215,89 @@ rep("this.floats=this.floats.filter(f=>a.time-f.birth<1.1);", "this.floats=this.
 rep("alpha=Math.min(age*9,1)*clamp((1.1-age)*3,0,1);", "alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);")
 rep("(f.special?22:24)*(1+.5*Math.exp(-age*13)),f.special?UI_ART.aqua:UI_ART.highlight,'center',Math.min(300,a.cssWidth-40)",
     "(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40)")
+
+# Tront patch 5 (S94, 2026-09-28): Bejeweled-parity invalid swap + juice (hitstop, camera punch, directional
+# squash/stretch, turnaround puff, score comets). Receipts: tools/swap-audit.mjs -> tools/out/swap/index.html.
+# Why patch 4 missed: tront.xyz drops everyone into the public co-op room, and there coop.requestSwap() rejects an
+# illegal move before trySwap() ever runs: no motion at all, flat 2D red corner brackets and a "No match" toast.
+# Patch 4 only fixed trySwap's solo path (the harness ran #solo=1).
+# Invalid swap, every mode: the pair swaps fully at normal swap speed, bumps into the wrong cell (squash, rattle,
+# dust puff, reject sound) and swaps back the same way. In co-op it is presentation only: phase and board are
+# untouched and nothing is sent, so the host keeps taking partner swaps. Peers check against their mirrored
+# board, so the bounce starts instantly instead of after a round trip.
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""const BOUNCE_HOLD=.075;
+JewelApp.prototype.bounceSwap=function(a,b){
+ const aa=this.getActor(a),bb=this.getActor(b);if(!aa||!bb||aa.move||bb.move)return false;
+ const pa=cellXY(a),pb=cellXY(b),d=2*FEEL.swap+BOUNCE_HOLD;this.selected=-1;this.grab=-1;this.hintCells=[];this.keyboardCell=b;
+ aa.move={type:'bounce',from:pa.slice(),to:pb.slice(),start:this.time,duration:d,sign:1};bb.move={type:'bounce',from:pb.slice(),to:pa.slice(),start:this.time,duration:d,sign:-1};
+ this.audio.swap((pa[0]+pb[0])*.5);this.fx.swap(pa,pb);this.bounceUntil=this.time+d;this.idleSince=this.time;this.lastInput=this.time;return true;};
+const gemHex=t=>'#'+mixColor(GEM_COLORS[t]||GEM_COLORS[5],[1,1,1],.25).map(v=>Math.round(clamp(v,0,1)*255).toString(16).padStart(2,'0')).join('');
+// Score comets: every cleared gem streaks into the score. Co-op: in the colour of whoever made the move.
+CabinetUI.prototype.comets=function(removed,owner){
+ const a=this.app,co=a.coop;if(!a.fx?.on||!removed?.length||a.prefs.juice<=0)return;this.cm=this.cm||[];const mine=owner!=='partner';
+ for(let k=0;k<Math.min(removed.length,8);k++){const r=removed[k];const col=co?.connected?(mine===(co.role==='host')?COOP_PALETTE.host:COOP_PALETTE.peer):gemHex(r.tile.type);
+  this.cm.push({p:cellXY(r.at),col,birth:a.time+.06+k*.035,dur:.5+Math.random()*.16,bend:(Math.random()-.5)*.9,big:k===0});}
+ if(this.cm.length>160)this.cm.splice(0,this.cm.length-160);};
+CabinetUI.prototype.drawComets=function(){
+ const a=this.app,p=this.ink,T=this.scoreAt,now=a.time;p.opacity=1;if(!this.cm?.length&&!this.flares?.length)return;if(!T||a.panelOpen){this.cm=[];this.flares=[];return;}
+ this.flares=this.flares||[];
+ this.cm=this.cm.filter(c=>{const t=(now-c.birth)/c.dur;if(t<0)return true;if(t>=1){this.scoreHit=now;this.flares.push({x:T[0],y:T[1],birth:now,col:c.col});return false;}
+  const S=project(c.p,a.vp,a.cssWidth,a.cssHeight),dx=T[0]-S[0],dy=T[1]-S[1],cx=S[0]+dx*.35-dy*c.bend,cy=S[1]+dy*.35+dx*c.bend;
+  const at=u=>{const v=1-u;return [v*v*S[0]+2*v*u*cx+u*u*T[0],v*v*S[1]+2*v*u*cy+u*u*T[1]];};
+  const u=t*t*(1.6-.6*t),head=at(u),fade=Math.min(1,t*6);let prev=head;
+  for(let k=1;k<=7;k++){const q=at(Math.max(0,u-k*.03*(.4+u)));p.line(prev[0],prev[1],q[0],q[1],(c.big?10:7.5)*(1-k/9),c.col,.75*(1-k/9)*fade);prev=q;}
+  p.line(head[0],head[1],head[0],head[1],c.big?22:16,c.col,.35*fade);p.line(head[0],head[1],head[0],head[1],c.big?13:10,c.col,fade);p.line(head[0],head[1],head[0],head[1],c.big?6:4.5,'#ffffff',fade);return true;});
+ this.flares=this.flares.filter(f=>{const k=(now-f.birth)/.32;if(k>=1||k<0)return k<0;const r=46+k*40,al=(1-k)*(1-k)*.9;let px=f.x+r,py=f.y;
+  for(let i=1;i<=24;i++){const an=i/24*TAU,qx=f.x+Math.cos(an)*r,qy=f.y+Math.sin(an)*r*.42;p.line(px,py,qx,qy,4*(1-k)+.8,f.col,al);px=qx;py=qy;}return true;});};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+# Solo / host-authorised path: an invalid swap becomes the same bounce, held in the 'reject' phase.
+rep(r"""this.phase='swap';this.deadline=this.time+FEEL.swap+FEEL.swapSettle;""",
+    r"""this.phase='swap';this.deadline=this.time+FEEL.swap+FEEL.swapSettle;if(!this.swapResult){const d=2*FEEL.swap+BOUNCE_HOLD;aa.move={type:'bounce',from:pa.slice(),to:pb.slice(),start:this.time,duration:d,sign:1};bb.move={type:'bounce',from:pb.slice(),to:pa.slice(),start:this.time,duration:d,sign:-1};this.phase='reject';this.deadline=this.time+d;}""")
+rep(r"""if(!authorised&&(this.coop?.hosting||this.coop?.mirror))return this.coop.requestSwap(a,b);""",
+    r"""if(!authorised&&(this.coop?.hosting||this.coop?.mirror))return this.coop.requestSwap(a,b);if(!authorised)this.turnOwner='me';""")
+# Co-op path: check locally first, bounce without a network call.
+rep(r"""const app=this.app;if(!this.hosting&&(app.phase!=='idle'||app.frozen||this.pending)){this.rejectLocal(a,b,'The board is resolving');return false;}""",
+    r"""const app=this.app;if(!this.hosting&&(app.phase!=='idle'||app.frozen||this.pending)){this.rejectLocal(a,b,'The board is resolving');return false;}if(app.time<(app.bounceUntil||0))return false;if(app.phase==='idle'&&!app.frozen&&app.board.adjacent(a,b)&&!app.board.validSwap(a,b)){app.bounceSwap(a,b);return false;}""")
+# Any other rejection still bounces when it can; the red corner brackets are gone, and "No match" needs no toast.
+rep(r"""rejectLocal(a,b,reason){""",
+    r"""rejectLocal(a,b,reason){if(Number.isInteger(a)&&Number.isInteger(b)&&a>=0&&b>=0&&a<64&&b<64&&this.app.phase==='idle'&&this.app.board.adjacent(a,b)&&this.app.bounceSwap(a,b)){this.pending=null;if(reason!=='No match')this.app.toast(reason);return;}""")
+rep(r"""if(n.rejectUntil>now&&!a.panelOpen)for(const i of n.rejectCells||[])ring(i,'#ff839c',true);""", "", 2)
+# Whose move was it (for comet colour): host knows the intent's sender, a peer matches its own accepted intent.
+rep(r"""this.app.trySwap(a,b,true);this.note('intent-accepted'""",
+    r"""this.app.turnOwner=peer==='self'?'me':'partner';this.app.trySwap(a,b,true);this.note('intent-accepted'""")
+rep(r"""this.pending=null;netBoardLoad(a,m.board);a.selected=-1;""",
+    r"""{const q=this.pending;a.turnOwner=q&&q.accepted&&(q.a===m.a&&q.b===m.b||q.a===m.b&&q.b===m.a)?'me':'partner';}this.pending=null;netBoardLoad(a,m.board);a.selected=-1;""")
+# The bounce itself: out on the normal swap curve, a .075 s bump against the wrong cell, back on the same curve.
+rep(r"""}else{const t=clamp(age/m.duration),e=m.type==='swap'?smooth(t):easeIO(t);""",
+    r"""}else if(m.type==='bounce'){const T=FEEL.swap,H=BOUNCE_HOLD,j=this.prefs.juice/100,dx=m.to[0]-m.from[0],dy=m.to[1]-m.from[1],hz=Math.abs(dx)>=Math.abs(dy),L=Math.hypot(dx,dy)||1;let u,arc=0,st=0,sq=0,rat=0;
+     if(age<T){const t=age/T;u=smooth(t);arc=Math.sin(t*PI);st=arc;}
+     else if(age<T+H){const t=(age-T)/H;u=1;sq=Math.sin(t*PI);rat=Math.sin(t*TAU*2)*(1-t);if(!m.turned){m.turned=true;if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);}}}
+     else{const t=clamp((age-T-H)/T);u=1-smooth(t);arc=Math.sin(t*PI);st=arc;}
+     pos=m.from.map((x,i)=>mix(x,m.to[i],u));pos[2]+=arc*.22*(m.sign>0?1:.6);rz=arc*.13*m.sign;pos[0]+=dx/L*rat*.05*j;pos[1]+=dy/L*rat*.05*j;
+     const along=1+st*.09*j-sq*.17*j,across=1-st*.06*j+sq*.11*j;sx=hz?along:across;sy=hz?across:along;
+     if(age>=m.duration){pos=m.from.slice();a.move=null;}
+    }else{const t=clamp(age/m.duration),e=m.type==='swap'?smooth(t):easeIO(t);""")
+# Squash and stretch: swaps stretch along their travel axis (the drop squeezed every move the same way), landings
+# squash a little harder.
+rep(r"""const squeeze=Math.sin(t*PI)*.045;sx=1+squeeze;sy=1-squeeze;""",
+    r"""const squeeze=Math.sin(t*PI)*(m.type==='swap'?.09*this.prefs.juice/100:.045),hz=Math.abs(m.to[0]-m.from[0])>=Math.abs(m.to[1]-m.from[1]);sx=hz?1+squeeze:1-squeeze*.66;sy=hz?1-squeeze*.66:1+squeeze;""")
+rep(r"""amp=clamp(.085+distance*.020,.095,.20)*this.prefs.juice/100""", r"""amp=clamp(.1+distance*.028,.11,.27)*this.prefs.juice/100""")
+# Hitstop + camera punch on x4+ cascades and specials. Hitstop freezes game time (and so every particle and the
+# shake) for 45-80 ms; the punch pushes the camera in a few percent and springs back. Reduced motion: no punch.
+rep(" update(dt){\n  if(this.coop?.updatePeer(dt))return;",
+    " update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}this.punch=(this.punch||0)*Math.exp(-dt*7);\n  if(this.coop?.updatePeer(dt))return;")
+rep(r"""this.shake=Math.min(.85,magnitude*(special?.48:.26));""",
+    r"""this.shake=Math.min(.85,magnitude*(special?.48:.26));if(special||this.cascade>=4){const k=this.prefs.juice/100;this.hitstop=Math.max(this.hitstop||0,(special?.08:.045+Math.min(this.cascade-4,4)*.008)*Math.min(k,1.25));if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}""")
+rep(r"""this.eye=[sx,.62+sy,z];""", r"""this.eye=[sx,.62+sy,z*(1-.045*(this.punch||0))];""")
+# Comets: spawn from explode (host, solo and mirrors alike), land on the score readout, which punches on impact.
+rep(r"""result.removed);this.presentation.feed(""", r"""result.removed);this.ui?.comets?.(result.removed,this.turnOwner);this.presentation.feed(""")
+rep(r"""this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46,35,""",
+    r"""this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,""")
+rep(r"""this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8,18,""",
+    r"""this.scoreAt=[w/2-40,sy+17];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,""")
+rep(r"""this.coopPresence();this.drawCursor();p.submit();""", r"""this.coopPresence();this.drawComets();this.drawCursor();p.submit();""")
+
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
