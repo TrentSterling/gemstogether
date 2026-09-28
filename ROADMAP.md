@@ -18,8 +18,8 @@ Tront: "log andres feedback its basically our north star to impress him". Andre 
 | 09-28 02:46 | combos need to feel like "ooh yes I got a freaking 5x combo!" | done (patches 6, 15) |
 | 09-28 02:46 | do a deep dive on Tetris Effect or Lumines Arise | done (research/) |
 | 09-28 14:11 | Animation speed isn't saved in settings | fixed (patch 17) |
-| 09-28 14:14 | "cool dynamic music... the increase in intensity and layering is cool, **it should probably not drop back to base layer so quickly once a higher layer is reached**" | **open, next** |
-| 09-28 14:14 | "I'm not sure about the speed up" (the tempo jump between stages, 84 to 128 BPM, or the arps doubling to 16ths when flow is high; ask which) | **open, ask** |
+| 09-28 14:14 | "cool dynamic music... the increase in intensity and layering is cool, **it should probably not drop back to base layer so quickly once a higher layer is reached**" | done (patch 18: layers latch and step down) |
+| 09-28 14:14 | "I'm not sure about the speed up" (the tempo jump between stages, 84 to 128 BPM, or the arps doubling to 16ths when flow is high; ask which) | done (patch 18: assumed tempo jumps + arp doubling; one steady 88 BPM, intensity by layering only) |
 
 Next music fix (from the 14:14 note): layers should latch. Once a layer is earned it holds for at least 8 bars and fades out over 2 to 4 bars instead of following flow straight down; the base layer returns only after a long quiet stretch. Keep the patch 15 exhale after x5, but make it a 2-bar breath that comes back to the latched layers, not to the pad.
 

@@ -71,7 +71,7 @@ class ResonanceFX {
   this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);this.resTick();
   // Beat (patch 14): the soundtrack's own beat times when it is playing, else a game-time clock at the stage tempo.
   {const mu=a.music,ac=a.audio?.ctx;let fire=0;if(mu&&mu.beats&&ac&&mu.ctx===ac&&ac.state==='running'&&!a.audio.muted&&!a.audio.loadedTrack){const now=ac.currentTime;while(mu.beats.length&&mu.beats[0].t<=now)fire=Math.max(fire,mu.beats.shift().down?1:.7);}
-   else{const bpm=this.stageInfo().bpm,b=Math.floor(a.time*bpm/60);if(b!==this.lastBeat){fire=b%4===0?1:.7;this.lastBeat=b;}}
+   else{const bpm=a.music?.bpm||88,b=Math.floor(a.time*bpm/60);if(b!==this.lastBeat){fire=b%4===0?1:.7;this.lastBeat=b;}}
    if(fire){this.beat=Math.max(this.beat||0,fire);this.beats=(this.beats||0)+1;}this.beat=(this.beat||0)*Math.exp(-dt*7);a.beatBump=a.prefs.motion?this.beat*.022*(.45+Math.min(this.flow,1)):0;}
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);

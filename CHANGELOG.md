@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.4 hosting patch 18 (2026-09-28) The music holds what you earn
+
+From Andre on Discord: "the increase in intensity and layering is cool, it should probably not drop back to base layer so quickly" and "not sure about the speed up".
+
+- **Earned layers stick.** Once the bass, arps, drums or lead come in, they hold for a few bars and then step down one at a time (drums, then arps, then bass) instead of collapsing to the pad the moment the board goes quiet. After a big chain the music takes a 2-bar breath and comes back to where you were.
+- **No more speed-ups.** The soundtrack stays at one steady 88 BPM. Stages change the chords, not the tempo, and a hot board adds a shimmering octave voice instead of doubling the notes.
+
 ## 3.2.4 hosting patch 17 (2026-09-28) Animation speed is saved
 
 - **Settings > Lab > Animation speed now sticks** between visits, like every other setting (reported by Andre on Discord). In co-op the board still follows the host's speed.

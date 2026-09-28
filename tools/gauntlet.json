@@ -415,5 +415,39 @@
       "no letterbox bars, fills the 16:9 card crop",
       "real play (shows Score, not Lab score)"
     ]
+  },
+  {
+    "title": "Round 14 (patch 18): the music holds what you earn (Andre's notes)",
+    "why": "Andre: 'cool dynamic music... the increase in intensity and layering is cool, it should probably not drop back to base layer so quickly once a higher layer is reached' and 'I'm not sure about the speed up'. The speed-up: fast play (Demo) raced through stages, and every stage changed the tempo (84 to 128 BPM); high flow also doubled the arps to 16ths.",
+    "before": "r10-cascade",
+    "beforeLabel": "(music change; see the chart and listen below)",
+    "after": "r15-cascade",
+    "afterLabel": "(music change; see the chart and listen below)",
+    "changes": [
+      "Earned layers latch: bass holds 4 bars, arp 3, drums and lead 2, then each fades over about 3 bars, so the song steps down drums, then arp, then bass instead of collapsing to the pad.",
+      "The exhale after a x5 is a 2-bar dip that comes back to the held layers.",
+      "No more speed-ups: one steady 88 BPM. Stages change the chords, not the tempo. High flow adds an octave shimmer voice instead of doubling the arp to 16ths, and the hats stay on 8ths."
+    ],
+    "frames": [],
+    "audio": [
+      [
+        "tools/out/music/latch-before.m4a",
+        "Before: the same 40 s burst (warm up, x5 lasers 6 to 9 s, board quiet from 14 s)"
+      ],
+      [
+        "tools/out/music/latch-after.m4a",
+        "After: same burst"
+      ]
+    ],
+    "images": [
+      [
+        "tools/out/music/latch-chart.png",
+        "Layer levels from the real in-page scheduler. Seconds each layer survives after the board goes quiet: before bass 4.6, arp 3.9, drums gone 1.1 s before, lead gone 0.4 s before. After: lead 8.5, drums 10.6, arp 13.9, bass 18."
+      ]
+    ],
+    "checks": [
+      "tools/music-latch.mjs on both builds (the same scripted burst)",
+      "verify 22/22"
+    ]
   }
 ]

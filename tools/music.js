@@ -15,10 +15,10 @@ const MUSIC_PROGS=[[[[0,3,7],[8,12,15],[3,7,10],[10,14,17]],[[0,3,7],[5,8,12],[8
  [[[8,12,15],[10,14,17],[0,3,7],[0,3,7]],[[5,8,12],[8,12,15],[10,14,17],[7,10,14]]]];
 const MUSIC_PENTA=[0,3,5,7,10,12,15,17];
 class ResonanceMusic {
- constructor(app){this.a=app;this.bpm=84;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
+ constructor(app){this.a=app;this.bpm=88;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
  hz(m){return 440*Math.pow(2,(m-69)/12);}
  // Layer targets from the game state: pad, bass, arp, drums, lead.
- targets(s){if(s.res)return [1,1,1,1,1];if(this.ctx&&this.exhaleUntil>this.ctx.currentTime)return [1,.2,0,0,0];if(this.a.gameOver)return [.7,0,0,0,0];const f=s.flow,c=s.cascade;return [.9,clamp((f-.10)*3,0,1),clamp((f-.32)*2.4,0,1),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
+ targets(s){if(s.res)return [1,1,1,1,1];if(this.a.gameOver)return [.7,0,0,0,0];const f=s.flow,c=s.cascade;return [.9,clamp((f-.10)*3,0,1),clamp((f-.32)*2.4,0,1),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
  state(){const fx=this.a.fx;return {flow:fx?fx.flow:0,laser:fx?fx.laser:0,cascade:this.a.phase==='idle'?0:this.a.cascade,res:!!(fx&&fx.res&&fx.res.on)};}
  build(ctx,dest){
   this.ctx=ctx;this.bus=ctx.createGain();this.bus.gain.value=1.4;this.bus.connect(dest);
@@ -35,11 +35,17 @@ class ResonanceMusic {
   if(lv[0]>.02&&beat===0&&bar%2===0){const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=500+Math.min(flow,1.2)*1600;lp.Q.value=.7;lp.connect(this.bus);const len=sp*32;
    for(const n of chord)for(const det of [-9,9]){this.osc('sawtooth',this.hz(root+n),t,len,.022*lv[0],1.1,1.6,lp,det);}this.osc('triangle',this.hz(root+chord[0]-12),t,len,.05*lv[0],1.1,1.6,lp);}
   if(lv[1]>.02&&(beat===0||beat===8||(flow>.8&&(beat===6||beat===14)))){const o=this.osc('triangle',this.hz(root-12+chord[0]),t,sp*3,.2*lv[1],.008,.25,this.bus);o.frequency.setValueAtTime(this.hz(root-12+chord[0]),t);}
-  if(lv[2]>.02){const seq=[0,1,2,1,0,1,2,3],tones=[chord[0],chord[1],chord[2],chord[0]+12],m=root+12+tones[seq[(i>>(flow>.9?0:1))%8]%tones.length];if(flow>.9||beat%2===0){this.osc('triangle',this.hz(m),t,sp*.7,.05*lv[2],.004,.22,this.echo);this.osc('sine',this.hz(m+12),t,sp*.5,.02*lv[2],.004,.15,this.bus);}}
+  if(lv[2]>.02){const seq=[0,1,2,1,0,1,2,3],tones=[chord[0],chord[1],chord[2],chord[0]+12],m=root+12+tones[seq[(i>>1)%8]%tones.length];if(beat%2===0){if(flow>.9)this.osc('sine',this.hz(m+24),t,sp*.9,.018*lv[2],.004,.3,this.echo);this.osc('triangle',this.hz(m),t,sp*.7,.05*lv[2],.004,.22,this.echo);this.osc('sine',this.hz(m+12),t,sp*.5,.02*lv[2],.004,.15,this.bus);}}
   if(lv[3]>.02){const four=lv[3]>.8;if(beat===0||beat===8||(four&&(beat===4||beat===12))){const o=this.osc('sine',150,t,.02,.55*lv[3],.002,.32,this.bus);o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.3);}
-   if(beat%4===2)this.hit(t,8000,'highpass',.7,.10*lv[3],.05,this.bus);if(four&&beat%2===1)this.hit(t,9500,'highpass',.7,.04*lv[3],.03,this.bus);if(beat===4||beat===12)this.hit(t,1500,'bandpass',.9,.22*lv[3],.16,this.bus);}
+   if(beat%4===2)this.hit(t,8000,'highpass',.7,.10*lv[3],.05,this.bus);if(four&&beat%4===0)this.hit(t,9500,'highpass',.7,.05*lv[3],.03,this.bus);if(beat===4||beat===12)this.hit(t,1500,'bandpass',.9,.22*lv[3],.16,this.bus);}
   if(lv[4]>.02&&beat%2===0){const ph=[0,2,4,5,7,5,4,2,3,4,6,7,5,4,2,1],k=ph[(i>>1)%16],m=key+12+MUSIC_PENTA[k%MUSIC_PENTA.length];if((i>>1)%4!==3){const o=this.osc('square',this.hz(m),t,sp*1.6,.028*lv[4],.01,.3,this.echo);const v=c.createOscillator(),vg=c.createGain();v.frequency.value=5.5;vg.gain.value=9;v.connect(vg);vg.connect(o.detune);v.start(t);v.stop(t+sp*2+.4);}}
  }
+ // Patch 18 (Andre: 'it should probably not drop back to base layer so quickly once a higher layer is reached').
+ // Earned layers LATCH: once a layer passes half level it holds (bass 4 bars, arp 3, drums/lead 2), rises fast and
+ // fades over about 3 bars, so the song steps down drums, then arp, then bass instead of collapsing. The exhale after a x5 is a 2-bar dip that returns to the held layers.
+ latch(tg,t,ex){const bar=60/this.bpm*4,h=this.hold||(this.hold=[0,0,0,0,0]),dip=[1,.2,0,0,0];
+  for(let k=0;k<5;k++){if(tg[k]>.5)h[k]=Math.max(h[k],t+bar*[8,4,3,2,2][k]);if(ex)h[k]=Math.max(h[k],t+bar*2);
+   const want=ex?dip[k]:t<h[k]?Math.max(tg[k],1):tg[k];this.lv[k]=mix(this.lv[k],want,want>this.lv[k]?(k===3?.35:.1):.05);}}
  // Patch 15: the x5 duck (a quarter-second hole, then the fanfare lands) and the exhale after a big chain.
  duck(){if(!this.ctx||!this.bus)return;const g=this.bus.gain,t=this.ctx.currentTime;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(.18,t+.05);g.setValueAtTime(.18,t+.25);g.linearRampToValueAtTime(1.6,t+.29);g.setTargetAtTime(1.4,t+.6,.4);}
  exhale(){if(this.ctx)this.exhaleUntil=this.ctx.currentTime+60/this.bpm*8;}
@@ -52,9 +58,9 @@ class ResonanceMusic {
  tick(){const au=this.a.audio;const live=au?.ctx&&au.ctx.state==='running'&&!au.muted&&!au.loadedTrack&&au.music;
   if(!live){if(this.ctx&&au?.ctx===this.ctx)this.next=0;return;}
   if(this.ctx!==au.ctx)this.build(au.ctx,au.music);this.hookSnap(au);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
-  const info=this.a.fx?.stageInfo?.();if(info){this.prog=info.prog;if(info.bpm!==this.bpm){this.bpm=info.bpm;this.delay.delayTime.setTargetAtTime(60/this.bpm*.75,now,.1);}}
+  const info=this.a.fx?.stageInfo?.();if(info)this.prog=info.prog;const ex=this.exhaleUntil>now;
   const tg=this.targets(this.state()),ahead=document.hidden?1.2:.15;
-  while(this.next<now+ahead){for(let k=0;k<5;k++)this.lv[k]=mix(this.lv[k],tg[k],k===3?.35:.08);if(this.step%4===0){(this.beats=this.beats||[]).push({t:this.next,down:this.step%16===0});if(this.beats.length>32)this.beats.shift();}this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
+  while(this.next<now+ahead){this.latch(tg,this.next,ex);if(this.step%4===0){(this.beats=this.beats||[]).push({t:this.next,down:this.step%16===0});if(this.beats.length>32)this.beats.shift();}this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
  // Offline: schedule [0, seconds) from a state curve fn(t) -> {flow, laser, cascade}.
- render(ctx,seconds,fn,key=62){this.build(ctx,ctx.destination);this.step=0;const sp=60/this.bpm/4;for(let t=0;t<seconds;t+=sp){const s=fn(t),tg=this.targets(s);for(let k=0;k<5;k++)this.lv[k]=mix(this.lv[k],tg[k],k===3?.35:.08);this.play(this.step++,t,this.lv,key,s.flow);}}
+ render(ctx,seconds,fn,key=62){this.build(ctx,ctx.destination);this.step=0;this.hold=null;this.lvLog=[];const sp=60/this.bpm/4;for(let t=0;t<seconds;t+=sp){const s=fn(t),tg=this.targets(s);this.latch(tg,t,!!s.exhale);if(this.step%4===0)this.lvLog.push([+t.toFixed(2),...this.lv.map(v=>+v.toFixed(3)),+s.flow.toFixed(3)]);this.play(this.step++,t,this.lv,key,s.flow);}}
 }
