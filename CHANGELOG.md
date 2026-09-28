@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.4 hosting patch 4 (2026-09-27) Easing audit + OVER 9000
+
+- **An invalid swap no longer teleports back.** The drop never updates a failed swap's home cells, so the gems were drawn at home for one frame between the slide and the return, and the return then eased home to home. Now they hold the swapped spot and bounce back off an invisible wall (back-out, about 11% overshoot, .34 s). Receipts: `tools/easing-audit.mjs` + `tools/easing-report.py` write a frame-stepped before/after report to `tools/out/easing/index.html`.
+- **Combo plaque** slides in with overshoot, the number punches on each new step, and it fades out instead of vanishing. **Toasts** fade and rise in and out. **Score floats** pop in at 1.5x.
+- **Score milestones:** 5K, OVER 9000, 25K, 50K, 100K, 250K, 500K, 1 MILLION, then every million. Each one throws the biggest show in the game: a big banner, six rainbow world rings, a ring of fireworks, a nova, a crown fountain and two light chases around the frame. Crossing 9,000 says IT'S OVER 9000! (the GPU font gained a "!" for it).
+- **Light chase:** from cascade x2 on, comets race both ways around the gold frame and flash the corners.
+- Falling gems leave light trails, the selected gem sheds curling motes, and embers are big enough to actually see.
+
 ## 3.2.4 hosting patch 3 (2026-09-27) Resonance FX
 
 Tetris Effect style juice pass, from Andre's feedback on Discord ("up the particles/fx even more"). Presentation only: board state, scoring and co-op packets are untouched.

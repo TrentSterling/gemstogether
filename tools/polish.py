@@ -220,6 +220,12 @@ rep("this.text(text,w/2,ty+9,13,UI_ART.highlight,'center',tw-20);}", "this.text(
 rep("this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),f.special?22:24,",
     "this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.special?22:24)*(1+.5*Math.exp(-age*13)),")
 
+# Milestone banner: floats may carry their own size, colour and life (defaults unchanged).
+rep("this.floats=this.floats.filter(f=>a.time-f.birth<1.1);", "this.floats=this.floats.filter(f=>a.time-f.birth<(f.life||1.1));")
+rep("alpha=Math.min(age*9,1)*clamp((1.1-age)*3,0,1);", "alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);")
+rep("(f.special?22:24)*(1+.5*Math.exp(-age*13)),f.special?UI_ART.aqua:UI_ART.highlight,'center',Math.min(300,a.cssWidth-40)",
+    "(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40)")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')
