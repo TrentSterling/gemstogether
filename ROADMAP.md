@@ -25,6 +25,31 @@ Tront: "log andres feedback its basically our north star to impress him". Andre 
 
 Next music fix (from the 14:14 note): layers should latch. Once a layer is earned it holds for at least 8 bars and fades out over 2 to 4 bars instead of following flow straight down; the base layer returns only after a long quiet stretch. Keep the patch 15 exhale after x5, but make it a 2-bar breath that comes back to the latched layers, not to the pad.
 
+## Next up (prioritized, as of 2026-09-28 after patch 20)
+
+Pick from the top. Each one ships with receipts (clip.mjs before/after; co-op features also coop-res/swap-audit).
+
+1. **Meta progression (Andre's Steam list, the last big open item).** A journey map of the stages you've reached, saved between sessions. Unlock the stage skins you've visited as a "start from" choice in zen (Jennifer keeps free play). A lifetime gem counter that fills a "treasury" you build up: the Homescapes idea, as a cabinet that gains ornaments.
+2. **Click-to-swap discoverability (Andre's carpal tunnel note).** A first-run hint card ("tap a gem, then its neighbour"), a visible selection glow that pulses toward the valid neighbours, and a Settings option: swap on tap-tap only. Measure drag vs tap usage.
+3. **Stage soundtracks from MIDI (Andre's idea, Tront's Suno tracks).** Convert a track to MIDI, store it as a compact note list in the HTML, and have ResonanceMusic play it through the same synth voices and layers (latched by flow). No samples, no AI noise, fully tweakable. Start with one stage as a test.
+4. **More modes on top of endless:** Timed (2 minutes, Resonance counts double), Moves (30 moves, best score), Puzzle boards (clear in N moves). The run-end card already exists (patch 13) to reuse.
+5. **Co-op team moments:** a "high five" burst when both players clear within a second; partner callouts ("PARTNER x5") in their colour; TEAM RESONANCE gets its own fanfare variant.
+6. **Named payouts for chains, not just Resonance:** x7+ in one move gets a name card (like Dodecatris) and goes into a per-session highlight reel ("best chain", "biggest Resonance").
+7. **Steam path prep:** a desktop wrapper (Tauri or Electron), Steam achievements mapped to milestones, stage unlocks, SUPERNOVA and co-op; controller glyphs; resolution and fullscreen options.
+
+## Brainstorm (not committed, ideas to pick from)
+
+- **Gem personalities:** each gem type gets a tiny idle life (hearts beat, diamonds glint, triangles spin) that speeds up with the music's beat.
+- **Special gem showcase:** when a blast or prism is forged, a quick camera push-in plus a unique sound, grounded on the new gem (it's the thing, so the light lives on it).
+- **Stage props:** each stage places a few 3D props in the world behind the cabinet (TIDEPOOL jellyfish, EMBER REEF coral glow, AURORA ribbons, STARFALL shooting stars that cross the sky on the beat).
+- **Photo mode:** freeze the board, orbit the camera a little (Tront loves the perspective camera), and save a PNG with the stage name and score.
+- **Daily board:** one seeded board a day, shared score; co-op friends see each other's result.
+- **Spectator juice:** in the public room, watchers get the full show and can send cheers (a sparkle that flies to the board).
+- **Accessibility:** colour-blind gem shapes are already distinct; add a high-contrast outline option and a larger cursor option.
+- **Ghost of your best:** in Timed mode, a faint score line of your best run to race.
+- **Music toys:** a Settings page that shows the live layers (pad, bass, arp, drums, lead) lighting up, so players see the music respond to them.
+- **Jennifer mode check:** a calm preset (Flashes Low, Juice 80, music on, endless) one tap away, for winding down.
+
 ## Standing direction (Tront's calls, these override research)
 
 - **MORE juice, never less.** Don't tone things down. When something reads weak, make it bigger. When something reads wrong, change its shape, not its volume.
