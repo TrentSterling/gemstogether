@@ -14,6 +14,16 @@ The rules every patch follows. Tront's calls override research. Living document:
 4. **Co-op is the default path.** tront.xyz puts everyone in a shared room. Every feature has to look and sound right for the host and for the joining player, and has to be tested there (not only with `#solo=1`).
 5. **Plain words.** Names are jewel and light words (SPARKLING, TIDEPOOL, PRISM HEART). No meme callouts, no dated references.
 
+## What the deep research added
+
+From `research/DEEP-RESEARCH-COMBO-SPECTACLE.md`: **"Do not make 5x merely five times as loud as 1x. Make 5x cross a state boundary that 1x cannot access."** How we apply it (Tront's MORE rule still wins; nothing gets taken away from x1):
+
+- **x4 is a warning:** a riser builds toward the next step.
+- **x5 owns exclusive assets:** the music ducks, then slams back with a fanfare phrase heard nowhere else; a 0.45 s slow-motion hold; gold shock rings; the longest rumble.
+- **Excitation, then relaxation:** after a x5+ chain the soundtrack exhales (pad only for two bars).
+- **Charge, transform, release:** Resonance (Zone and Burst style) charges from every clear, transforms for 8 s, then releases with a named payout (RADIANT RESONANCE, PRISMATIC RESONANCE, SUPERNOVA), like Dodecatris.
+- **Synchronize the channels:** result sounds snap to the soundtrack's 1/32 grid, and the frame and gems breathe on its beats.
+
 ## The combo ladder
 
 | Tier | Feeling | Visual (adds) | Audio (adds) | Camera and time |

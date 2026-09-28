@@ -67,5 +67,11 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 - Patch 8: the journey (six score-driven stages: sky grade, tempo, progressions, stage show, progress bar).
 - Patch 9: gamepad support + rumble + bold cursor.
 - Patch 10: Flashes setting (Full/Low/Off).
+- Patch 11: Resonance (a shared Zone-style meter, TEAM RESONANCE, a payout).
+- Patch 12: result sounds snap to the beat.
+- Patch 13: optional out-of-moves run end (solo).
+- Patch 14: the board breathes to the beat + chain aura.
+- Patch 15: research pass (x4 riser; the x5 duck, fanfare and slow-motion hold; the exhale; named payouts).
+- Patch 16: phone strip for stage + Resonance; new link preview image (v2).
 
 - Patch 5 (2026-09-28): Bejeweled-style invalid swap in solo AND co-op (the regression André and Tront hit); red brackets gone; hitstop + camera punch; squash and stretch; score comets; milestone meme removed.
