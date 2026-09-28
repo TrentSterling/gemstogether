@@ -155,5 +155,25 @@
         "Journey tour: every stage line in turn (score jumped to each line every 2 s)"
       ]
     ]
+  },
+  {
+    "title": "Round 4 (patch 9): gamepad support",
+    "why": "Andre: 'add gamepad support'. Also part of the drag-fatigue fix: a pad (or the arrow keys) now plays the whole game without holding the mouse.",
+    "before": "r2-stage",
+    "beforeLabel": "before: no gamepad input at all (any clip; pads were ignored)",
+    "after": "r4-pad",
+    "afterLabel": "patch 9: a scripted standard pad walks the cursor, holds A + down to swap, then X hint and Y point",
+    "changes": [
+      "Standard-mapping gamepads drive the board cursor: D-pad or left stick (with key repeat), tap A to select or swap with the selected neighbour, hold A + a direction to swap that way, B deselects or closes a panel, X hint, Y point ping for co-op partners, Start settings, Back/Select co-op room.",
+      "A bold pulsing gold cursor frame whenever the keyboard or a pad is driving; it turns aqua with swap arrows while A is held.",
+      "Rumble scales with the combo tier (x5+ and specials hit hardest), a short buzz on an illegal swap's bump, a long one on a stage change.",
+      "The first button press also wakes the audio, like a click."
+    ],
+    "frames": [],
+    "checks": [
+      "verify 22/22",
+      "scripted pad: cursor 27 -> 2 by D-pad taps, hold A + down swapped 2<->10 (1 move, +150), rumble fired, X showed a 2-cell hint, Y placed a point ping on the cursor cell, 0 errors",
+      "not tested with a physical controller here: needs a real pad on Tront's machine"
+    ]
   }
 ]

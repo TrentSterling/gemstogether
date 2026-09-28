@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.4 hosting patch 9 (2026-09-28) Gamepad support
+
+- **Plug in a controller and play** (Discord: "add gamepad support"). The D-pad or left stick moves a cursor, with key repeat. Tap A to select (or to swap with the selected neighbour), or hold A and push a direction to swap that way. B deselects, X shows a hint and Y points a gem out to your co-op partners. Start opens Settings and Back/Select opens the Co-op Room.
+- **A bold, pulsing gold cursor** whenever a pad or the arrow keys are driving. It turns aqua with swap arrows while A is held.
+- **Rumble** that scales with your combo: bigger chains and specials hit harder, an illegal swap buzzes, and a new stage gives a long rumble.
+- Less drag fatigue: the whole game plays from the pad or the keyboard now.
+
 ## 3.2.4 hosting patch 8 (2026-09-28) The journey
 
 Zen/endless now travels (Discord: "switch up the stage/background/theme/music after each XX points, like progressing a level"). Endless is still endless; the journey rides on top.

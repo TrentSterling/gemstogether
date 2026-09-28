@@ -348,6 +348,41 @@ CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();""", r"""this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();""")
 
+# Tront patch 9 (S94 gauntlet R4): gamepad (Discord: "add gamepad support"). Standard mapping. It drives the same
+# board cursor as the arrow keys: D-pad / left stick move (with repeat), tap A = select or swap with the selected
+# neighbour, hold A + a direction = swap that way (like a drag), B = deselect / close, X = hint, Y = point ping for
+# co-op partners, Start = settings, Back/Select = co-op room. Rumble scales with the combo tier.
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""JewelApp.prototype.pollPad=function(){
+ const pads=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const p of pads||[])if(p&&p.connected&&(!g||p.mapping==='standard'&&g.mapping!=='standard'))g=p;
+ const now=performance.now(),P=this.padState||(this.padState={b:[],dir:null,next:0,id:null,aAt:0,swapped:false});if(!g){P.id=null;return;}
+ const snap=()=>{P.b=g.buttons.map(b=>!!b.pressed);};
+ if(P.id!==g.id){P.id=g.id;this.pad=g.index;this.keyboardActive=true;this.toast('Gamepad ready: A select, hold A + direction to swap, X hint, Y point');snap();return;}
+ const bt=i=>!!g.buttons[i]?.pressed,down=i=>bt(i)&&!P.b[i],ax=g.axes[0]||0,ay=g.axes[1]||0;
+ if(g.buttons.some(b=>b.pressed)&&!P.woke){P.woke=true;this.audio.start().catch(()=>{});}
+ if(this.panelOpen){if(down(1)||down(9))this.closePanel();snap();return;}
+ if(down(9))this.openPanel('settings');else if(down(8))this.openPanel('coop');else if(down(2))this.hint();else if(down(3)){this.keyboardActive=true;this.pointAt(this.keyboardCell);}else if(down(1)){this.selected=-1;this.grab=-1;}
+ const dir=bt(14)||ax<-.5?'l':bt(15)||ax>.5?'r':bt(12)||ay<-.5?'u':bt(13)||ay>.5?'d':null;
+ if(down(0)){P.aAt=now;P.swapped=false;}
+ if(dir&&(dir!==P.dir||now>=P.next)){P.next=now+(dir!==P.dir?230:95);const x=this.keyboardCell%8,y=this.keyboardCell/8|0,to=clamp(y+(dir==='u'?-1:dir==='d'?1:0),0,7)*8+clamp(x+(dir==='l'?-1:dir==='r'?1:0),0,7);this.keyboardActive=true;
+  if(bt(0)&&P.aAt&&to!==this.keyboardCell){P.swapped=true;if(this.auto)this.toggleDemo(false);this.selected=-1;this.trySwap(this.keyboardCell,to);}else this.keyboardCell=to;}
+ P.dir=dir;
+ if(!bt(0)&&P.b[0]){if(!P.swapped){this.keyboardActive=true;this.clickCell(this.keyboardCell);}P.aAt=0;}
+ snap();};
+JewelApp.prototype.rumble=function(strong,weak,ms){const g=this.pad!=null&&navigator.getGamepads?navigator.getGamepads()[this.pad]:null,v=g&&g.vibrationActuator;if(!v||this.prefs.juice<=0)return;try{v.playEffect('dual-rumble',{duration:ms,strongMagnitude:clamp(strong,0,1),weakMagnitude:clamp(weak,0,1)});}catch{}};
+CabinetUI.prototype.drawPadCursor=function(){const a=this.app,p=this.ink;if(!a.keyboardActive||a.panelOpen||a.auto)return;const i=a.keyboardCell,ac=a.getActor(i);if(!ac)return;
+ const pos=ac.pos,q0=project([pos[0]-.5,pos[1]+.5,.7],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.5,pos[1]-.5,.7],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
+ const pulse=.5+.5*Math.sin(performance.now()*.008),col=armed?'#86e5ed':'#ffd98a',th=3+pulse*1.5,L=w*.34;p.opacity=1;
+ for(const [px,py,sx,sy] of [[x,y,1,1],[X,y,-1,1],[x,Y,1,-1],[X,Y,-1,-1]])p.poly([px+sx*L,py,px,py,px,py+sy*L],th,col,.95);
+ p.box(x-3,y-3,w+6,Y-y+6,col,8,.10+.08*pulse);
+ if(armed){const c=[(x+X)/2,(y+Y)/2],r=w*.62+pulse*3,s=w*.13;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const tx=c[0]+dx*r,ty=c[1]+dy*r;p.poly([tx-dy*s-dx*s,ty+dx*s-dy*s,tx,ty,tx+dy*s-dx*s,ty-dx*s-dy*s],3,col,.9);}}};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.drawComets();this.drawCursor();p.submit();""", r"""this.drawComets();this.drawPadCursor();this.drawCursor();p.submit();""")
+rep(r"""this.music?.tick();""", r"""this.music?.tick();this.pollPad?.();""")
+rep(r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}""",
+    r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}this.rumble?.(special||this.cascade>=5?.9:this.cascade>=3?.5:.12,.3+.1*Math.min(this.cascade,6),special?260:110+this.cascade*20);""")
+rep(r"""if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);}""", r"""if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);this.rumble?.(0,.45,70);}""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

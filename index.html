@@ -645,7 +645,7 @@ class ResonanceFX {
   else if(k>this.stage){this.stage=k;if(!a.practice)this.stageShow(k);}
   const tg=this.stageInfo(this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
  stageShow(k){const a=this.a,t=a.time,info=this.stageInfo(k);this.stats.stages=(this.stats.stages||0)+1;this.flow=Math.max(this.flow,1.1);this.pulse=1.5;this.laser=Math.max(this.laser,1.2);
-  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);
+  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);a.rumble?.(1,1,480);
   if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
   for(let b=0;b<8;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.5),-3+Math.random()*7,-.8+Math.random()*1.2],GEM_COLORS[b%6],t+.2+b*.12,1.2);}
   this.trace(col,t,.9);}
@@ -1349,7 +1349,7 @@ class CabinetUI {
  }
  draw(){const a=this.app,p=this.ink;p.begin(a.cssWidth,a.cssHeight);this.hits=[];
   this.floats=this.floats.filter(f=>a.time-f.birth<(f.life||1.1));for(const f of this.floats){const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos,a.vp,a.cssWidth,a.cssHeight),alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);p.opacity=alpha;this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40),.12,true);}p.opacity=1;
-  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();
+  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();this.drawPadCursor();this.drawCursor();p.submit();
  }
 }
 
@@ -1532,7 +1532,7 @@ class JewelApp {
  explode(authority=null){
   const plan=this.clearPlan,result=authority?authority.result:this.board.applyClear(plan,this.cascade),mode=this.presentation.mode;if(authority)netBoardLoad(this,authority.board);this.clearResult=result;
   const special=mode==='prism'||mode==='blast',magnitude=clamp(.19+this.cascade*.087+result.removed.length*.013+(special?.24:0),0,1.35)*this.prefs.juice/100;
-  this.juice=Math.min(1.55,this.juice*.27+magnitude);this.shake=Math.min(.85,magnitude*(special?.48:.26));if(special||this.cascade>=4){const k=this.prefs.juice/100;this.hitstop=Math.max(this.hitstop||0,(special?.08:.045+Math.min(this.cascade-4,4)*.008)*Math.min(k,1.25));if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}
+  this.juice=Math.min(1.55,this.juice*.27+magnitude);this.shake=Math.min(.85,magnitude*(special?.48:.26));if(special||this.cascade>=4){const k=this.prefs.juice/100;this.hitstop=Math.max(this.hitstop||0,(special?.08:.045+Math.min(this.cascade-4,4)*.008)*Math.min(k,1.25));if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}this.rumble?.(special||this.cascade>=5?.9:this.cascade>=3?.5:.12,.3+.1*Math.min(this.cascade,6),special?260:110+this.cascade*20);
   let center=[0,0,0],typ=0;
   for(let k=0;k<result.removed.length;k++){const item=result.removed[k],a=this.actors.get(item.tile.id);if(!a)continue;typ=item.tile.type;center=vadd(center,a.pos);a.charge=null;a.pop={start:this.time+Math.min(k*.002,.035),duration:.135};this.burstGem(a.pos,item.tile.type,magnitude,item.tile.special);}
   if(result.removed.length)center=vmul(center,1/result.removed.length);
@@ -1586,7 +1586,7 @@ class JewelApp {
      if(age>=m.duration){pos=m.to.slice();a.move=null;}
     }else if(m.type==='bounce'){const T=FEEL.swap,H=BOUNCE_HOLD,j=this.prefs.juice/100,dx=m.to[0]-m.from[0],dy=m.to[1]-m.from[1],hz=Math.abs(dx)>=Math.abs(dy),L=Math.hypot(dx,dy)||1;let u,arc=0,st=0,sq=0,rat=0;
      if(age<T){const t=age/T;u=smooth(t);arc=Math.sin(t*PI);st=arc;}
-     else if(age<T+H){const t=(age-T)/H;u=1;sq=Math.sin(t*PI);rat=Math.sin(t*TAU*2)*(1-t);if(!m.turned){m.turned=true;if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);}}}
+     else if(age<T+H){const t=(age-T)/H;u=1;sq=Math.sin(t*PI);rat=Math.sin(t*TAU*2)*(1-t);if(!m.turned){m.turned=true;if(m.sign>0){this.audio.reject(m.from[0]);this.fx.bump?.(m.from,m.to);this.rumble?.(0,.45,70);}}}
      else{const t=clamp((age-T-H)/T);u=1-smooth(t);arc=Math.sin(t*PI);st=arc;}
      pos=m.from.map((x,i)=>mix(x,m.to[i],u));pos[2]+=arc*.22*(m.sign>0?1:.6);rz=arc*.13*m.sign;pos[0]+=dx/L*rat*.05*j;pos[1]+=dy/L*rat*.05*j;
      const along=1+st*.09*j-sq*.17*j,across=1-st*.06*j+sq*.11*j;sx=hz?along:across;sy=hz?across:along;
@@ -1634,7 +1634,7 @@ class JewelApp {
  finishAACompare(){if(!this.aaCompare)return;this.aaCompare=false;this.aaCompareBypass=false;this.frozen=!!this.aaWasFrozen;$('freeze').checked=this.frozen;this.syncAA();}
  resize(){this.cssWidth=innerWidth;this.cssHeight=innerHeight;const scale=(devicePixelRatio||1)*this.prefs.quality,maxDim=Math.min(4096,this.renderer.gl?this.renderer.gl.getParameter(this.renderer.gl.MAX_RENDERBUFFER_SIZE):this.renderer.device.limits.maxTextureDimension2D);let w=Math.round(this.cssWidth*scale),h=Math.round(this.cssHeight*scale);if(Math.max(w,h)>maxDim){const k=maxDim/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k);}if(w*h>8294400){const k=Math.sqrt(8294400/(w*h));w=Math.round(w*k);h=Math.round(h*k);}this.renderer.setAA(!this.aaCompareBypass&&(this.prefs.aaMode==='msaa'||this.prefs.aaMode==='hybrid'));this.renderer.resize(w,h);this.syncAA();this.updateCamera();}
  updateCamera(){const aspect=this.cssWidth/this.cssHeight,tan=Math.tan(42/2*PI/180),z=cabinetFraming(this.cssWidth,this.cssHeight).distance;let shake=this.prefs.motion?this.shake:0;const sx=Math.sin(this.time*54)*shake*.026,sy=Math.sin(this.time*43+1)*shake*.022;this.eye=[sx,.62+sy,z*(1-.045*(this.punch||0))];this.target=[0,0,0];this.forward=vnorm(vsub(this.target,this.eye));this.right=vnorm(vcross(this.forward,[0,1,0]));this.up=vcross(this.right,this.forward);this.vp=matMul(perspective(42*PI/180,aspect,.1,150),lookAt(this.eye,this.target,[Math.sin(this.time*33)*shake*.002,1,0]));this.tanFov=tan;}
- draw(){this.syncAA();this.updateCamera();const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());const r=this.renderer,u=r.uniforms;u.set(this.vp,0);u.set([...this.eye,1],16);u.set([...this.right,0],20);u.set([...this.up,0],24);u.set([this.time,this.juice,this.cssWidth/this.cssHeight,this.tanFov],28);u.set([1.08+this.juice*.035,.70,this.prefs.motion?1:0,1],32);u.set([r.width,r.height,1/r.width,1/r.height],36);u.set([...this.forward,0],40);u.set([(this.effectiveAA==='fxaa'||this.effectiveAA==='hybrid')?this.prefs.aaStrength/100:0,this.prefs.sharpness/100,0,0],44);u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.music?.tick();this.fx.uniforms(u);
+ draw(){this.syncAA();this.updateCamera();const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());const r=this.renderer,u=r.uniforms;u.set(this.vp,0);u.set([...this.eye,1],16);u.set([...this.right,0],20);u.set([...this.up,0],24);u.set([this.time,this.juice,this.cssWidth/this.cssHeight,this.tanFov],28);u.set([1.08+this.juice*.035,.70,this.prefs.motion?1:0,1],32);u.set([r.width,r.height,1/r.width,1/r.height],36);u.set([...this.forward,0],40);u.set([(this.effectiveAA==='fxaa'||this.effectiveAA==='hybrid')?this.prefs.aaStrength/100:0,this.prefs.sharpness/100,0,0],44);u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.music?.tick();this.pollPad?.();this.fx.uniforms(u);
   const batches=Array.from({length:6},()=>[]),special=[];for(const a of this.actors.values()){if(a.scale[0]<.001)continue;const m=trs(a.pos,a.rotation,a.scale);batches[a.tile.type].push(...packedInstance(m,GEM_COLORS[a.tile.type],a.energy,2,a.hover,a.tile.special,a.seed));}
   batches.forEach((b,i)=>r.upload(this.world.gemMeshes[i],new Float32Array(b),b.length/24));r.upload(this.world.specialMesh,new Float32Array(special),special.length/24);
   const hover=[];let cells=new Map();for(const i of this.hintCells)cells.set(i,'hint');if(this.hover>=0)cells.set(this.hover,'hover');if(this.keyboardActive)cells.set(this.keyboardCell,'hover');if(this.selected>=0)cells.set(this.selected,'selected');
@@ -2431,6 +2431,29 @@ CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(
  const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
  p.opacity=clamp(inn*3,0,1)*(1-out);const Y=cy+bw*.04;p.box(cx-bw*.62+dx,Y,bw*1.24,bw*.34,'#071418',10,.85);p.box(cx-bw*.62+dx,Y,bw*1.24,5,oc,2,1);p.box(cx-bw*.62+dx,Y+bw*.34-5,bw*1.24,5,oc,2,1);
  this.text('STAGE '+o.n+(o.loop?'  ENCORE':''),cx+dx,Y+bw*.035,bw*.07,oc,'center',bw*1.2,.14,true);this.text(o.name,cx+dx*1.15,Y+bw*.13,bw*.14,'#ffffff','center',bw*1.2,.18,true);p.opacity=1;};
+JewelApp.prototype.pollPad=function(){
+ const pads=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const p of pads||[])if(p&&p.connected&&(!g||p.mapping==='standard'&&g.mapping!=='standard'))g=p;
+ const now=performance.now(),P=this.padState||(this.padState={b:[],dir:null,next:0,id:null,aAt:0,swapped:false});if(!g){P.id=null;return;}
+ const snap=()=>{P.b=g.buttons.map(b=>!!b.pressed);};
+ if(P.id!==g.id){P.id=g.id;this.pad=g.index;this.keyboardActive=true;this.toast('Gamepad ready: A select, hold A + direction to swap, X hint, Y point');snap();return;}
+ const bt=i=>!!g.buttons[i]?.pressed,down=i=>bt(i)&&!P.b[i],ax=g.axes[0]||0,ay=g.axes[1]||0;
+ if(g.buttons.some(b=>b.pressed)&&!P.woke){P.woke=true;this.audio.start().catch(()=>{});}
+ if(this.panelOpen){if(down(1)||down(9))this.closePanel();snap();return;}
+ if(down(9))this.openPanel('settings');else if(down(8))this.openPanel('coop');else if(down(2))this.hint();else if(down(3)){this.keyboardActive=true;this.pointAt(this.keyboardCell);}else if(down(1)){this.selected=-1;this.grab=-1;}
+ const dir=bt(14)||ax<-.5?'l':bt(15)||ax>.5?'r':bt(12)||ay<-.5?'u':bt(13)||ay>.5?'d':null;
+ if(down(0)){P.aAt=now;P.swapped=false;}
+ if(dir&&(dir!==P.dir||now>=P.next)){P.next=now+(dir!==P.dir?230:95);const x=this.keyboardCell%8,y=this.keyboardCell/8|0,to=clamp(y+(dir==='u'?-1:dir==='d'?1:0),0,7)*8+clamp(x+(dir==='l'?-1:dir==='r'?1:0),0,7);this.keyboardActive=true;
+  if(bt(0)&&P.aAt&&to!==this.keyboardCell){P.swapped=true;if(this.auto)this.toggleDemo(false);this.selected=-1;this.trySwap(this.keyboardCell,to);}else this.keyboardCell=to;}
+ P.dir=dir;
+ if(!bt(0)&&P.b[0]){if(!P.swapped){this.keyboardActive=true;this.clickCell(this.keyboardCell);}P.aAt=0;}
+ snap();};
+JewelApp.prototype.rumble=function(strong,weak,ms){const g=this.pad!=null&&navigator.getGamepads?navigator.getGamepads()[this.pad]:null,v=g&&g.vibrationActuator;if(!v||this.prefs.juice<=0)return;try{v.playEffect('dual-rumble',{duration:ms,strongMagnitude:clamp(strong,0,1),weakMagnitude:clamp(weak,0,1)});}catch{}};
+CabinetUI.prototype.drawPadCursor=function(){const a=this.app,p=this.ink;if(!a.keyboardActive||a.panelOpen||a.auto)return;const i=a.keyboardCell,ac=a.getActor(i);if(!ac)return;
+ const pos=ac.pos,q0=project([pos[0]-.5,pos[1]+.5,.7],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.5,pos[1]-.5,.7],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
+ const pulse=.5+.5*Math.sin(performance.now()*.008),col=armed?'#86e5ed':'#ffd98a',th=3+pulse*1.5,L=w*.34;p.opacity=1;
+ for(const [px,py,sx,sy] of [[x,y,1,1],[X,y,-1,1],[x,Y,1,-1],[X,Y,-1,-1]])p.poly([px+sx*L,py,px,py,px,py+sy*L],th,col,.95);
+ p.box(x-3,y-3,w+6,Y-y+6,col,8,.10+.08*pulse);
+ if(armed){const c=[(x+X)/2,(y+Y)/2],r=w*.62+pulse*3,s=w*.13;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const tx=c[0]+dx*r,ty=c[1]+dy*r;p.poly([tx-dy*s-dx*s,ty+dx*s-dy*s,tx,ty,tx+dy*s-dx*s,ty-dx*s-dy*s],3,col,.9);}}};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;
 CabinetUI.prototype.coopBadge=function(){
  const a=this.app,n=a.coop;if(!n?.publicRoom)return privateCoopBadge.call(this);

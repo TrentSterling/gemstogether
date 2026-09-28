@@ -17,7 +17,7 @@ mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
 const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H});
 const log = [];
-let tour = false;
+let tour = false, padScript = null, padMove = null;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
@@ -40,11 +40,29 @@ try {
   } else if (scene === 'tour') {
     // All six journey stages: jump the score to each stage line every 2 s (drives the real stage shows).
     tour = true;
+  } else if (scene === 'pad') {
+    // A scripted standard gamepad (navigator.getGamepads is replaced; real Gamepad objects cannot be made).
+    await page.eval(`(()=>{window.__rumbles=[];window.__pad={id:'Scripted standard gamepad',index:0,connected:true,mapping:'standard',axes:[0,0,0,0],
+      buttons:Array.from({length:17},()=>({pressed:false,value:0})),vibrationActuator:{playEffect:(t,o)=>{window.__rumbles.push(o);return Promise.resolve('complete');}}};
+      navigator.getGamepads=()=>[window.__pad];})()`);
+    const plan = await page.eval(`(()=>{const a=${J}.app,m=a.board.legalMoves()[0],start=a.keyboardCell;return {m,start}})()`);
+    const [i, j] = plan.m, taps = [];
+    let cx = plan.start % 8, cy = plan.start / 8 | 0; const tx = i % 8, ty = i / 8 | 0;
+    while (cx !== tx) { taps.push(cx < tx ? 15 : 14); cx += cx < tx ? 1 : -1; }
+    while (cy !== ty) { taps.push(cy < ty ? 13 : 12); cy += cy < ty ? 1 : -1; }
+    const toward = j === i + 1 ? 15 : j === i - 1 ? 14 : j > i ? 13 : 12;
+    padScript = [];
+    let f0 = 12;
+    for (const b of taps) { padScript.push([f0, b, true], [f0 + 2, b, false]); f0 += 4; }
+    padScript.push([f0 + 4, 0, true], [f0 + 7, toward, true], [f0 + 9, toward, false], [f0 + 10, 0, false]);
+    padScript.push([f0 + 80, 2, true], [f0 + 82, 2, false], [f0 + 100, 3, true], [f0 + 102, 3, false]);
+    padMove = plan;
   } else if (scene === 'showcase') {
     await page.eval(`${J}.showcase()`);
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if (padScript) for (const [pf, pb, pv] of padScript) if (pf === f) await page.eval(`(()=>{const b=window.__pad.buttons[${pb}];b.pressed=${pv};b.value=${pv ? 1 : 0};})()`);
     if (tour && f % 60 === 10) await page.eval(`(()=>{const a=${J}.app,k=${Math.floor(f / 60) + 1},s=5000*k*(k+1)/2+10;a.board.score=s;a.displayScore=s;})()`);
     await page.shot(`${dir}/${String(f).padStart(3, '0')}.png`);
     const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);
@@ -52,7 +70,9 @@ try {
     await step(2);
   }
   const d = await page.eval(`${J}.diagnostics()`);
-  writeFileSync(`${dir}/log.json`, JSON.stringify({log, errors: d.errors, maxCascade: await page.eval(`${J}.app.maxCascadeSeen`)}));
+  const pad = padScript ? await page.eval(`({rumbles:window.__rumbles.length,strongest:Math.max(0,...window.__rumbles.map(r=>r.strongMagnitude)),moves:${J}.app.board.moves,score:${J}.app.board.score,cursor:${J}.app.keyboardCell,point:${J}.points().local,hint:${J}.app.hintCells.length})`) : null;
+  if (pad) console.log('pad', JSON.stringify({...pad, move: padMove}));
+  writeFileSync(`${dir}/log.json`, JSON.stringify({log, pad, errors: d.errors, maxCascade: await page.eval(`${J}.app.maxCascadeSeen`)}));
   console.log(name, 'frames', frames, 'maxCascade', await page.eval(`${J}.app.maxCascadeSeen`), 'errors', JSON.stringify(d.errors));
 } finally { page.kill(); }
 const ff = process.env.FFMPEG || 'ffmpeg';

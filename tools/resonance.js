@@ -168,7 +168,7 @@ class ResonanceFX {
   else if(k>this.stage){this.stage=k;if(!a.practice)this.stageShow(k);}
   const tg=this.stageInfo(this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
  stageShow(k){const a=this.a,t=a.time,info=this.stageInfo(k);this.stats.stages=(this.stats.stages||0)+1;this.flow=Math.max(this.flow,1.1);this.pulse=1.5;this.laser=Math.max(this.laser,1.2);
-  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);
+  const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);a.rumble?.(1,1,480);
   if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
   for(let b=0;b<8;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.5),-3+Math.random()*7,-.8+Math.random()*1.2],GEM_COLORS[b%6],t+.2+b*.12,1.2);}
   this.trace(col,t,.9);}
