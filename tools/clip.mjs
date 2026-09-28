@@ -17,7 +17,7 @@ mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
 const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H});
 const log = [];
-let tour = false, padScript = null, padMove = null;
+let tour = false, padScript = null, padMove = null, autoplay = false;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
@@ -58,12 +58,24 @@ try {
     padScript.push([f0 + 4, 0, true], [f0 + 7, toward, true], [f0 + 9, toward, false], [f0 + 10, 0, false]);
     padScript.push([f0 + 80, 2, true], [f0 + 82, 2, false], [f0 + 100, 3, true], [f0 + 102, 3, false]);
     padMove = plan;
+  } else if (scene === 'res') {
+    // Charge the Resonance meter to 3 gems short, then let Showcase play real moves into and through it.
+    await page.eval(`(()=>{const a=${J}.app,fx=a.fx;if(fx.resCap){fx.res={fill:fx.resCap()-3,mine:fx.resCap()-3,theirs:0,on:false,until:0,count:0};}})()`);
+    await step(20);
+    autoplay = true;
+  } else if (scene === 'end') {
+    // Out of moves: turn End run on, play one real move, then report no legal moves when the turn finishes.
+    await page.eval(`(()=>{const a=${J}.app;a.prefs.endRun=true;a.board.score=12340;a.displayScore=12340;const m=a.board.legalMoves()[0];const lm=a.board.legalMoves.bind(a.board);a.board.legalMoves=()=>[];${J}.swap(m[0],m[1]);})()`);
+  } else if (scene === 'end1') {
+    // Same moment for a build without the option: no legal moves reported once, so it reshuffles.
+    await page.eval(`(()=>{const a=${J}.app;a.board.score=12340;a.displayScore=12340;const m=a.board.legalMoves()[0];const lm=a.board.legalMoves.bind(a.board);${J}.swap(m[0],m[1]);let once=false;a.board.legalMoves=()=>{if(!once&&a.phase!=='swap'&&a.phase!=='anticipate'&&a.phase!=='explode'&&a.phase!=='fall'){once=true;return [];}return lm();};})()`);
   } else if (scene === 'showcase') {
     await page.eval(`${J}.showcase()`);
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
     if (padScript) for (const [pf, pb, pv] of padScript) if (pf === f) await page.eval(`(()=>{const b=window.__pad.buttons[${pb}];b.pressed=${pv};b.value=${pv ? 1 : 0};})()`);
+    if (autoplay) await page.eval(`(()=>{const a=${J}.app;if(a.phase==='idle'){const m=a.board.legalMoves();if(m.length){const p=m[(a.board.moves*7)%m.length];${J}.swap(p[0],p[1]);}}})()`);
     if (tour && f % 60 === 10) await page.eval(`(()=>{const a=${J}.app,k=${Math.floor(f / 60) + 1},s=5000*k*(k+1)/2+10;a.board.score=s;a.displayScore=s;})()`);
     await page.shot(`${dir}/${String(f).padStart(3, '0')}.png`);
     const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);

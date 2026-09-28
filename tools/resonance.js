@@ -68,7 +68,7 @@ class ResonanceFX {
   const au=a.audio;let bass=0;
   if(au?.analyser&&au.ctx?.state==='running'&&!au.muted){if(!this.bins)this.bins=new Uint8Array(au.analyser.frequencyBinCount);au.analyser.getByteFrequencyData(this.bins);let s=0;for(let i=1;i<8;i++)s+=this.bins[i];bass=s/(7*255);}
   this.bass=bass>this.bass?mix(this.bass,bass,.6):this.bass*Math.exp(-dt*5);
-  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);
+  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));this.stageTick(dt);this.resTick();
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -174,12 +174,27 @@ class ResonanceFX {
   if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
   for(let b=0;b<8;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.5),-3+Math.random()*7,-.8+Math.random()*1.2],GEM_COLORS[b%6],t+.2+b*.12,1.2);}
   this.trace(col,t,.9);}
+ // Resonance (patch 11), Tetris Effect Zone style. Every cleared gem charges one shared meter: in co-op both players'
+ // clears count, tallied from the same explode events on every screen, so partners see the same meter. Full = an 8 s
+ // concert (lasers, max flow, every clear rings a chord, light chases the frame), ending in a payout show.
+ resCap(){return 60+Math.min(this.stage||0,8)*12;}
+ resonate(removed,owner){const a=this.a,n=removed?removed.length:0;if(!n||a.practice)return;const R=this.res||(this.res={fill:0,mine:0,theirs:0,on:false,until:0,count:0});
+  if(R.on){R.count+=n;this.sting(Math.min(9,3+Math.floor(R.count/10)));this.laser=Math.max(this.laser,1.4);this.pulse=Math.min(1.5,this.pulse+.4);return;}
+  R.fill+=n;if(owner==='partner')R.theirs+=n;else R.mine+=n;if(R.fill>=this.resCap())this.resStart();}
+ resStart(){const a=this.a,R=this.res,t=a.time;R.on=true;R.start=t;R.until=t+8;R.count=0;R.team=R.theirs>=R.fill*.2&&R.mine>=R.fill*.2;this.stats.resonances=(this.stats.resonances||0)+1;
+  this.flow=1.5;this.pulse=1.5;this.laser=1.5;a.ui?.resCallout?.(R.team?'TEAM RESONANCE':'RESONANCE');a.rumble?.(1,1,600);
+  if(this.on){const sp=a.world.sparks;for(let r=0;r<4;r++)sp.emit([0,0,-2-r],[16+r*5,0,0],[1,.85,.45],1,t+r*.12,1.5,12,0,0);this.nova([0,0,0],Math.round(900*this.j),GEM_COLORS,t);}}
+ resTick(){const a=this.a,s=a.board?.score||0;if(s<(this.resScore||0))this.res=null;this.resScore=s;const R=this.res;if(!R||!R.on)return;const t=a.time;
+  this.flow=Math.max(this.flow,1.25);this.laser=Math.max(this.laser,1.15);
+  if(this.on&&(!R.lastTrace||t-R.lastTrace>.55)){R.lastTrace=t;this.trace([1,.85,.45],t,1.3);}
+  if(t>=R.until){R.on=false;R.fill=0;R.mine=0;R.theirs=0;a.ui?.resPayout?.(R.count,R.team);a.rumble?.(1,.8,500);
+   if(this.on){for(let b=0;b<12;b++){const side=b&1?1:-1;this.firework([side*(5+Math.random()*3.8),-3.6+Math.random()*8.2,-.8+Math.random()*1.3],GEM_COLORS[b%6],t+b*.08,1.4);}this.fountain(Math.round(900*this.j),t+.1);}}}
  // Combo ladder (patch 6). Every tier keeps everything below it and ADDS a new kind of response:
  // x3 a centre-stage callout + chord sting, x4 a bigger callout + sub boom, x5+ nightclub lasers in the sky,
  // speed lines and a flash (the callout and burst are drawn by CabinetUI).
  tier(c){if(c<3)return;const a=this.a;this.stats.tiers=(this.stats.tiers||0)+1;
   if(c>=5)this.laser=Math.min(1.5,Math.max(this.laser,.8)+.25+(c-5)*.1);a.ui?.callout?.(c);this.sting(c);}
- sting(c){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.01,j=Math.min(1.3,this.j);
+ sting(c){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.01+(this.a.music?.snapWait?.(.01)||0),j=Math.min(1.3,this.j);
   const root=196*Math.pow(2,Math.min(c-3,9)*2/12),notes=[1,1.25,1.5,2,2.5,3].slice(0,Math.min(6,c));
   const lp=x.createBiquadFilter();lp.type='lowpass';lp.Q.value=5;lp.frequency.setValueAtTime(700,t);lp.frequency.exponentialRampToValueAtTime(7000,t+.35);const g=x.createGain();g.gain.value=.5*j;lp.connect(g);g.connect(au.sfx);
   notes.forEach((m,i)=>{for(const [type,det,v] of [['sawtooth',-7,.04],['sawtooth',7,.04],['triangle',0,.06]]){const o=x.createOscillator(),e=x.createGain();o.type=type;o.frequency.value=root*m;o.detune.value=det;const s=t+i*.055;

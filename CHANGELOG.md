@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.2.4 hosting patch 13 (2026-09-28) Optional run end
+
+- **Settings > Display > Out of moves: Reshuffle or End run.** Reshuffle is the default and works exactly as before. With End run on, running out of moves dims the board and shows an OUT OF MOVES card: your score counts up, the stage you reached, NEW BEST! with fireworks, and a Play again button. It only applies when no partner is connected, so it never ends a shared board.
+
+## 3.2.4 hosting patch 12 (2026-09-28) Clears land on the beat
+
+- Match, special and chord sounds now wait for the next 1/32 note of the soundtrack (never more than about 90 ms), so your clears play in time with the music. Swaps, clicks and the reject buzz stay instant. Measured: 23 of 23 result sounds on the grid, up from 0.
+
+## 3.2.4 hosting patch 11 (2026-09-28) Resonance
+
+- **A shared meter, Tetris Effect Zone style.** Every gem you clear charges it; in co-op both players' clears count, and the bar shows your share and your partner's in your colours.
+- **When it fills: RESONANCE** (TEAM RESONANCE if you both pitched in). Eight seconds of concert: lasers, maximum flow, golden light around the screen, light racing the frame, every clear rings a climbing chord and the whole soundtrack plays. It ends with a payout: how many gems you cleared, fireworks and a crown fountain.
+
 ## 3.2.4 hosting patch 10 (2026-09-28) Flashes setting
 
 - **Settings > Display > Flashes: Full, Low or Off.** Full is the default and nothing changes for it. Low and Off calm the x5 strobe, the sky and rim flash, the bloom swell and the glow on every match, and dim the lasers. Callouts, speed lines, particles and music stay. Measured over the same combo: Full has 5 hard flashes, Low 3 softer ones, Off none.

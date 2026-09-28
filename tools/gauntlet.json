@@ -214,5 +214,98 @@
       "clicking the row cycles Full -> Low and saves to gemstogether-settings-v1",
       "verify 22/22"
     ]
+  },
+  {
+    "title": "Round 6 (patch 11): Resonance, a shared Zone-style meter",
+    "why": "Tetris Effect Connected's big idea: both players fill one meter together and share one climax. Our co-op had no shared goal.",
+    "before": "r5-res",
+    "beforeLabel": "patch 10: the same kind of session, no meter",
+    "after": "r6-res",
+    "afterLabel": "patch 11: the meter fills, RESONANCE fires, 8 s of concert, then the payout",
+    "changes": [
+      "Every cleared gem charges one shared meter (60 gems, plus 12 per stage). In co-op both players' clears count, and the bar shows your share and your partner's share in your colours.",
+      "When it fills: RESONANCE (or TEAM RESONANCE if you both put in at least 20%). 8 seconds of concert: lasers pinned, maximum flow, golden light around the screen edges, light chasing the frame, every clear rings a chord that climbs, and the full soundtrack plays.",
+      "Then the payout: 'N GEMS  RESONANCE COMPLETE' with twelve fireworks and a crown fountain.",
+      "A tier callout now lifts above a stage card when both land at once."
+    ],
+    "frames": [
+      [
+        40,
+        "RESONANCE"
+      ],
+      [
+        110,
+        "during"
+      ],
+      [
+        170,
+        "x5 during a stage change"
+      ],
+      [
+        280,
+        "payout"
+      ]
+    ],
+    "checks": [
+      "tools/coop-res.mjs (two real browsers, private room): after each host and peer move both screens show the same meter and the mirrored split, 10/10",
+      "verify 22/22, coop-point 10/10, swap-audit solo/host/peer pass"
+    ]
+  },
+  {
+    "title": "Round 7 (patch 12): clears land on the beat",
+    "why": "The core Tetris Effect trick: what you do sounds like it's in time with the music.",
+    "before": "r6-res",
+    "beforeLabel": "(no visual change; see the chart)",
+    "after": "r6-res",
+    "afterLabel": "(no visual change; see the chart)",
+    "changes": [
+      "Match, special and chord sounds wait for the next 1/32 of the soundtrack's grid (never more than about 90 ms at 84 BPM, less on faster stages). Swaps, clicks and the reject buzz are never delayed, so input stays instant."
+    ],
+    "frames": [],
+    "images": [
+      [
+        "tools/out/beat/beat-hist.png",
+        "Measured from AudioBufferSourceNode.start() in a real-time session: before 0/23 result sounds on the grid, after 23/23 (longest wait 74 ms)"
+      ]
+    ],
+    "checks": [
+      "tools/beat-audit.mjs: after 23/23 on the grid, before 0/23, 0 errors"
+    ]
+  },
+  {
+    "title": "Round 8 (patch 13): optional run end",
+    "why": "Andre: 'some kind of fail-state would be nice, like out of moves'. Tront: 'would want a toggle for people who would rather flip the board'.",
+    "before": "r7b-end1",
+    "beforeLabel": "patch 12: no moves left, it reshuffles",
+    "after": "r8-end",
+    "afterLabel": "patch 13 with End run on: OUT OF MOVES card",
+    "changes": [
+      "Settings > Display > Out of moves: Reshuffle (default) or End run. Only when no partner is connected, so it never ends a shared board.",
+      "End run: the board dims, the card slides in, your score counts up, the stage you reached, NEW BEST! with fireworks, and a Play again button. The soundtrack drops to just the pad."
+    ],
+    "frames": [
+      [
+        40,
+        "the moment"
+      ],
+      [
+        70,
+        "counting up"
+      ],
+      [
+        150,
+        "settled"
+      ]
+    ],
+    "images": [
+      [
+        "tools/out/clips/r8-card.png",
+        "The card at rest"
+      ]
+    ],
+    "checks": [
+      "probe: swaps are blocked while the card is up; clicking Play again clears it and deals a fresh board (16 legal moves), 0 errors",
+      "verify 22/22"
+    ]
   }
 ]

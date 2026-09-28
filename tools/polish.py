@@ -313,8 +313,8 @@ CabinetUI.prototype.drawBurst=function(){const a=this.app,p=this.ink,b=this.burs
 CabinetUI.prototype.drawCallout=function(){const a=this.app,o=this.co;if(!o||a.panelOpen)return;const age=a.time-o.birth,L=1.2;if(age<0)return;if(age>L){this.co=null;return;}
  const {cx,cy,bw}=this.boardBox(),c=o.c,s=1+1.5*Math.exp(-age*15),al=Math.min(1,age*18)*clamp((L-age)/.32,0,1),size=bw*(.19+.045*Math.min(c-3,6));
  const shake=c>=5?Math.sin(age*95)*6*Math.exp(-age*7):0,col=c>=9?gemHex(((a.time*10)|0)%6):TIER_COLS[Math.min(c,9)],p=this.ink;
- p.opacity=al;const y=cy-size*.72*s,rise=-(age>.8?(age-.8)*40:0);
- this.text('x'+c,cx+shake,y+rise,size*s,col,'center',Infinity,.2,true);
+ p.opacity=al;const lift=this.sc&&a.time-this.sc.birth<2.6?bw*.2:0,y=cy-size*.72*s-lift,rise=-(age>.8?(age-.8)*40:0)-lift;
+ this.text('x'+c,cx+shake,y+rise+lift,size*s,col,'center',Infinity,.2,true);
  this.text(o.name,cx-shake*.5,cy+size*.36*s+rise,size*.3*Math.max(1,s*.9),'#ffffff','center',bw*1.25,.16,true);p.opacity=1;};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.coopPresence();this.drawComets();this.drawCursor();p.submit();""", r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();""")
@@ -391,6 +391,55 @@ rep(r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});""",
     r"""activate(id){const a=this.app;a.audio.start().catch(()=>{});if(id==='flash'){const o=['full','low','off'];a.prefs.flash=o[(o.indexOf(a.prefs.flash||'full')+1)%3];a.savePreferences();a.toast('Flashes: '+({full:'Full',low:'Low',off:'Off'})[a.prefs.flash]);return;}""")
 rep(r"""if(a.prefs.motion&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f);}""",
     r"""const FL=a.fx?a.fx.F:1;if(a.prefs.motion&&FL>0&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f*FL);}""")
+
+# Tront patch 11 (S94 gauntlet R6): Resonance, a shared Zone-style meter (logic in resonance.js). Here: the hook,
+# the meter under the stage bar (two colours in co-op: yours and your partner's), the callout, the golden edge
+# glow while it runs, and the payout banner.
+rep(r"""this.ui?.comets?.(result.removed,this.turnOwner);""", r"""this.ui?.comets?.(result.removed,this.turnOwner);this.fx.resonate?.(result.removed,this.turnOwner);""")
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""CabinetUI.prototype.resCallout=function(label){this.rc={label,birth:this.app.time};};
+CabinetUI.prototype.resPayout=function(count,team){this.rp={count,team,birth:this.app.time};};
+CabinetUI.prototype.drawRes=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||a.panelOpen)return;const R=fx.res,co=a.coop,t=a.time;p.opacity=1;
+ if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,cap=fx.resCap(),mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
+  const on=R&&R.on,glow=on?.6+.4*Math.sin(t*14):0;this.text(on?'RESONANCE!':'RESONANCE',x+4,yy,11,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w,.12,true);
+  p.box(x+2,yy+17,w-4,11,'#071418',4,.95);
+  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+4+(w-8)*f*k/6,yy+19,(w-8)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+2,yy+15,w-4,15,'#ffffff',5,.12*glow);}
+  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+4,yy+19,(w-8)*fm,7,mineCol,2,1);if(ft>0)p.box(x+4+(w-8)*fm,yy+19,(w-8)*ft,7,theirCol,2,1);
+   if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+2,yy+15,w-4,15,'#ffd98a',5,.18*pu);}}}
+ if(R&&R.on){const w=a.cssWidth,h=a.cssHeight,pu=.55+.45*Math.sin(t*6.5),g='#ffc861',FL=fx.F;for(let k=0;k<6;k++){const d=6+k*10,al=(.11-.016*k)*pu*(.4+.6*FL);p.box(0,0,d,h,g,0,al);p.box(w-d,0,d,h,g,0,al);p.box(0,0,w,d,g,0,al);p.box(0,h-d,w,d,g,0,al);}}
+ const {cx,cy,bw}=this.boardBox(),o=this.rc;
+ if(o){const age=t-o.birth,L=1.6;if(age>L)this.rc=null;else if(age>=0){const s=1+1.2*Math.exp(-age*12),al=Math.min(1,age*16)*clamp((L-age)/.35,0,1);p.opacity=al;
+  this.text(o.label,cx,cy-bw*.08*s,bw*.12*s,gemHex(((t*12)|0)%6),'center',bw*1.3,.2,true);this.text('EVERY CLEAR SINGS',cx,cy+bw*.1,bw*.045,'#ffffff','center',bw*1.2,.14,true);p.opacity=1;}}
+ const q=this.rp;if(q){const age=t-q.birth,L=2.4;if(age>L)this.rp=null;else if(age>=0){const s=1+.9*Math.exp(-age*10),al=Math.min(1,age*14)*clamp((L-age)/.4,0,1);p.opacity=al;
+  this.text(q.count+' GEMS',cx,cy-bw*.14*s,bw*.15*s,'#ffe27a','center',bw*1.3,.22,true);this.text((q.team?'TEAM ':'')+'RESONANCE COMPLETE',cx,cy+bw*.06,bw*.055,'#ffffff','center',bw*1.3,.14,true);p.opacity=1;}}};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.coopPresence();this.drawStage();""", r"""this.coopPresence();this.drawStage();this.drawRes();""")
+
+# Tront patch 13 (S94 gauntlet R8): optional run end (Discord: 'some kind of fail-state... out of moves', with a
+# toggle for people who would rather the board flip). Settings > Display > Out of moves: Reshuffle (default) or
+# End run. Only when no partner is connected, so it never ends someone else's shared board.
+rep(r"""if(!this.legal.length){this.shuffle();return;}""",
+    r"""if(!this.legal.length){if(this.prefs.endRun&&!this.practice&&!this.auto&&!this.coop?.connected&&!this.coop?.mirror){this.endRun();return;}this.shuffle();return;}""")
+rep(r"""clickCell(i){if(this.aaCompare||i<0||this.phase!=='idle')return;""", r"""clickCell(i){if(this.aaCompare||i<0||this.phase!=='idle'||this.gameOver)return;""")
+rep(r"""trySwap(a,b,authorised=false){""", r"""trySwap(a,b,authorised=false){if(this.gameOver)return false;""")
+rep(r"""this.seed=seed;this.finishAACompare();""", r"""this.gameOver=null;this.seed=seed;this.finishAACompare();""")
+rep(r"""this.text('Flashes',x,yy+259,15);this.button('flash',({full:'Full',low:'Low',off:'Off'})[a.prefs.flash||'full']+' >',x+w-126,yy+246,126,39);this.lineDivider(x,yy+306,w);this.button('fullscreen','Fullscreen',x,yy+327,w,42);this.button('new-board','New board',x,yy+383,w,42);end=yy+454;""",
+    r"""this.text('Flashes',x,yy+259,15);this.button('flash',({full:'Full',low:'Low',off:'Off'})[a.prefs.flash||'full']+' >',x+w-126,yy+246,126,39);this.text('Out of moves',x,yy+318,15);this.button('end-run',(a.prefs.endRun?'End run':'Reshuffle')+' >',x+w-126,yy+305,126,39);this.lineDivider(x,yy+365,w);this.button('fullscreen','Fullscreen',x,yy+386,w,42);this.button('new-board','New board',x,yy+442,w,42);end=yy+513;""")
+rep(r"""if(id==='flash'){""", r"""if(id==='end-run'){a.prefs.endRun=!a.prefs.endRun;a.savePreferences();a.toast(a.prefs.endRun?'Out of moves now ends the run (solo)':'Out of moves reshuffles the board');return;}if(id==='again'){a.newBoard();return;}if(id==='flash'){""")
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""JewelApp.prototype.endRun=function(){const s=this.board.score,best=s>=this.best&&s>0,stage=this.fx?.stageInfo?.()||{n:1,name:''};this.selected=-1;this.grab=-1;this.hintCells=[];
+ this.gameOver={score:s,best,stage,moves:this.board.moves,birth:this.time};this.audio.reject?.(0);this.rumble?.(.8,.5,420);const fx=this.fx;
+ if(fx&&fx.on){const t=this.time;fx.flow=Math.max(fx.flow,1);fx.pulse=1.5;if(best){for(let b=0;b<12;b++){const side=b&1?1:-1;fx.firework([side*(5+Math.random()*3.8),-3.6+Math.random()*8.2,-.8+Math.random()*1.3],GEM_COLORS[b%6],t+.6+b*.1,1.4);}fx.fountain(Math.round(900*fx.j),t+.8);}}};
+CabinetUI.prototype.drawGameOver=function(){const a=this.app,g=a.gameOver,p=this.ink;if(!g||a.panelOpen)return;const age=a.time-g.birth,{cx,cy,bw}=this.boardBox(),inn=clamp(age/.45,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2;
+ p.opacity=clamp(age*3,0,1);p.box(cx-bw*.52,cy-bw*.52,bw*1.04,bw*1.04,'#020b0f',14,.62);
+ const W=bw*.86,H=bw*.66,x=cx-W/2,y=cy-H/2+(1-u)*bw*.35;p.opacity=clamp(age*4,0,1);p.box(x,y,W,H,'#071418',12,.95);p.box(x,y,W,5,'#ffd98a',2,1);p.box(x,y+H-5,W,5,'#ffd98a',2,1);
+ const n=Math.round(g.score*smooth(clamp((age-.35)/1.1,0,1)));this.text('OUT OF MOVES',cx,y+H*.07,bw*.07,'#ffd98a','center',W-20,.16,true);
+ this.text(n.toLocaleString('en-US'),cx,y+H*.25,bw*.14*(1+.08*Math.exp(-Math.max(0,age-1.45)*8)),'#ffffff','center',W-20,.2,true);
+ this.text(g.best&&age>1.45?'NEW BEST!':'Best '+a.best.toLocaleString('en-US'),cx,y+H*.51,bw*.05,g.best?gemHex(((a.time*8)|0)%6):UI_ART.dim,'center',W-20,.14,true);
+ this.text('Reached stage '+g.stage.n+'  '+g.stage.name,cx,y+H*.63,bw*.036,UI_ART.text,'center',W-20);
+ if(age>.8){p.opacity=1;this.button('again','Play again',cx-W*.32,y+H*.76,W*.64,Math.max(40,H*.15));}p.opacity=1;};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.drawComets();this.drawPadCursor();""", r"""this.drawComets();this.drawGameOver();this.drawPadCursor();""")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

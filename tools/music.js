@@ -18,8 +18,8 @@ class ResonanceMusic {
  constructor(app){this.a=app;this.bpm=84;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
  hz(m){return 440*Math.pow(2,(m-69)/12);}
  // Layer targets from the game state: pad, bass, arp, drums, lead.
- targets(s){const f=s.flow,c=s.cascade;return [.9,clamp((f-.10)*3,0,1),clamp((f-.32)*2.4,0,1),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
- state(){const fx=this.a.fx;return {flow:fx?fx.flow:0,laser:fx?fx.laser:0,cascade:this.a.phase==='idle'?0:this.a.cascade};}
+ targets(s){if(s.res)return [1,1,1,1,1];if(this.a.gameOver)return [.7,0,0,0,0];const f=s.flow,c=s.cascade;return [.9,clamp((f-.10)*3,0,1),clamp((f-.32)*2.4,0,1),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
+ state(){const fx=this.a.fx;return {flow:fx?fx.flow:0,laser:fx?fx.laser:0,cascade:this.a.phase==='idle'?0:this.a.cascade,res:!!(fx&&fx.res&&fx.res.on)};}
  build(ctx,dest){
   this.ctx=ctx;this.bus=ctx.createGain();this.bus.gain.value=1.4;this.bus.connect(dest);
   const d=this.delay=ctx.createDelay(1.5),fb=ctx.createGain(),lp=ctx.createBiquadFilter();d.delayTime.value=60/this.bpm*.75;fb.gain.value=.38;lp.type='lowpass';lp.frequency.value=2600;
@@ -40,10 +40,15 @@ class ResonanceMusic {
    if(beat%4===2)this.hit(t,8000,'highpass',.7,.10*lv[3],.05,this.bus);if(four&&beat%2===1)this.hit(t,9500,'highpass',.7,.04*lv[3],.03,this.bus);if(beat===4||beat===12)this.hit(t,1500,'bandpass',.9,.22*lv[3],.16,this.bus);}
   if(lv[4]>.02&&beat%2===0){const ph=[0,2,4,5,7,5,4,2,3,4,6,7,5,4,2,1],k=ph[(i>>1)%16],m=key+12+MUSIC_PENTA[k%MUSIC_PENTA.length];if((i>>1)%4!==3){const o=this.osc('square',this.hz(m),t,sp*1.6,.028*lv[4],.01,.3,this.echo);const v=c.createOscillator(),vg=c.createGain();v.frequency.value=5.5;vg.gain.value=9;v.connect(vg);vg.connect(o.detune);v.start(t);v.stop(t+sp*2+.4);}}
  }
+ // Beat snap (patch 12): result sounds wait for the next 1/32 of the music grid (always < 90 ms at 84 BPM, less when
+ // faster), so clears land in time with the soundtrack. Swaps, clicks and the reject buzz are never delayed.
+ snapWait(d=0){const c=this.ctx,au=this.a.audio;if(!c||!au||au.ctx!==c||!this.next||au.loadedTrack||au.muted)return 0;const g=60/this.bpm/8,now=c.currentTime+d;return ((this.next-now)%g+g)%g;}
+ hookSnap(au){if(au.snapHooked)return;au.snapHooked=true;const B=au.buffers||{},set=new Set();for(const [k,v] of Object.entries(B))if(!['tick','whoosh','reject','land'].includes(k))for(const b of [].concat(v))set.add(b);
+  const play=au.play.bind(au);au.play=(buffer,rate,volume,pan,delay=0)=>play(buffer,rate,volume,pan,delay+(set.has(buffer)?this.snapWait(delay):0));}
  // Realtime: called every frame; keeps ~0.15 s scheduled ahead (1.2 s while the tab is hidden).
  tick(){const au=this.a.audio;const live=au?.ctx&&au.ctx.state==='running'&&!au.muted&&!au.loadedTrack&&au.music;
   if(!live){if(this.ctx&&au?.ctx===this.ctx)this.next=0;return;}
-  if(this.ctx!==au.ctx)this.build(au.ctx,au.music);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
+  if(this.ctx!==au.ctx)this.build(au.ctx,au.music);this.hookSnap(au);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
   const info=this.a.fx?.stageInfo?.();if(info){this.prog=info.prog;if(info.bpm!==this.bpm){this.bpm=info.bpm;this.delay.delayTime.setTargetAtTime(60/this.bpm*.75,now,.1);}}
   const tg=this.targets(this.state()),ahead=document.hidden?1.2:.15;
   while(this.next<now+ahead){for(let k=0;k<5;k++)this.lv[k]=mix(this.lv[k],tg[k],k===3?.35:.08);this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
