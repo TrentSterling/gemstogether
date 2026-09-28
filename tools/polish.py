@@ -184,6 +184,42 @@ rep("this.audio.swap((pa[0]+pb[0])*.5);", "this.audio.swap((pa[0]+pb[0])*.5);thi
 rep("if(this.phase!=='intro')this.audio.land(a.at%8,distance);", "if(this.phase!=='intro'){this.audio.land(a.at%8,distance);this.fx.land(m.to,a.tile.type,distance);}")
 rep("window.__jewel={ready:false,app:a,", "window.__jewel={ready:false,app:a,fx:()=>a.fx.info(),")
 
+# Tront patch: easing audit (S93). Receipts: tools/easing-audit.mjs -> tools/out/easing/index.html.
+# 1. Invalid swap snapped. board.swap() returns null, so the actors keep their home cell (a.at). The swap slide
+#    ends at FEEL.swap (.205 s) but the reject starts at the phase deadline (+.014 s); in between the actor is drawn
+#    at cellXY(a.at) = home, a one-frame teleport. The reject then eased home -> home (only the wobble moved).
+#    Fix: a failed swap's slide runs to the deadline, and the return starts from the swapped spot with a back-out
+#    overshoot (a bounce off an invisible wall) over .34 s instead of a .23 s quintic.
+rep("this.swapResult=this.board.swap(a,b);this.cascade=0;",
+    "this.swapResult=this.board.swap(a,b);if(!this.swapResult){aa.move.duration=bb.move.duration=FEEL.swap+FEEL.swapSettle;}this.cascade=0;")
+rep("this.swapActors.forEach((a,i)=>this.motion(a,this.swapPositions[i],'reject',.23,0,i?1:-1));",
+    "this.swapActors.forEach((a,i)=>{this.motion(a,this.swapPositions[i],'reject',.34,0,i?1:-1);a.move.from=this.swapPositions[1-i].slice();});")
+rep("this.phase='reject';this.deadline=this.time+.24;", "this.phase='reject';this.deadline=this.time+.35;")
+rep("e=m.type==='swap'?smooth(t):easeIO(t);", "e=m.type==='swap'?smooth(t):m.type==='reject'?1+2.7*(t-1)**3+1.7*(t-1)**2:easeIO(t);")
+# 2. Combo plaque popped on and off. Now: slides in from the right with overshoot, the number punches on every
+#    new step, and it fades and drifts out over .3 s after the combo ends.
+rep("const privateCoopBadge=CabinetUI.prototype.coopBadge;",
+    "CabinetUI.prototype.comboEase=function(a){\n"
+    " const live=a.comboEnd&&this.lastCascade>1&&!a.panelOpen&&a.time<a.comboEnd+.3;if(!live){this.cOn=false;return false;}\n"
+    " if(!this.cOn){this.cOn=true;this.cIn=a.time;this.cPunch=a.time;this.cLast=this.lastCascade;}\n"
+    " if(this.lastCascade!==this.cLast){this.cLast=this.lastCascade;this.cPunch=a.time;}\n"
+    " const ui=clamp((a.time-this.cIn)/.22),uo=clamp((a.comboEnd+.3-a.time)/.3),u=1+2.7*(ui-1)**3+1.7*(ui-1)**2,k=Math.exp(-(a.time-this.cPunch)*9);\n"
+    " this.cE={al:smooth(ui)*smooth(uo),dx:(1-u)*46+(1-smooth(uo))*24,s:1+.42*k};return true;};\n"
+    "const privateCoopBadge=CabinetUI.prototype.coopBadge;")
+rep("if(a.comboEnd&&a.time<a.comboEnd&&this.lastCascade>1&&!a.panelOpen){const sy=wide?top+(bottom-top)*.31:Math.max(8,top-126),cx=wide?Math.min(w-91,right+111):w/2;",
+    "if(this.comboEase(a)){const sy=wide?top+(bottom-top)*.31:Math.max(8,top-126),cx=(wide?Math.min(w-91,right+111):w/2)+this.cE.dx;this.ink.opacity=this.cE.al;")
+rep("+this.lastCascade,cx,sy+20,39,UI_ART.highlight,'center',130,.14,true);",
+    "+this.lastCascade,cx,sy+20-39*(this.cE.s-1)*.5,39*this.cE.s,UI_ART.highlight,'center',130,.14,true);")
+rep("'center',132);}", "'center',132);}this.ink.opacity=1;")
+# 3. Toasts popped on and off. Now: fade + rise in over .18 s, fade + settle out over .26 s.
+rep("if(this.toastUntil>performance.now()&&!a.panelOpen){const text=this.fitLine(this.toastMessage,w-58,13),tw=Math.min(w-22,this.measure(text,13)+32);let ty=wide?h-43:Math.max(6,top-136);",
+    "const tnow=performance.now();if(this.toastUntil+260>tnow&&!a.panelOpen){const tI=smooth(clamp((2800-(this.toastUntil-tnow))/180)),tO=smooth(clamp((this.toastUntil+260-tnow)/260));this.ink.opacity=tI*tO;"
+    "const text=this.fitLine(this.toastMessage,w-58,13),tw=Math.min(w-22,this.measure(text,13)+32);let ty=(wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;")
+rep("this.text(text,w/2,ty+9,13,UI_ART.highlight,'center',tw-20);}", "this.text(text,w/2,ty+9,13,UI_ART.highlight,'center',tw-20);this.ink.opacity=1;}")
+# 4. Score floats appeared at full size. Now they pop in at 1.5x and settle in about .2 s.
+rep("this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),f.special?22:24,",
+    "this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.special?22:24)*(1+.5*Math.exp(-age*13)),")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

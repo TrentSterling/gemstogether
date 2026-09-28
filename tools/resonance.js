@@ -50,8 +50,21 @@ class ResonanceFX {
   if(this.on&&this.flow>.28&&!a.frozen&&!document.hidden){this.stream+=dt*(this.flow-.2)*50*this.j;
    while(this.stream>=1){this.stream--;const an=Math.random()*TAU,r=9+Math.random()*7;
     a.world.sparks.emit([Math.cos(an)*r,Math.sin(an)*r*.62,-3-Math.random()*5],[(Math.random()-.5)*.8,4.98,.25],vmul(this.pick(),.75),.05+Math.random()*.07,a.time,1.0+Math.random()*.7,3,Math.random()*100,0);}}
+  // Falling gems leave light trails, thicker while flow is up; the selected gem sheds curling motes.
+  if(this.on&&!a.frozen&&!document.hidden){const sp=a.world.sparks,t=a.time,p=Math.min(1,(.2+this.flow*.8)*dt*38*this.j);
+   for(const act of a.actors.values()){const m=act.move;if(m?.type!=='fall'||t<m.start||Math.random()>p)continue;
+    sp.emit([act.pos[0]+(Math.random()-.5)*.35,act.pos[1]+.25,.45],[(Math.random()-.5)*.25,.5+Math.random()*.5,0],vmul(mixColor(GEM_COLORS[act.tile.type],[1,1,1],.2),.6+this.flow*.5),.07+Math.random()*.04,t,.32+Math.random()*.2,10,Math.random()*100,0);}
+   const sel=a.selected>=0?a.getActor(a.selected):null;
+   if(sel&&a.phase==='idle'){this.orbit=(this.orbit||0)+dt*26;while(this.orbit>=1){this.orbit--;
+    sp.emit([sel.pos[0],sel.pos[1]-.3,.75],[.55+Math.random()*.4,.42+Math.random()*.12,4+Math.random()*2],vmul(mixColor(GEM_COLORS[sel.tile.type],[1,.95,.85],.4),1.2),.07+Math.random()*.05,t,.9+Math.random()*.3,11,Math.random()*100,0);}}}
   this.field.mesh.count=a.prefs.quality<.9?Math.floor(FX_FIELD*.45):FX_FIELD;
  }
+ // Light traces the board frame: two heads race opposite ways, each drawing the edge behind it.
+ trace(col,t,speed=1){const sp=this.a.world.sparks,E=3.62,c=[[-E,E],[E,E],[E,-E],[-E,-E]],dur=.16/speed,bright=vmul(mixColor(col,[1,1,1],.35),1.4);
+  for(const dir of [1,-1])for(let e=0;e<4;e++){const i0=dir>0?e:(6-e)%4,i1=dir>0?(e+1)%4:(5-e)%4,a0=[c[i0][0],c[i0][1],1.5],a1=[c[i1][0],c[i1][1],1.5],b=t+e*dur;
+   sp.emit(a0,a1,vmul(bright,.6),.08,b,dur*2.6,7,e,0);
+   for(let k=0;k<5;k++)sp.emit(a0,a1,vmul(bright,1-k*.15),.22-k*.03,b+k*.012,dur,6,e*7+k,0);}
+  for(const q of c)sp.emit([q[0],q[1],1.5],[0,0,0],bright,.9,t+dur*4,.25,8,0,0);}
  uniforms(u){
   const on=this.on?1:0,calm=this.a.prefs.motion?1:.45,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
   u[43]=this.swirl;u[46]=flow;u[47]=pulse;
@@ -77,8 +90,9 @@ class ResonanceFX {
     const v=horiz?[s,jit,Math.random()*1.4]:[jit,s,Math.random()*1.4];
     sp.emit([p[0],p[1],.72],v,vmul(mixColor(gcol,[1,1,1],.2),1.1+Math.random()*.9),.05+Math.random()*.06,t+Math.random()*.03,.45+Math.random()*.5,10,Math.random()*100,0);}
    // Embers curl upward and linger after the flash.
-   for(let k=0;k<Math.round(4*j);k++)sp.emit([p[0]+(Math.random()-.5)*.5,p[1]+(Math.random()-.5)*.5,.8],[.5+Math.random()*1.1,.12+Math.random()*.32,3+Math.random()*4],vmul(mixColor(gcol,[1,.95,.8],.35),1.3+Math.random()),.035+Math.random()*.05,t+.05+Math.random()*.25,1.3+Math.random()*1.4,11,Math.random()*100,0);
+   for(let k=0;k<Math.round(4*j);k++)sp.emit([p[0]+(Math.random()-.5)*.5,p[1]+(Math.random()-.5)*.5,.8],[.5+Math.random()*1.1,.12+Math.random()*.32,3+Math.random()*4],vmul(mixColor(gcol,[1,.95,.8],.35),1.3+Math.random()),.08+Math.random()*.08,t+.05+Math.random()*.25,1.3+Math.random()*1.4,11,Math.random()*100,0);
   });
+  if(cascade>=2||special)this.trace(special?mixColor(col,[1,.85,.5],.3):col,t,1+Math.min(cascade,6)*.12);
   if(mode==='blast')this.nova(center,180*j,[GEM_COLORS[4],color('#ffd58f'),col],t);
   if(mode==='prism'||cascade>=5)this.nova(center,Math.min(900,260+cascade*90)*j,GEM_COLORS,t);
   // Fireworks around the cabinet once a cascade gets going.
