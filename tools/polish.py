@@ -319,6 +319,13 @@ CabinetUI.prototype.drawCallout=function(){const a=this.app,o=this.co;if(!o||a.p
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.coopPresence();this.drawComets();this.drawCursor();p.submit();""", r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();""")
 
+# Tront patch 7 (S94 gauntlet R2): Resonance music, a generative soundtrack on the music bus (tools/music.js).
+MUSIC = (ROOT / 'tools' / 'music.js').read_text(encoding='utf-8')
+rep("const SKY_GL_FS=`", MUSIC + "\nconst SKY_GL_FS=`")
+rep("this.fx=new ResonanceFX(this);", "this.fx=new ResonanceFX(this);this.music=new ResonanceMusic(this);")
+rep("this.fx.frame();this.fx.uniforms(u);", "this.fx.frame();this.music?.tick();this.fx.uniforms(u);")
+rep("fx:()=>a.fx.info(),", "fx:()=>a.fx.info(),music:()=>({...a.music.stats,lv:a.music.lv.map(v=>+v.toFixed(2)),step:a.music.step,live:!!a.music.ctx}),")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

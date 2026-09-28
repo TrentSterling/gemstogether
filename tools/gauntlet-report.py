@@ -44,6 +44,19 @@ for r in rounds:
     for f, cap in r.get('frames', []):
         pairs += (f'<div class="pair"><figure><img src="{frame(b, f)}" alt="before {cap}"><figcaption>Before, {cap}</figcaption></figure>'
                   f'<figure><img src="{frame(a, f)}" alt="after {cap}"><figcaption>After, {cap}</figcaption></figure></div>')
+    extra = ''
+    for au, cap in r.get('audio', []):
+        src = ROOT / au
+        if src.exists():
+            shutil.copy(src, G / 'media' / src.name)
+            extra += f'<figure><audio src="media/{src.name}" controls preload="none"></audio><figcaption>{cap}</figcaption></figure>'
+    for im, cap in r.get('images', []):
+        src = ROOT / im
+        if src.exists():
+            shutil.copy(src, G / 'media' / src.name)
+            extra += f'<figure><img src="media/{src.name}" alt="{cap}"><figcaption>{cap}</figcaption></figure>'
+    if extra:
+        pairs += '<h3>Listen</h3>' + extra
     checks = ''.join(f'<li>{c}</li>' for c in r.get('checks', []))
     notes = ''.join(f'<li>{n}</li>' for n in r.get('changes', []))
     secs.append(f'<section><h2>{r["title"]}</h2><p class="why">{r.get("why", "")}</p><h3>What changed</h3><ul>{notes}</ul>'
@@ -55,7 +68,7 @@ html = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 body{{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,sans-serif}}main{{max-width:1320px;margin:0 auto;padding:24px 16px 80px}}
 h1{{font-size:28px;margin:0}}h2{{font-size:21px;margin:44px 0 4px;border-top:1px solid var(--line);padding-top:24px}}h3{{font-size:14px;color:var(--dim);margin:18px 0 8px}}
 .why{{color:var(--dim);max-width:80ch}}.pair{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}}
-@media (max-width:760px){{.pair{{grid-template-columns:1fr}}}}figure{{margin:0}}video,img{{width:100%;border-radius:6px;display:block;background:#000}}
+@media (max-width:760px){{.pair{{grid-template-columns:1fr}}}}figure{{margin:0}}video,img,audio{{width:100%;border-radius:6px;display:block;background:#000}}
 figcaption{{font-size:12px;color:var(--dim);padding-top:3px}}.checks li::marker{{content:"\\2713  ";color:var(--ok)}}
 </style></head><body><main><h1>Gems Together: polish gauntlet</h1>
 <p class="why">Each round: make it better, check the work, receipts. Clips come from tools/clip.mjs (manual clock, so before and after show the exact same moments).</p>

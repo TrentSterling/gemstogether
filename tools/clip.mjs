@@ -37,7 +37,7 @@ try {
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
     await page.shot(`${dir}/${String(f).padStart(3, '0')}.png`);
-    const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score}})()`);
+    const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);
     log.push(s);
     await step(2);
   }

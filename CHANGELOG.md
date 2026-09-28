@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.2.4 hosting patch 7 (2026-09-28) Resonance music
+
+The game now has a soundtrack that plays along with you (Discord: "next up is ambient music").
+
+- **Generative and sample-free**, played on the music bus, so the Music volume slider controls it. It is in your Gem tones key (natural minor), at 84 BPM.
+- **It layers in with your play**, Tetris Effect style. A soft pad is always there. Bass joins as the board warms up, then 16th-note arps through an echo, then kick, hats and clap when the board is hot or a chain hits x4. A lead melody plays while the x5 sky lasers are on, then it all settles back down.
+- **Load your own track** in Settings and the soundtrack steps aside; remove it and it comes back. Mute works as before.
+- Receipts: `tools/music-render.mjs` renders the real scheduler offline (a 60 s journey, plus audio muxed under the cascade clip) and checks the live path.
+
 ## 3.2.4 hosting patch 6 (2026-09-28) The combo ladder: x5 is a concert
 
 From the Discord playtest: combos have to feel like "ooh yes I got a freaking 5x combo!". Before this, x3, x5 and x9 looked about the same. Now every tier keeps everything below it and adds a new kind of response:
