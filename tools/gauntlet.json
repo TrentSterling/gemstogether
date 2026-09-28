@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Round 0 (patch 5): the illegal swap, Bejeweled style",
+    "why": "Patch 4 made it worse on the live site. Players sit in the co-op room, where an illegal swap never moved and drew red brackets. Solo also crawled home. Full co-op receipts: tools/out/swap/index.html.",
+    "before": "p4-swap", "beforeLabel": "patch 4 (solo path: hold, then a slow back-out)",
+    "after": "p5-swap", "afterLabel": "patch 5: full swap, bump, swap back",
+    "changes": ["The pair swaps fully at normal swap speed, bumps into the wrong cell (squash, rattle, dust, reject sound) and swaps back on the same curve.", "The same animation for solo, co-op host and co-op peer; visual only in co-op, so nothing goes over the network.", "Red corner brackets and the No match toast are gone."],
+    "frames": [[6, "100 ms"], [12, "200 ms (fully swapped)"], [16, "267 ms (bump)"], [22, "367 ms (on the way back)"]],
+    "checks": ["swap-audit: solo, host and peer reach the other cell, the biggest per-frame jump is 0.12 to 0.19 cell (no teleports), all end home", "no toast, no brackets, board hashes match, 0 errors", "live verify 22/22 at tront.xyz"]
+  },
+  {
+    "title": "Round 1 (patch 6): the combo ladder, x5 is a concert",
+    "why": "Andre: combos need to feel like 'ooh yes I got a freaking 5x combo!'. In the baseline, x3, x5 and x9 looked about the same (a sky tint, some rings, a small side plaque). Direction: MORE; x1 keeps its flash, and every tier stacks a new kind of response on top.",
+    "before": "r0-cascade", "beforeLabel": "patch 5 (nine-wave fixture)",
+    "after": "r1-cascade", "afterLabel": "patch 6 (same board, same frames)",
+    "changes": ["x3+: a centre-stage callout that slams in and grows each tier: SPARKLING, RADIANT, DAZZLING, BRILLIANT, PRISMATIC, LEGENDARY, TRANSCENDENT (rainbow).", "x3+: a synthesized chord sting that climbs two semitones per tier; x4+ adds a sub boom.", "x5+: nightclub lasers: 12 rainbow beams sweep up from the horizon behind the cabinet and hold while the chain lives.", "x5+: tapered anime speed lines around the board, plus a hard 160 ms strobe in the tier colour (skipped with reduced motion)."],
+    "frames": [[62, "x1"], [112, "x3"], [137, "x4"], [166, "x5"], [214, "x7"], [268, "x9"]],
+    "checks": ["verify 22/22 (WebGPU)", "WebGL2 fallback renders the lasers, 0 errors", "nine-wave fixture reaches x9 with 0 errors on both builds"]
+  }
+]

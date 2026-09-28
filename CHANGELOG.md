@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.2.4 hosting patch 6 (2026-09-28) The combo ladder: x5 is a concert
+
+From the Discord playtest: combos have to feel like "ooh yes I got a freaking 5x combo!". Before this, x3, x5 and x9 looked about the same. Now every tier keeps everything below it and adds a new kind of response:
+
+- **x3 and up: a centre-stage callout** slams in over the board and gets bigger every step: SPARKLING, RADIANT, DAZZLING, BRILLIANT, PRISMATIC, LEGENDARY, and a rainbow TRANSCENDENT at x9.
+- **x3 and up: a chord sting** (synthesized, no samples) that climbs two semitones per tier. x4 and up adds a sub boom.
+- **x5 and up: nightclub lasers.** Twelve rainbow beams sweep up from the horizon behind the cabinet and keep going while the chain lives.
+- **x5 and up: anime speed lines** burst around the board and taper outward, with a hard 160 ms strobe in the tier colour (skipped with reduced motion).
+- Every match still gets the full background flash, exactly as before.
+- Receipts: `tools/clip.mjs` (frame-stepped clips, before and after, same board) and `tools/gauntlet-report.py` write `tools/out/gauntlet/index.html`.
+
 ## 3.2.4 hosting patch 5 (2026-09-28) Bejeweled-style invalid swap + combo juice
 
 - **An illegal swap now swaps and swaps back, like Bejeweled, everywhere.** The pair trades places at normal swap speed, bumps into the wrong cell (squash, a quick rattle, a puff of dust, the reject sound) and swaps back on the same curve. About half a second in all.

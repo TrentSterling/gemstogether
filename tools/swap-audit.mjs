@@ -10,7 +10,7 @@ import {pathToFileURL} from 'node:url';
 import {mkdirSync, writeFileSync} from 'node:fs';
 
 const file = process.argv[2] || 'index.html', label = process.argv[3] || 'after';
-const base = pathToFileURL(resolve(file)).href;
+const base = /^https?:/.test(file) ? file : pathToFileURL(resolve(file)).href;
 const out = `tools/out/swap/${label}`;
 mkdirSync(out, {recursive: true});
 const J = 'window.__jewel';

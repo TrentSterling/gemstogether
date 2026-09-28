@@ -299,6 +299,26 @@ rep(r"""this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8
 rep(r"""this.coopPresence();this.drawCursor();p.submit();""", r"""this.coopPresence();this.drawComets();this.drawCursor();p.submit();""")
 
 
+# Tront patch 6 (S94 gauntlet R1): the combo ladder. Callout + burst drawn here; lasers + stings in resonance.js.
+rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
+    r"""const TIER_NAMES=['','','','SPARKLING','RADIANT','DAZZLING','BRILLIANT','PRISMATIC','LEGENDARY','TRANSCENDENT'];
+const TIER_COLS=['#8ff7ff','#8ff7ff','#8ff7ff','#8ff7ff','#ffe27a','#ff8ff0','#b9a4ff','#7dffb0','#ffb347','#ffffff'];
+CabinetUI.prototype.callout=function(c){const a=this.app;this.co={c,birth:a.time,name:TIER_NAMES[Math.min(c,9)]};if(c>=5)this.burst={birth:a.time,c};};
+CabinetUI.prototype.boardBox=function(){const a=this.app,p0=project(cellXY(0),a.vp,a.cssWidth,a.cssHeight),p1=project(cellXY(63),a.vp,a.cssWidth,a.cssHeight);return {cx:(p0[0]+p1[0])/2,cy:(p0[1]+p1[1])/2,bw:Math.abs(p1[0]-p0[0])*8/7};};
+CabinetUI.prototype.drawBurst=function(){const a=this.app,p=this.ink,b=this.burst;if(!b||a.panelOpen)return;const age=a.time-b.birth,L=.5;if(age<0)return;if(age>L){this.burst=null;return;}
+ const {cx,cy,bw}=this.boardBox(),k=age/L,w=a.cssWidth,h=a.cssHeight,col=TIER_COLS[Math.min(b.c,9)];p.opacity=1;
+ if(a.prefs.motion&&age<.16){const f=1-age/.16;p.box(0,0,w,h,age<.05?'#ffffff':col,0,.5*f*f);}
+ const n=40+Math.min(b.c-5,6)*8;for(let i=0;i<n;i++){const r=Math.abs(Math.sin(i*12.9898+b.c*7.1)*43758.5453)%1,an=i/n*TAU+(r-.5)*.12,r0=bw*(.8+k*.9)+r*bw*.1,r1=r0+bw*(.35+r*.65)*(1-k*.4),th=(3+r*6)*(1-k*.5),cs=Math.cos(an),sn=Math.sin(an),cl=i%3?'#ffffff':col;
+  for(let q=0;q<4;q++){const u0=r0+(r1-r0)*q/4,u1=r0+(r1-r0)*(q+1)/4;p.line(cx+cs*u0,cy+sn*u0,cx+cs*u1,cy+sn*u1,th*(.2+.8*(q+1)/4),cl,.9*(1-k)*(.4+.6*(q+1)/4));}}};
+CabinetUI.prototype.drawCallout=function(){const a=this.app,o=this.co;if(!o||a.panelOpen)return;const age=a.time-o.birth,L=1.2;if(age<0)return;if(age>L){this.co=null;return;}
+ const {cx,cy,bw}=this.boardBox(),c=o.c,s=1+1.5*Math.exp(-age*15),al=Math.min(1,age*18)*clamp((L-age)/.32,0,1),size=bw*(.19+.045*Math.min(c-3,6));
+ const shake=c>=5?Math.sin(age*95)*6*Math.exp(-age*7):0,col=c>=9?gemHex(((a.time*10)|0)%6):TIER_COLS[Math.min(c,9)],p=this.ink;
+ p.opacity=al;const y=cy-size*.72*s,rise=-(age>.8?(age-.8)*40:0);
+ this.text('x'+c,cx+shake,y+rise,size*s,col,'center',Infinity,.2,true);
+ this.text(o.name,cx-shake*.5,cy+size*.36*s+rise,size*.3*Math.max(1,s*.9),'#ffffff','center',bw*1.25,.16,true);p.opacity=1;};
+const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
+rep(r"""this.coopPresence();this.drawComets();this.drawCursor();p.submit();""", r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();this.drawCursor();p.submit();""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

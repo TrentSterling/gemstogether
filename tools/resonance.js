@@ -13,18 +13,30 @@ const FX_FIELD=7000;
 const FX_MILESTONES=[5000,10000,25000,50000,100000,250000,500000,1000000];
 const FX_TINT_GL=`vec3 fxTint(float p){float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;return vec3(r,g,b)/255.0;}`;
 const FX_TINT_WG=`fn fxTint(p:f32)->vec3f{let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;return vec3f(r,g,b)/255.0;}`;
-const FX_SKY_GL=`vec3 fxSky(vec2 uv,float aspect){float fl=min(uAA.z,1.5);float pu=uAA.w;vec3 tc=fxTint(uLife.w);vec2 q=(uv-vec2(0.5,0.55))*vec2(aspect,1.0);float d=length(q);
+const FX_LASER_GL=`vec3 fxLaser(vec2 uv,float aspect){float lz=min(uRight.w,1.5);if(lz<0.002)return vec3(0.0);float t=uParams.x;vec3 acc=vec3(0.0);vec2 P=uv*vec2(aspect,1.0);
+ for(int i=0;i<12;i++){float fi=float(i);float side=i<6?-1.0:1.0;float k=mod(fi,6.0);vec2 o=vec2(0.5+side*(0.36+0.025*k),0.40)*vec2(aspect,1.0);
+  float ang=1.5708+side*(-0.10-0.16*k)+sin(t*(0.9+0.21*k)+fi*1.7)*0.42;vec2 d=vec2(cos(ang),sin(ang));vec2 q=P-o;float al=dot(q,d);if(al<0.0)continue;
+  float pe=abs(q.x*d.y-q.y*d.x);float w=0.0022+al*0.0035;float core=exp(-pe*pe/(w*w*0.3));float glow=exp(-pe*pe/(w*w*12.0))*0.45;
+  vec3 col=0.55+0.45*cos(6.2831*(fi*0.137+t*0.18+vec3(0.0,0.33,0.67)));acc+=col*(core*1.4+glow)*exp(-al*0.55)*(0.75+0.25*sin(t*9.0+fi));}
+ float haze=exp(-abs(uv.y-0.42)*9.0)*0.12;return (acc+vec3(haze))*lz;}`;
+const FX_LASER_WG=`fn fxLaser(uv:vec2f,aspect:f32)->vec3f{let lz=min(U.right.w,1.5);if(lz<0.002){return vec3f(0.0);}let t=U.params.x;var acc=vec3f(0.0);let P=uv*vec2f(aspect,1.0);
+ for(var i=0;i<12;i++){let fi=f32(i);let side=select(1.0,-1.0,i<6);let k=fi%6.0;let o=vec2f(0.5+side*(0.36+0.025*k),0.40)*vec2f(aspect,1.0);
+  let ang=1.5708+side*(-0.10-0.16*k)+sin(t*(0.9+0.21*k)+fi*1.7)*0.42;let d=vec2f(cos(ang),sin(ang));let q=P-o;let al=dot(q,d);if(al<0.0){continue;}
+  let pe=abs(q.x*d.y-q.y*d.x);let w=0.0022+al*0.0035;let core=exp(-pe*pe/(w*w*0.3));let glow=exp(-pe*pe/(w*w*12.0))*0.45;
+  let col=0.55+0.45*cos(6.2831*(fi*0.137+t*0.18+vec3f(0.0,0.33,0.67)));acc+=col*(core*1.4+glow)*exp(-al*0.55)*(0.75+0.25*sin(t*9.0+fi));}
+ let haze=exp(-abs(uv.y-0.42)*9.0)*0.12;return (acc+vec3f(haze))*lz;}`;
+const FX_SKY_GL=`${FX_LASER_GL}vec3 fxSky(vec2 uv,float aspect){float fl=min(uAA.z,1.5);float pu=uAA.w;vec3 tc=fxTint(uLife.w);vec2 q=(uv-vec2(0.5,0.55))*vec2(aspect,1.0);float d=length(q);
  float hz=(uv.y-0.44)*6.5;float aur=exp(-hz*hz)*fl*(0.75+0.25*sin(uv.x*9.0+uForward.w*0.8));float rr=(1.0-min(pu,1.0))*1.35+0.05;float w=(d-rr)*6.0;float wave=exp(-w*w)*pu;
- return tc*(aur*0.045+wave*0.12)+vec3(0.9,0.95,1.0)*wave*0.03;}`;
-const FX_SKY_WG=`fn fxSky(uv:vec2f,aspect:f32)->vec3f{let fl=min(U.aa.z,1.5);let pu=U.aa.w;let tc=fxTint(U.life.w);let q=(uv-vec2f(0.5,0.55))*vec2f(aspect,1.0);let d=length(q);
+ return tc*(aur*0.045+wave*0.12)+vec3(0.9,0.95,1.0)*wave*0.03+fxLaser(uv,aspect);}`;
+const FX_SKY_WG=`${FX_LASER_WG}fn fxSky(uv:vec2f,aspect:f32)->vec3f{let fl=min(U.aa.z,1.5);let pu=U.aa.w;let tc=fxTint(U.life.w);let q=(uv-vec2f(0.5,0.55))*vec2f(aspect,1.0);let d=length(q);
  let hz=(uv.y-0.44)*6.5;let aur=exp(-hz*hz)*fl*(0.75+0.25*sin(uv.x*9.0+U.forward.w*0.8));let rr=(1.0-min(pu,1.0))*1.35+0.05;let w=(d-rr)*6.0;let wave=exp(-w*w)*pu;
- return tc*(aur*0.045+wave*0.12)+vec3f(0.9,0.95,1.0)*wave*0.03;}`;
+ return tc*(aur*0.045+wave*0.12)+vec3f(0.9,0.95,1.0)*wave*0.03+fxLaser(uv,aspect);}`;
 
 class ResonanceFX {
  constructor(app){
   // The drop's stroke font has no '!'; milestones need one (same stroke + dot as its '?').
   if(typeof JEWEL_LETTERS==='object'&&!JEWEL_LETTERS['!'])JEWEL_LETTERS['!']=[.28,[[.14,0,.14,.68],[.14,.97,.14,1]]];
-  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.bins=null;this.last=performance.now();
+  this.a=app;this.flow=0;this.pulse=0;this.swirl=0;this.bass=0;this.stream=0;this.laser=0;this.bins=null;this.last=performance.now();
   this.tint=[.45,.82,1];this.target=this.tint.slice();this.stats={matches:0,fireworks:0,fountains:0};
   const q=new Geo();q.quad([-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,.5,0],[1,1,1],0,[[0,0],[1,0],[1,1],[0,1]]);
   this.field=new ParticlePool(app.renderer,q.data(),FX_FIELD,true);const rng=new SeededRandom(5150);
@@ -46,7 +58,7 @@ class ResonanceFX {
   const au=a.audio;let bass=0;
   if(au?.analyser&&au.ctx?.state==='running'&&!au.muted){if(!this.bins)this.bins=new Uint8Array(au.analyser.frequencyBinCount);au.analyser.getByteFrequencyData(this.bins);let s=0;for(let i=1;i<8;i++)s+=this.bins[i];bass=s/(7*255);}
   this.bass=bass>this.bass?mix(this.bass,bass,.6):this.bass*Math.exp(-dt*5);
-  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);
+  this.flow*=Math.exp(-dt*(a.phase==='idle'?.30:.06));this.pulse*=Math.exp(-dt*2.4);this.laser*=Math.exp(-dt*(a.phase==='idle'?.9:.12));
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -71,14 +83,14 @@ class ResonanceFX {
   for(const q of c){sp.emit([q[0],q[1],1.5],[0,0,0],bright,1.1,t+dur*4,.3,8,0,0);sp.emit([q[0],q[1],1.5],[0,0,0],vmul(bright,2),1.6,t+dur*4,.35,1,0,0);}}
  uniforms(u){
   const on=this.on?1:0,calm=this.a.prefs.motion?1:.45,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
-  u[43]=this.swirl;u[46]=flow;u[47]=pulse;
+  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5);
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
  match(center,type,cascade,count,mode,mag,removed){
-  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.stats.matches++;
+  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.stats.matches++;this.tier(cascade);
   this.flow=Math.min(1.5,this.flow+.13+cascade*.055+count*.012+(special?.28:0));
   this.pulse=Math.min(1.5,this.pulse*.35+.5+cascade*.11+(special?.4:0));
   const gc=GEM_COLORS[type]||GEM_COLORS[5],m=Math.max(gc[0],gc[1],gc[2],1e-4);const n=gc.map(v=>v/m),l=(n[0]+n[1]+n[2])/3;this.target=n.map(v=>clamp(mix(l,v,2.2),.08,1));
@@ -141,6 +153,18 @@ class ResonanceFX {
  bump(pa,pb){if(!this.on)return;const sp=this.a.world.sparks,t=this.a.time,j=this.j,dx=pb[0]-pa[0],dy=pb[1]-pa[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
   for(const [p,s] of [[pb,1],[pa,-1]]){const e=[p[0]+ux*s*.44,p[1]+uy*s*.44,.62];
    for(let i=0;i<Math.round(22*j);i++){const side=(i&1?1:-1)*(.6+Math.random()*2.2),fw=(Math.random()*.8+.2)*s;sp.emit([e[0]+(Math.random()-.5)*.1,e[1]+(Math.random()-.5)*.1,e[2]],[-uy*side+ux*fw*.7,ux*side+uy*fw*.7,.3+Math.random()*.8],vmul([.9,.92,1],.8+Math.random()*.5),.34+Math.random()*.3,t,.28+Math.random()*.22,1,Math.random()*100,-1.5);}}}
+ // Combo ladder (patch 6). Every tier keeps everything below it and ADDS a new kind of response:
+ // x3 a centre-stage callout + chord sting, x4 a bigger callout + sub boom, x5+ nightclub lasers in the sky,
+ // speed lines and a flash (the callout and burst are drawn by CabinetUI).
+ tier(c){if(c<3)return;const a=this.a;this.stats.tiers=(this.stats.tiers||0)+1;
+  if(c>=5)this.laser=Math.min(1.5,Math.max(this.laser,.8)+.25+(c-5)*.1);a.ui?.callout?.(c);this.sting(c);}
+ sting(c){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.01,j=Math.min(1.3,this.j);
+  const root=196*Math.pow(2,Math.min(c-3,9)*2/12),notes=[1,1.25,1.5,2,2.5,3].slice(0,Math.min(6,c));
+  const lp=x.createBiquadFilter();lp.type='lowpass';lp.Q.value=5;lp.frequency.setValueAtTime(700,t);lp.frequency.exponentialRampToValueAtTime(7000,t+.35);const g=x.createGain();g.gain.value=.5*j;lp.connect(g);g.connect(au.sfx);
+  notes.forEach((m,i)=>{for(const [type,det,v] of [['sawtooth',-7,.04],['sawtooth',7,.04],['triangle',0,.06]]){const o=x.createOscillator(),e=x.createGain();o.type=type;o.frequency.value=root*m;o.detune.value=det;const s=t+i*.055;
+   e.gain.setValueAtTime(0,s);e.gain.linearRampToValueAtTime(v,s+.012);e.gain.exponentialRampToValueAtTime(.0005,s+.55+c*.04);o.connect(e);e.connect(lp);o.start(s);o.stop(s+.7+c*.04);}});
+  if(c>=4){const o=x.createOscillator(),e=x.createGain();o.type='sine';o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(38,t+.4);e.gain.setValueAtTime(.32*j,t);e.gain.exponentialRampToValueAtTime(.001,t+.55);o.connect(e);e.connect(au.sfx);o.start(t);o.stop(t+.6);}
+  setTimeout(()=>{try{lp.disconnect();g.disconnect();}catch{}},3000);}
  land(to,type,dist){if(!this.on||dist<1.8||Math.random()<.35)return;const sp=this.a.world.sparks,t=this.a.time,c=vmul(GEM_COLORS[type],.7);
   for(let i=0;i<3;i++){const s=(i-1)*1.3+(Math.random()-.5)*.6;sp.emit([to[0]+s*.12,to[1]-.38,.55],[s,.25+Math.random()*.4,.3],c,.035,t,.28,1,Math.random()*100,-2);}}
 }
