@@ -1,0 +1,16 @@
+{
+  "name": "gems-together-desktop",
+  "productName": "Gems Together",
+  "version": "3.3.0",
+  "private": true,
+  "description": "Gems Together desktop cabinet and Steam preparation",
+  "author": "Trent Sterling",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "electron . --smoke",
+    "package": "node package.mjs"
+  },
+  "dependencies": { "steamworks.js": "0.4.0" },
+  "devDependencies": { "electron": "44.5.0", "@electron/packager": "20.3.0" }
+}

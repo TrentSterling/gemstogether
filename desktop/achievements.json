@@ -1,0 +1,112 @@
+[
+  {
+    "id": "FIRST_LIGHT",
+    "name": "First light",
+    "description": "Clear your first gems."
+  },
+  {
+    "id": "BLAST_FORGED",
+    "name": "Forge a sun",
+    "description": "Create a blast gem."
+  },
+  {
+    "id": "PRISM_FORGED",
+    "name": "The spectrum",
+    "description": "Create a prism."
+  },
+  {
+    "id": "CHAIN_5",
+    "name": "Dazzling",
+    "description": "Reach a five-wave chain."
+  },
+  {
+    "id": "CHAIN_7",
+    "name": "Crown of light",
+    "description": "Reach a seven-wave chain."
+  },
+  {
+    "id": "CHAIN_9",
+    "name": "Constellation",
+    "description": "Reach a nine-wave chain."
+  },
+  {
+    "id": "SCORE_5000",
+    "name": "Five thousand",
+    "description": "Score 5,000 in a run."
+  },
+  {
+    "id": "SCORE_50000",
+    "name": "Fifty thousand",
+    "description": "Score 50,000 in a run."
+  },
+  {
+    "id": "STAGE_TIDEPOOL",
+    "name": "Tidepool",
+    "description": "Visit Tidepool."
+  },
+  {
+    "id": "STAGE_EMBER",
+    "name": "Ember reef",
+    "description": "Visit Ember Reef."
+  },
+  {
+    "id": "STAGE_AURORA",
+    "name": "Aurora deep",
+    "description": "Visit Aurora Deep."
+  },
+  {
+    "id": "STAGE_STARFALL",
+    "name": "Starfall",
+    "description": "Visit Starfall."
+  },
+  {
+    "id": "STAGE_PRISM",
+    "name": "Prism heart",
+    "description": "Visit Prism Heart."
+  },
+  {
+    "id": "RESONANCE",
+    "name": "Resonant",
+    "description": "Complete a Resonance."
+  },
+  {
+    "id": "SUPERNOVA",
+    "name": "Supernova",
+    "description": "Clear 90 gems in a Resonance."
+  },
+  {
+    "id": "TEAM_RESONANCE",
+    "name": "Together in light",
+    "description": "Complete a team Resonance."
+  },
+  {
+    "id": "HIGH_FIVE",
+    "name": "High five",
+    "description": "Two players clear within one second."
+  },
+  {
+    "id": "COOP_CLEAR",
+    "name": "Better together",
+    "description": "Clear gems with a partner."
+  },
+  {
+    "id": "TREASURY_1000",
+    "name": "A growing treasury",
+    "description": "Clear 1,000 lifetime gems."
+  },
+  {
+    "id": "PUZZLE_CLEAR",
+    "name": "A little ingenuity",
+    "description": "Solve a puzzle."
+  },
+  {
+    "id": "DAILY_CLEAR",
+    "name": "A daily ritual",
+    "description": "Finish a daily board."
+  },
+  {
+    "id": "TIMED_CLEAR",
+    "name": "Two minutes of light",
+    "description": "Finish a timed run."
+  }
+]

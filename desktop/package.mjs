@@ -1,0 +1,13 @@
+import {packager} from '@electron/packager';
+import {mkdir,copyFile,cp,readFile,writeFile} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('.',import.meta.url)),repo=resolve(root,'..');
+const pkg=JSON.parse(await readFile(join(root,'package.json'),'utf8'));
+const stage=join(root,'.stage',Date.now().toString());await mkdir(join(stage,'game'),{recursive:true});
+for(const file of ['main.cjs','preload.cjs','achievements.json'])await copyFile(join(root,file),join(stage,file));
+for(const file of ['index.html','og-image.png'])await copyFile(join(repo,file),join(stage,'game',file));
+await mkdir(join(stage,'node_modules'),{recursive:true});await cp(join(root,'node_modules','steamworks.js'),join(stage,'node_modules','steamworks.js'),{recursive:true});
+const {devDependencies,scripts,...runtime}=pkg;await writeFile(join(stage,'package.json'),JSON.stringify(runtime,null,2));
+const outputs=await packager({dir:stage,name:'Gems Together',platform:'win32',arch:'x64',electronVersion:pkg.devDependencies.electron,out:join(root,'dist'),appVersion:pkg.version,buildVersion:pkg.version,prune:false,asar:false,overwrite:false});
+console.log(outputs.join('\n'));

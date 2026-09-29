@@ -11,8 +11,8 @@ Tront: "log andres feedback its basically our north star to impress him". Andre 
 | 09-28 02:36 | the "it's over 9000" reference has to go | done (patch 5) |
 | 09-28 02:36 | next: ambient music, and a background that animates like a journey | done (patches 7, 8, 14) |
 | 09-28 02:39 | add gamepad support | done (patch 9) |
-| 09-28 02:40 | hold-and-drag nearly gave him carpal tunnel | partly (pad and keyboard play, patch 9); click-swap discoverability still open |
-| 09-28 02:43 | stages and themes like Tetris Effect + meta progression + online co-op + a banger soundtrack = sells on Steam | stages, co-op, soundtrack done; meta progression open |
+| 09-28 02:40 | hold-and-drag nearly gave him carpal tunnel | done (patch 21: tap hint, neighbour glow, tap-only option and gesture counts) |
+| 09-28 02:43 | stages and themes like Tetris Effect + meta progression + online co-op + a banger soundtrack = sells on Steam | progression added in patch 21; desktop and achievement preparation ready |
 | 09-28 02:43 | zen/endless should switch stage, background, theme and music every XX points | done (patch 8) |
 | 09-28 02:45 | some kind of fail state, "out of moves" | done as an option (patch 13) |
 | 09-28 02:46 | combos need to feel like "ooh yes I got a freaking 5x combo!" | done (patches 6, 15) |
@@ -21,34 +21,39 @@ Tront: "log andres feedback its basically our north star to impress him". Andre 
 | 09-28 14:14 | "cool dynamic music... the increase in intensity and layering is cool, **it should probably not drop back to base layer so quickly once a higher layer is reached**" | done (patch 18: layers latch and step down) |
 | 09-28 14:14 | "I'm not sure about the speed up" (the tempo jump between stages, 84 to 128 BPM, or the arps doubling to 16ths when flow is high; ask which) | done (patch 18: assumed tempo jumps + arp doubling; one steady 88 BPM, intensity by layering only) |
 
-| 09-28 13:49 | converting songs to MIDI means you can master and tweak the track, with no AI artifacts or noise | idea: a MIDI-driven stage soundtrack (Tront has Suno tracks to convert) |
+| 09-28 13:49 | converting songs to MIDI means you can master and tweak the track, with no AI artifacts or noise | cancelled by Trent on 09-29 |
 
-Next music fix (from the 14:14 note): layers should latch. Once a layer is earned it holds for at least 8 bars and fades out over 2 to 4 bars instead of following flow straight down; the base layer returns only after a long quiet stretch. Keep the patch 15 exhale after x5, but make it a 2-bar breath that comes back to the latched layers, not to the pad.
+The music latch and two-bar breath shipped in patch 18. Intensity comes from layers at a steady 88 BPM.
 
-## Next up (prioritized, as of 2026-09-28 after patch 20)
+## Delivered in 3.3.0 (patch 21, 2026-09-29)
 
-Pick from the top. Each one ships with receipts (clip.mjs before/after; co-op features also coop-res/swap-audit).
+Trent authorized every priority except MIDI, plus the brainstorm below. Source: `tools/expedition.js`, injected by `tools/polish.py`. Receipts include deterministic before/after clips, private co-op and an isolated public room with a real spectator.
 
-1. **Meta progression (Andre's Steam list, the last big open item).** A journey map of the stages you've reached, saved between sessions. Unlock the stage skins you've visited as a "start from" choice in zen (Jennifer keeps free play). A lifetime gem counter that fills a "treasury" you build up: the Homescapes idea, as a cabinet that gains ornaments.
-2. **Click-to-swap discoverability (Andre's carpal tunnel note).** A first-run hint card ("tap a gem, then its neighbour"), a visible selection glow that pulses toward the valid neighbours, and a Settings option: swap on tap-tap only. Measure drag vs tap usage.
-3. **Stage soundtracks from MIDI (Andre's idea, Tront's Suno tracks).** Convert a track to MIDI, store it as a compact note list in the HTML, and have ResonanceMusic play it through the same synth voices and layers (latched by flow). No samples, no AI noise, fully tweakable. Start with one stage as a test.
-4. **More modes on top of endless:** Timed (2 minutes, Resonance counts double), Moves (30 moves, best score), Puzzle boards (clear in N moves). The run-end card already exists (patch 13) to reuse.
-5. **Co-op team moments:** a "high five" burst when both players clear within a second; partner callouts ("PARTNER x5") in their colour; TEAM RESONANCE gets its own fanfare variant.
-6. **Named payouts for chains, not just Resonance:** x7+ in one move gets a name card (like Dodecatris) and goes into a per-session highlight reel ("best chain", "biggest Resonance").
-7. **Steam path prep:** a desktop wrapper (Tauri or Electron), Steam achievements mapped to milestones, stage unlocks, SUPERNOVA and co-op; controller glyphs; resolution and fullscreen options.
+1. **Meta progression:** saved journey, visited stage skins as endless starting choices, lifetime gem treasury and six cabinet ornaments. Skins preserve a fresh score of zero.
+2. **Tap-to-swap discoverability:** first-run hint, neighbour pulses, tap-only comfort choice, saved tap/drag/keyboard/pad gesture counts.
+3. **More modes:** two-minute Timed with double Resonance scoring, 30 Moves, four deterministic puzzles and Daily. Budgets are authoritative and end after the current cascade; invalid swaps and cascade waves cost no extra moves.
+4. **Co-op team moments:** high-five burst, partner x5+ callouts in their colour and a distinct team fanfare. Contributions and challenge state mirror to joining players and survive host handoff.
+5. **Named chain payouts:** x7 CROWN OF LIGHT, x8 PRISM PARADE, x9+ CONSTELLATION. Session moments retain the five strongest chains and three biggest Resonances independently.
+6. **Steam preparation:** portable Electron Windows wrapper, 22 allowlisted milestone achievements, Xbox/PlayStation glyphs, controller menu navigation, resolution and fullscreen. Steam dashboard registration and live achievement activation still require the registered App ID/account.
 
-## Brainstorm (not committed, ideas to pick from)
+## Brainstorm delivered in patch 21
 
-- **Gem personalities:** each gem type gets a tiny idle life (hearts beat, diamonds glint, triangles spin) that speeds up with the music's beat.
-- **Special gem showcase:** when a blast or prism is forged, a quick camera push-in plus a unique sound, grounded on the new gem (it's the thing, so the light lives on it).
-- **Stage props:** each stage places a few 3D props in the world behind the cabinet (TIDEPOOL jellyfish, EMBER REEF coral glow, AURORA ribbons, STARFALL shooting stars that cross the sky on the beat).
-- **Photo mode:** freeze the board, orbit the camera a little (Tront loves the perspective camera), and save a PNG with the stage name and score.
-- **Daily board:** one seeded board a day, shared score; co-op friends see each other's result.
-- **Spectator juice:** in the public room, watchers get the full show and can send cheers (a sparkle that flies to the board).
-- **Accessibility:** colour-blind gem shapes are already distinct; add a high-contrast outline option and a larger cursor option.
-- **Ghost of your best:** in Timed mode, a faint score line of your best run to race.
-- **Music toys:** a Settings page that shows the live layers (pad, bass, arp, drums, lead) lighting up, so players see the music respond to them.
-- **Jennifer mode check:** a calm preset (Flashes Low, Juice 80, music on, endless) one tap away, for winding down.
+- **Gem personalities:** hearts pulse, facets glint and triangles tilt to the beat, respecting motion and idle settings.
+- **Special gem showcase:** grounded forge reveal and sound, with a short camera push.
+- **Stage props:** crystals, jellyfish, glowing coral, aurora ribbons, stars and prism sculptures. Starfall also sends shooting stars on downbeats.
+- **Photo mode:** local frozen view, small orbit and stamped PNG; the shared board continues to sync.
+- **Daily board:** a UTC-day seed with 30 moves and connected friends' saved daily results.
+- **Spectator juice:** the full cascade show and cosmetic cheers, with no board mutations or progression farming.
+- **Accessibility:** high contrast outlines and larger cursor.
+- **Ghost of your best:** saved Timed score trajectory and a faint score marker.
+- **Music toys:** live pad, bass, arpeggio, drums and lead meters from the real scheduler.
+- **Jennifer mode:** one-tap calm preset; personal comfort stays local in shared play.
+
+## Current follow-through
+
+- **Announcer auditions:** Trent chose warm and playful. Qwen3, Kokoro and VoiceStudio/OmniVoice read the same short level-up, combo and team lines in the local listening lab. Choose a voice before adding production clips. OmniVoice's model license is noncommercial; its auditions remain local.
+- **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Verified on both GPU backends, including a real swap during travel.
+- **Steam account work:** create an App ID, register the 22 exact achievement API names, then verify activation and delivery with the real Steam client. Local wrapper smoke checks cover the GPU game, preload isolation, ID validation, resolution and fullscreen.
 
 ## Standing direction (Tront's calls, these override research)
 
@@ -79,10 +84,10 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 ## 2. The journey (stages, themes, music)
 
-- **Stages and themes like Tetris Effect and Lumines.** Each stage has its own palette, sky, galaxy form, gem sound set, BPM and music. One data table: `{name, palette, skyTint, galaxyForm, bpm, meter, key, mode, stems, gemSoundSet}`.
+- **Stages and themes like Tetris Effect and Lumines.** Each stage has its own palette, sky, galaxy form, props and chord progression. The tempo stays at 88 BPM.
 - **Zen/endless progresses too:** every XX points (or cleared gems, since points inflate with skill), move to the next stage, crossfading on a downbeat without pausing the board. Each stage has 3 phases that add a layer and a visual beat. (André.)
 - **Animated background that feels like a journey** while you play. (André.)
-- **Pacing:** alternate calm stages (6/4, 100 to 120 BPM) with driving ones (4/4, about 135 BPM).
+- **Pacing:** calm and driving passages come from layers and scenery at one steady tempo (Trent's patch 18 direction).
 - **Meta progression:** unlocks that carry over between sessions, a journey map, maybe something you build up. aFoolsDuty compared it to Homescapes ("solve puzzles to rebuild the house or farm you inherited").
 - **More modes than endless/zen** (timed, move-limited, puzzle boards).
 
@@ -90,7 +95,7 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 - **Ambient music first, then a "banger soundtrack"** (André: stages + meta progression + online co-op + a banger soundtrack = "this would sell on Steam").
 - **The player is the composer:** match, land and select sounds snap to the beat and climb the stage's scale (the core Tetris Effect trick). Snap only the result sounds, never the swap whoosh (latency).
-- **Procedural stems, no samples:** pad, bass, hats, kick, arp and lead on one beat clock, in one key per stage, layered by flow and combo tier. Fixed 8-bar chord loops per stage so it never goes aimless. No licensing risk in a public one-file game.
+- **Procedural stems:** pad, bass, hats, kick, arp and lead on one beat clock, in one key per stage, layered by flow and combo tier. Fixed 8-bar chord loops per stage. Announcer auditions are separate from the soundtrack.
 
 ## 4. Co-op
 
@@ -110,6 +115,7 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 ## Done
 
+- Patch 21 (3.3.0): saved journey and treasury, input onboarding, shared modes, team moments, highlights, living gems, stage props and crossfades, photos, daily friends, spectator cheers, accessibility, ghost, music meters, calm preset, desktop/Steam preparation and local voice audition tools. MIDI cancelled.
 - Patch 6: combo ladder (callouts SPARKLING..TRANSCENDENT, chord stings, x5+ sky lasers, speed lines, strobe).
 - Patch 7: Resonance music (generative soundtrack that layers in with play).
 - Patch 8: the journey (six score-driven stages: sky grade, tempo, progressions, stage show, progress bar).

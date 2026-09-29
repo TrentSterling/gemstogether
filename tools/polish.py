@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'versions' / 'gemstogether-v3.2.4.html'
 DST = ROOT / 'index.html'
-OGV = 2
+OGV = 3
 html = SRC.read_text(encoding='utf-8')
 orig = html
 
@@ -472,6 +472,27 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
   this.applyPreferences();""", r"""readStorage('gemstogether-settings-v1',{}));
   this.animSpeed=clamp(Number(this.prefs.animSpeed)||1,.35,1.5);this.applyPreferences();""")
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
+
+# Patch 21: the remaining roadmap, built into the same standalone HTML.
+rep("version:'3.2.4'", "version:'3.3.0'")
+rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
+rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
+rep("this.down.dragged=true;this.grab=-1;this.trySwap(start,target);", "this.down.dragged=true;this.grab=-1;this.expedition?.input('drag');this.trySwap(start,target);")
+rep("this.app.turnOwner=peer==='self'?'me':'partner';this.app.trySwap(a,b,true);", "this.app.turnOwner=peer==='self'?'me':'partner';this.app.turnPlayer=peer==='self'?this.selfId:peer;this.app.trySwap(a,b,true);")
+rep("const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());", "const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());cabinetMeshes.push(...(this.expedition?.meshes()||[]));")
+rep("[this.fx.field.mesh,this.world.shards.mesh,this.world.sparks.mesh,this.world.ambient.mesh]", "[...(this.fx.outgoingField?.mesh.count?[this.fx.outgoingField.mesh]:[]),this.fx.field.mesh,this.world.shards.mesh,this.world.sparks.mesh,this.world.ambient.mesh]")
+rep("const r=overGem?12:10,inner=overGem?5.5:4.2;", "const cursorScale=a.prefs.largeCursor?1.65:1;const r=(overGem?12:10)*cursorScale,inner=(overGem?5.5:4.2)*cursorScale;")
+rep("this.text('Drag a gem to its neighbour'", "this.text('Tap a gem, then its neighbour'")
+rep("else if(this.app.phase!=='idle'||this.app.frozen||this.app.aaCompare)reason='The board is resolving';", "else if(this.app.gameOver||this.app.expedition&&!this.app.expedition.acceptSwap())reason='The run has ended';else if(this.app.phase!=='idle'||this.app.frozen||this.app.aaCompare)reason='The board is resolving';")
+# Harness-only isolation for exercising the PUBLIC code path without the live room.
+# Tests assign a random room and seat cap before calling joinPublic; normal boot uses the constants.
+rep("mod.joinRoom(config,PUBLIC_ROOM.id,detail=>", "mod.joinRoom(config,this.testPublicRoom||PUBLIC_ROOM.id,detail=>")
+rep("x.slot=i<PUBLIC_ROOM.maxPlayers?i+1:0;", "x.slot=i<(this.testPublicLimit||PUBLIC_ROOM.maxPlayers)?i+1:0;")
+rep("this.lineDivider(x,yy+365,w);this.button('fullscreen','Fullscreen',x,yy+386,w,42);this.button('new-board','New board',x,yy+442,w,42);end=yy+513;", "this.lineDivider(x,yy+365,w);this.button('exp-comfort','Input and comfort',x,yy+386,w,42);this.button('fullscreen','Fullscreen',x,yy+439,w,42);this.button('new-board','New board',x,yy+495,w,42);end=yy+566;")
+rep("end=y+365;", "this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;")
+rep("this.selected=-1;this.trySwap(this.keyboardCell,to);", "this.selected=-1;this.expedition?.input('pad');this.trySwap(this.keyboardCell,to);")
+rep("Swap a prism with any gem to clear that colour. No timer or lives.", "Swap a prism with any gem to clear that colour. Endless has no timer or lives; Journey also has challenges.")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.3.0 hosting patch 21 (2026-09-29) Your journey, together
+
+- Journey saves visited stages, unlocked endless starting skins, lifetime gems, six cabinet ornaments and 22 local achievements. Practice and spectators do not earn progression.
+- Tap-to-swap onboarding, neighbour pulses, tap-only input, gesture counts, high contrast outlines, a larger cursor and Jennifer's calm preset. Comfort choices stay local in co-op.
+- Shared two-minute Timed, 30-move, four puzzle and seeded daily challenges. Timed Resonance scores double; a best-run ghost and connected friends' daily results provide something to race.
+- High fives, partner chain callouts, a team fanfare, named x7+ chain payouts and a session list retaining the best chains and biggest Resonances. Spectators can send cosmetic cheers.
+- Living gem personalities, grounded special-forge reveals and stage props. Fields of light crossfade over 3.2 seconds as new props settle into place. Starfall sends shooting stars across the background on the beat.
+- Photo mode freezes your view, supports a small camera orbit and exports a PNG stamped with stage and score. Shared play and network updates continue behind the frozen view.
+- Music settings show the live five-layer soundtrack. The tempo stays at 88 BPM.
+- Portable Electron Windows build, isolated Steam achievement bridge, Xbox/PlayStation menu glyphs, resolution controls and fullscreen. Live Steam activation needs the registered App ID and dashboard entries.
+- Local announcer audition tools compare warm, playful Qwen3 and Kokoro voices on identical game lines; VoiceStudio is cloned separately for its OmniVoice audition. Auditions stay outside the game package pending the voice selection.
+- MIDI soundtrack work was dropped at Trent's request.
+
 ## 3.2.4 hosting patch 20 (2026-09-28) Every stage gets its own sky
 
 - **Backgrounds swap with the stage.** Behind the cabinet, the field of light rebuilds into a new shape at every stage line: TIDEPOOL ripples, EMBER REEF embers, AURORA DEEP curtains, STARFALL stars, PRISM HEART's twelve-arm rainbow.

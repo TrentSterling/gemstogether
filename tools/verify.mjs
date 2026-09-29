@@ -13,11 +13,13 @@ const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h 
 
 async function boot(w, h, port) {
   const page = await launch({port, width: w, height: h});
+  try {
   await page.goto(base + '#solo=1');
   await page.front();
   await until(() => page.eval(`!!(${J}&&${J}.ready)`), {timeout: 60000, label: 'boot'});
   await sleep(1500);
   return page;
+  } catch (error) { page.kill(); throw error; }
 }
 async function pill(page) {
   return page.eval(`(()=>{const r=document.querySelector('#trontAbout>summary,.tront-about>summary')?.getBoundingClientRect();return r&&{x:r.x,y:r.y,w:r.width,h:r.height}})()`);
@@ -28,7 +30,7 @@ async function hits(page) { return (await page.eval(`${J}.ui()`)).hits || []; }
 let page = await boot(1280, 800, 9476);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
-  ok('version 3.2.4', d.version === '3.2.4', d.version);
+  ok('version 3.3.0', d.version === '3.3.0', d.version);
   ok('GPU backend', /WebGPU|WebGL/.test(d.backend), d.backend);
   ok('no runtime errors', d.errors.length === 0, JSON.stringify(d.errors).slice(0, 200));
   const s = await page.eval(`${J}.state()`);

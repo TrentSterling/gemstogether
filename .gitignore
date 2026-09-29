@@ -1,2 +1,5 @@
 tools/out/
 ref/
+desktop/node_modules/
+desktop/dist/
+desktop/.stage/

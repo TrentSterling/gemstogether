@@ -34,4 +34,4 @@ try {
   }
   ok('board hashes match', (await net(A)).hash === (await net(B)).hash);
   ok('no errors', !(await A.eval(`${J}.diagnostics()`)).errors.length && !(await B.eval(`${J}.diagnostics()`)).errors.length);
-} finally { A?.kill(); B?.kill(); console.log(`${pass} passed, ${fail} failed`); }
+} finally { A?.kill(); B?.kill(); console.log(`${pass} passed, ${fail} failed`); process.exitCode=fail?1:0; }

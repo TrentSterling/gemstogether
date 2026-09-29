@@ -20,7 +20,7 @@ From `research/DEEP-RESEARCH-COMBO-SPECTACLE.md`: **"Do not make 5x merely five 
 
 - **x4 is a warning:** a riser builds toward the next step.
 - **x5 owns exclusive assets:** the music ducks, then slams back with a fanfare phrase heard nowhere else; a 0.45 s slow-motion hold; gold shock rings; the longest rumble.
-- **Excitation, then relaxation:** after a x5+ chain the soundtrack exhales (pad only for two bars).
+- **Excitation, then relaxation:** after a x5+ chain the soundtrack takes a two-bar breath, then returns to the earned layers.
 - **Charge, transform, release:** Resonance (Zone and Burst style) charges from every clear, transforms for 8 s, then releases with a named payout (RADIANT RESONANCE, PRISMATIC RESONANCE, SUPERNOVA), like Dodecatris.
 - **Synchronize the channels:** result sounds snap to the soundtrack's 1/32 grid, and the frame and gems breathe on its beats.
 
@@ -43,15 +43,15 @@ The stage comes from the shared score, so co-op partners always travel together.
 
 | # | Name | Sky grade (r, g, b of 128) | BPM | Mood |
 |---|---|---|---|---|
-| 1 | DAWN SHALLOWS | 128 128 128 | 84 | the drop's own dusk, calm |
-| 2 | TIDEPOOL | 76 168 196 | 92 | cool teal, water |
-| 3 | EMBER REEF | 210 112 78 | 104 | warm, glowing coral |
-| 4 | AURORA DEEP | 150 88 214 | 116 | violet, northern lights |
-| 5 | STARFALL | 70 96 204 | 96 | deep blue breather |
-| 6 | PRISM HEART | 214 94 178 | 128 | magenta climax |
+| 1 | DAWN SHALLOWS | 128 128 128 | 88 | the drop's own dusk, calm |
+| 2 | TIDEPOOL | 76 168 196 | 88 | cool teal, water |
+| 3 | EMBER REEF | 210 112 78 | 88 | warm, glowing coral |
+| 4 | AURORA DEEP | 150 88 214 | 88 | violet, northern lights |
+| 5 | STARFALL | 70 96 204 | 88 | deep blue breather |
+| 6 | PRISM HEART | 214 94 178 | 88 | magenta climax |
 | 7+ | ENCORE | loops stages 2 to 6 | | |
 
-Pacing alternates calm and driving tempos (Hydelic's numbers: about 100 to 120 BPM feels calm, about 135 BPM drives).
+The soundtrack stays at 88 BPM. Stages change chords, colour and scenery; intensity comes from earned layers. Background fields crossfade for 3.2 seconds, with outgoing props shrinking into darkness and incoming props growing into place. Travel never pauses the board. Reduced motion keeps the fade and removes the floating and spinning.
 
 ## Particle language
 
@@ -70,15 +70,16 @@ Pacing alternates calm and driving tempos (Hydelic's numbers: about 100 to 120 B
 
 ## Audio
 
-- **Sample-free and generative.** Everything is WebAudio synthesis in one HTML file: no licensing risk.
+- **Generative soundtrack and effects.** Music stays WebAudio synthesis in one HTML file. MIDI work is cancelled.
 - The music is in the player's Gem tones key (natural minor) and layers in with play: pad, then bass, arps, drums, and a lead during lasers.
-- Stings climb with the tier. The swap whoosh is never delayed. Beat-snapping (next) applies only to result sounds.
+- Stings climb with the tier. The swap whoosh is never delayed. Result sounds snap to the beat.
 - A player's own loaded track always wins over the soundtrack.
+- Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. The local audition compares the same lines across voices. Select the voice before adding production assets; avoid narration on every ordinary match. VoiceStudio's default OmniVoice weights are noncommercial, so its local audition requires a separate rights decision for Steam.
 
 ## Comfort (options, never defaults)
 
 - Reduced motion: no camera punch, no strobe, the swirl freezes, flashes soften (already honoured).
-- Next: a Flash Intensity setting (Full default, Low, Off) that caps flash brightness and rate at three per second or fewer, plus a toggle for the x5 strobe. It mirrors Tetris Effect's MIN, MID and MAX effect settings.
+- Flash Intensity has Full (default), Low and Off. Tap-only swapping, high contrast outlines, a larger cursor and Jennifer's calm preset are local choices. Default effects remain at full juice.
 
 ## Receipts standard
 
