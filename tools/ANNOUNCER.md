@@ -6,6 +6,11 @@ has nineteen lines at -2, -4 and -6 semitones. Warm founder / -4 is the default;
 all six profiles are selectable in Audio > Announcer voices, with previews,
 an on/off toggle and independent voice volume.
 
+Current casting review is at `tools/out/voices/deep-round3/index.html`.
+Trent prefers Current Cave / -6, with Fresh booming baritone second, but neither
+yet has his desired Bejeweled announcer tone. This ranking has not changed the
+embedded pack or its default. See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
+
 The exact new line is **“Welcome back to Gems Together!”** It plays once after
 the first audio interaction on a return visit. New players hear “Welcome to
 Gems Together!” instead. Ordinary clears keep their musical sounds. New worlds,
@@ -39,8 +44,8 @@ duration and formants. Generation trims silence, matches levels and adds
 short edge fades; FFmpeg compresses the final mono clips to 24 kHz / 64 kbps.
 
 `announcer-pack.json` contains 114 MP3s and their checksums. `polish.py` embeds
-it into the single HTML file. The browser and Windows app use the same pack
-and lazily decode the selected clips. Playback needs no TTS service or model.
+it into the single HTML file. The browser lazily decodes the selected clips.
+Playback needs no TTS service or model.
 Only the selected Qwen voices ship; the earlier OmniVoice audition remains
 local. The Qwen model's recorded license is Apache-2.0.
 
@@ -59,6 +64,6 @@ bounded peaks and nonzero energy, first and returning greetings, duck/restore,
 mute, queueing, saved settings, phone layout, a real nine-wave cascade,
 stage travel, payouts and private host/peer playback with matching hashes.
 Cached Whisper checked the actual compressed audio: **114/114** spoken-content
-checks passed. The Windows smoke test decoded all six welcome-back variants.
+checks passed.
 Receipts are `tools/out/announcer/runtime-results.json` and
 `tools/out/announcer/speech-results.json`.
