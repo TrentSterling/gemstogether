@@ -1,6 +1,54 @@
 # Local announcer auditions
 
-## Current direction: deep, booming Qwen
+## Current direction: smooth, deep Silver master
+
+Trent selected **Silver master** from round five: the bass he wanted without
+rasp. He wants variations with more celebratory energy, but a smooth, deep,
+calming "Welcome back". His specific tonal reference is **Bejeweled 2**.
+This supersedes the earlier baritone/Cave ranking below. Auditions still do
+not authorize replacing the embedded pack or publishing the game.
+
+The focused comparison is `tools/out/voices/silver-round6/index.html`:
+the exact liked Silver, three requested delivery directions and six DSP rows.
+The DSP rows are four semitones down (timing/formants preserved), gentle
+EQ/compression, a diffuse short room tail, a quiet stereo double, EQ plus room,
+and the lower pitch plus EQ/room. Thirty final clips pass speech and level
+checks; the player passes 46 checks, including real reference playback and
+Stop cancellation. Asset checks pass 92/92, including exact baseline WAVs,
+the frozen reference, stereo channels and game/pack hashes.
+
+The exact prepared synthetic Silver reference is now retained in
+`tools/voice-references/silver-reference.wav` with provenance in its JSON.
+SHA256: `3043e39c2689dddba1f6dfb6840b8a3ecbe6c2211d32fd5a20952add90215ad8`.
+The nine new calls share this reference, with no final pitch edit. Qwen Base
+has no documented style-instruction API: these experiments pass instruction
+embeddings through the locally inspected model's `instruct_ids` path. The
+prompts describe requested moods, not verified subjective results. Two high
+calls were retried with the same speaker reference; rejected takes remain
+local. Final new calls measure 100-146 Hz. The lower DSP rows measure 96-119 Hz.
+
+Three publicly playable Bejeweled 2 snippets are retained locally under
+`tools/out/voices/bejeweled2-reference/`, with source URLs and hashes. Their
+measured median pitches are 73 Hz (Excellent), 88 Hz (Welcome back) and 92 Hz
+(Incredible). These short recordings contain effects; measurements do not
+prove a perceptual match. Level-matched listening references appear at the
+bottom of the page. They are never cloning inputs or game assets.
+
+```powershell
+C:/py/python.exe tools/voice-silver.py
+# Only if reviewing a high-register call: add --retry-reviewed.
+C:/py/python.exe tools/deep-voice-level.py --round silver
+C:/py/python.exe tools/voice-check.py --round silver
+python tools/voice-lab-build.py --round silver
+node tools/voice-lab-audit.mjs --silver
+```
+
+The generator needs retained round-five outputs, local Bejeweled listening
+references and the already cached Base model. It verifies reference and clip
+hashes before cache reuse. The normalizer preserves stereo and keeps an
+already level-matched baseline byte-identical. No production pack changes.
+
+## Earlier casting
 
 Trent wants a deeper Bejeweled-style announcer with Qwen's expressive energy.
 After round four, the fresh baritone is his favourite and Cave with darker
@@ -92,7 +140,7 @@ desired Bejeweled announcer tone. Keep these performances as the next comparison
 bases. Discuss modest additional pitch lowering, separate formant changes and
 light compression / short reverb before rendering more variants. His favourite
 was not the deepest Cave edit; a numerical pitch target cannot choose the voice.
-The specific Bejeweled reference is pending. This is a provisional audition
+At that stage the specific Bejeweled reference was pending. This is a provisional audition
 ranking, not a production-pack selection.
 
 The reference-first generation yielded 87-138 Hz calls without shifting the

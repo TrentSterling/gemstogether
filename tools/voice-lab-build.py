@@ -5,7 +5,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parent
 out=root/'out/voices'
 parser=argparse.ArgumentParser()
-parser.add_argument('--round', choices=['original','ryan','deep','tone','casting'], default='original')
+parser.add_argument('--round', choices=['original','ryan','deep','tone','casting','silver'], default='original')
 args=parser.parse_args()
 order=['af_heart','am_puck','am_fenrir','qwen-serena','qwen-ryan','omni-female','omni-male']
 if args.round=='ryan':
@@ -13,8 +13,8 @@ if args.round=='ryan':
     order=['qwen-ryan','qwen-ryan-baritone','qwen-ryan-minus2','qwen-ryan-minus4',
            'qwen-cave-clean','qwen-cave-pa','qwen-gems-founder','qwen-cave-reference']
 lines=['tidepool','dazzling','team','supernova']
-if args.round in ['deep','tone','casting']:
-    out=out/({'deep':'deep-round3','tone':'tone-round4','casting':'casting-round5'}[args.round])
+if args.round in ['deep','tone','casting','silver']:
+    out=out/({'deep':'deep-round3','tone':'tone-round4','casting':'casting-round5','silver':'silver-round6'}[args.round])
     manifest=json.loads((out/'plan.json').read_text(encoding='utf-8'))
     if manifest['status']!='generated; listening review pending':
         raise ValueError('Deep audition generation has not completed')
@@ -37,7 +37,7 @@ for voice in order:
                 clip.update(recognizedText=check['heard'], speechReview=not check['pass'])
             clips.append(clip)
 html=(root/'voice-lab.html').read_text(encoding='utf-8').replace('__VOICE_CATALOG__',json.dumps(clips))
-if args.round in ['deep','tone','casting']:
+if args.round in ['deep','tone','casting','silver']:
     html=html.replace('Gems Together | Voice auditions','Gems Together | Deep voice auditions')
     html=html.replace('Dry voice samples, trimmed and adjusted to similar listening levels.', 'All samples are matched to the same listening loudness. Original renders are retained separately.')
     html=html.replace('29 SEPTEMBER 2026','30 SEPTEMBER 2026')
@@ -67,6 +67,30 @@ if args.round in ['deep','tone','casting']:
             'Start with Cave / your favourite. Darker resonance keeps the pitch and timing; another 2 down keeps the original vowels; body + room keeps the voice and pitch while adding EQ, compression and a short room tail. These are the same performances throughout.')
         html=html.replace('identity.append(engine,title,fav)',"const note=document.createElement('p');note.className='hint';note.textContent=clips[0].description;identity.append(engine,title,note,fav)")
         html=html.replace('<div class="toolbar">','<p><a href="../deep-round3/index.html">Previous deep voice auditions</a></p><div class="toolbar">')
+    elif args.round=='silver':
+        html=html.replace('Gems Together | Deep voice auditions','Gems Together | Silver voice refinements')
+        html=html.replace('A deeper voice.<br>The same spark.','Silver, smooth.<br>Welcome back.')
+        html=html.replace('Deep Qwen voices for Gems Together. Compare fresh bass and baritone designs, deeper edits of the performances you liked, and the current voices. Each reads the same three lines.',
+            'Your selected Silver master comes first. Three new deliveries keep his exact speaker reference: a calm, deep greeting and more expression in the celebrations. Six processing treatments retain the original performances. Compare one line at a time.')
+        html=html.replace('gems-deep-voice-favorite','gems-silver-voice-favorite')
+        html=html.replace('The fresh voices use a new Qwen character reference, lowered before Qwen generates the short lines. Their finished clips have no pitch edit. The deep edits retain the existing performance while lowering pitch and darkening resonance. The current pack rows are your baseline.',
+            'The first row is the exact Silver performance you liked. The next three try different deliveries from that retained speaker, using experimental model guidance. The final six change processing: four semitones down, gentle EQ and compression, a soft room tail, a quiet stereo double, EQ plus room, or the lower pitch plus EQ and room. All are matched in listening loudness.')
+        html=html.replace('Try each welcome first, then the short victory calls. Listen for a full chesty sound, lively emphasis and clear words. Your favourite here does not change the game pack.',
+            'Listen for a welcoming, unhurried greeting and a satisfying lift on the wins. The original Bejeweled 2 clips below provide a direct listening reference. Try the stereo double on headphones. Your favourite here does not change the game pack.')
+        html=html.replace('identity.append(engine,title,fav)',"const note=document.createElement('p');note.className='hint';note.textContent=(clips[0].deliveryDirection?'Delivery direction: ':'')+clips[0].description;identity.append(engine,title,note,fav)")
+        html=html.replace('<div class="toolbar">','<p><a href="../casting-round5/index.html">Previous described voice casting</a></p><div class="toolbar">')
+        refs=manifest['references']
+        reference_html='<section id="reference"><small>BEJEWELED 2 / LISTENING REFERENCE</small><h2>The sound you mean.</h2><p>The original short calls, matched to the audition loudness for comparison.</p><div class="toolbar">'
+        for ref in refs:
+            text={'Welcome_Back':'Welcome back','excellent1':'Excellent','Incredible':'Incredible'}[ref['name']]
+            clip={'voice':'bejeweled-2','line':ref['name'],'text':text,'file':ref['listeningFile']}
+            # JSON attribute values are parsed from data, never evaluated as code.
+            import html as html_module
+            reference_html+='<button class="reference-play" data-reference="'+html_module.escape(json.dumps(clip),quote=True)+'">'+text+'</button>'
+        reference_html+='</div><p class="hint">Source: <a href="https://www.soundboard.com/sb/bejeweled2voice">Bejeweled 2 soundboard</a>. These reference clips are only on this local listening page.</p></section>'
+        html=html.replace('<footer>',reference_html+'<footer>')
+        html=html.replace('window.voiceLab={catalog,groups:[...groups.keys()]};',
+            "names['bejeweled-2']='Bejeweled 2';document.querySelectorAll('.reference-play').forEach(b=>b.addEventListener('click',()=>play([JSON.parse(b.dataset.reference)])));window.voiceLab={catalog,groups:[...groups.keys()]};")
     elif args.round=='casting':
         html=html.replace('Gems Together | Deep voice auditions','Gems Together | Described voice casting')
         html=html.replace('A deeper voice.<br>The same spark.','Twelve characters.<br>Find the voice.')

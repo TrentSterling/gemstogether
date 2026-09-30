@@ -27,10 +27,10 @@ def command(args):
 def main():
     global OUT
     parser = argparse.ArgumentParser()
-    parser.add_argument('--round', choices=['deep', 'tone', 'casting'], default='deep')
+    parser.add_argument('--round', choices=['deep', 'tone', 'casting', 'silver'], default='deep')
     chosen = parser.parse_args().round
     if chosen != 'deep':
-        OUT = OUT.parent / ('tone-round4' if chosen == 'tone' else 'casting-round5')
+        OUT = OUT.parent / {'tone': 'tone-round4', 'casting': 'casting-round5', 'silver': 'silver-round6'}[chosen]
     catalog = json.loads((OUT / 'catalog.json').read_text(encoding='utf-8'))
     (OUT / 'raw').mkdir(exist_ok=True)
     receipts = []
@@ -52,17 +52,22 @@ def main():
             'measured_LRA=' + info['input_lra'], 'measured_thresh=' + info['input_thresh'],
             'offset=' + info['target_offset'], 'linear=true', 'print_format=json',
         ])
-        command(['-i', str(raw), '-af', params, '-ar', '24000', '-ac', '1', '-c:a', 'pcm_s16le', str(path)])
+        channels = sf.info(raw).channels
+        if clip.get('retainPcm') and abs(float(info['input_i']) - TARGET) <= .5:
+            shutil.copyfile(raw, path)
+        else:
+            command(['-i', str(raw), '-af', params, '-ar', '24000', '-ac', str(channels), '-c:a', 'pcm_s16le', str(path)])
         measured = command(['-i', str(path), '-af', FILTER + ':print_format=json', '-f', 'null', '-'])
         audio, rate = sf.read(path)
         source, source_rate = sf.read(raw)
         detail = {
             'file': path.name, 'targetLUFS': TARGET, 'measuredLUFS': float(measured['input_i']),
             'truePeakDb': float(measured['input_tp']), 'raw': 'raw/' + path.name,
-            'rawSha256': hashlib.sha256(raw.read_bytes()).hexdigest(),
+            'rawSha256': hashlib.sha256(raw.read_bytes()).hexdigest(), 'channels': channels,
             'pass': abs(float(measured['input_i']) - TARGET) <= .5
                     and float(measured['input_tp']) <= -1.3
-                    and abs(len(audio)/rate - len(source)/source_rate) <= .01,
+                    and abs(len(audio)/rate - len(source)/source_rate) <= .01
+                    and sf.info(path).channels == channels,
         }
         if not detail['pass']:
             raise ValueError('Loudness/duration check failed: ' + str(detail))

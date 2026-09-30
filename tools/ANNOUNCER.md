@@ -6,11 +6,15 @@ has nineteen lines at -2, -4 and -6 semitones. Warm founder / -4 is the default;
 all six profiles are selectable in Audio > Announcer voices, with previews,
 an on/off toggle and independent voice volume.
 
-Current casting review is at `tools/out/voices/deep-round3/index.html`.
-After the follow-up at `tools/out/voices/tone-round4/index.html`, Trent prefers
-the fresh baritone and also likes Cave with darker resonance. He requested
-broader described-character casting at `tools/out/voices/casting-round5/index.html`.
-These rankings have not changed the embedded pack or its default.
+Current casting review is at `tools/out/voices/silver-round6/index.html`.
+Trent selected **Silver master** from the twelve-character round five: smooth
+bass without rasp. He wants a deep, calming welcome and more expressive wins,
+with **Bejeweled 2** as the reference. Thirty local clips compare the exact
+liked Silver, three requested deliveries and six processing treatments.
+The exact synthetic speaker is frozen in `voice-references/silver-reference.wav`;
+its transcript and provenance are in the matching JSON. The page also has
+three local Bejeweled listening references, never used in the game or as
+cloning inputs. This review has not changed the embedded pack or its default.
 See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
 
 The exact new line is **“Welcome back to Gems Together!”** It plays once after

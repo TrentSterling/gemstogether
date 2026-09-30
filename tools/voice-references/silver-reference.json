@@ -1,0 +1,26 @@
+{
+  "speaker": "Silver master",
+  "file": "silver-reference.wav",
+  "sha256": "3043e39c2689dddba1f6dfb6840b8a3ecbe6c2211d32fd5a20952add90215ad8",
+  "synthetic": true,
+  "text": "Welcome back to Gems Together! Those little gems are waiting. Take your time, make your move, and let the board shine. Brilliant! Beautifully done! Resonance! Let it shine!",
+  "style": "A mature American male master of ceremonies with an elegant deep baritone voice, rich chest resonance and exceptionally crisp diction. Clear, assured and warmly proud, with controlled excitement and playful delight. Bold rhythmic stresses, rounded full vowels and concise falling endings make each short celebration satisfying. He speaks brightly from a stable low register into a clean studio microphone.",
+  "designSeed": 133,
+  "designModelRevision": "5ecdb67327fd37bb2e042aab12ff7391903235d3",
+  "baseModelRevision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+  "preparation": {
+    "pitchChanged": true,
+    "formantRatio": 0.9,
+    "targetMedianHz": 115,
+    "source": "silver-reference.wav",
+    "sourceSha256": "14b6d2a1766c70f11ba06e5793511165ee966d2afc329600576371a73150fbc6"
+  },
+  "selection": "Trent selected the round-five Silver master; smooth deep bass without rasp.",
+  "productionSelectionPending": true,
+  "measurements": {
+    "medianHz": 117.45,
+    "p10Hz": 66.87,
+    "p90Hz": 153.82,
+    "seconds": 13.2294
+  }
+}
