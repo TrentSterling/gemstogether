@@ -7,9 +7,11 @@ all six profiles are selectable in Audio > Announcer voices, with previews,
 an on/off toggle and independent voice volume.
 
 Current casting review is at `tools/out/voices/deep-round3/index.html`.
-Trent prefers Current Cave / -6, with Fresh booming baritone second, but neither
-yet has his desired Bejeweled announcer tone. This ranking has not changed the
-embedded pack or its default. See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
+After the follow-up at `tools/out/voices/tone-round4/index.html`, Trent prefers
+the fresh baritone and also likes Cave with darker resonance. He requested
+broader described-character casting at `tools/out/voices/casting-round5/index.html`.
+These rankings have not changed the embedded pack or its default.
+See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
 
 The exact new line is **“Welcome back to Gems Together!”** It plays once after
 the first audio interaction on a return visit. New players hear “Welcome to

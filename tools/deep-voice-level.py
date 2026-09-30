@@ -1,6 +1,7 @@
 """Match the actual audition clips' loudness; retain the untouched outputs."""
 import json
 import hashlib
+import argparse
 import math
 import shutil
 import subprocess
@@ -24,6 +25,12 @@ def command(args):
 
 
 def main():
+    global OUT
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--round', choices=['deep', 'tone', 'casting'], default='deep')
+    chosen = parser.parse_args().round
+    if chosen != 'deep':
+        OUT = OUT.parent / ('tone-round4' if chosen == 'tone' else 'casting-round5')
     catalog = json.loads((OUT / 'catalog.json').read_text(encoding='utf-8'))
     (OUT / 'raw').mkdir(exist_ok=True)
     receipts = []
@@ -32,8 +39,11 @@ def main():
         if path.parent != OUT.resolve():
             raise ValueError('Unexpected audition path: ' + str(path))
         raw = OUT / 'raw' / path.name
-        if not raw.exists():
+        # A new render must replace an older retained source before normalization.
+        if not raw.exists() or not clip.get('normalization'):
             shutil.copyfile(path, raw)
+        elif clip['normalization'].get('rawSha256') and hashlib.sha256(raw.read_bytes()).hexdigest() != clip['normalization']['rawSha256']:
+            raise ValueError('Retained raw audio changed: ' + raw.name)
         info = command(['-i', str(raw), '-af', FILTER + ':print_format=json', '-f', 'null', '-'])
         if not math.isfinite(float(info['input_i'])):
             raise ValueError('Cannot measure speech loudness: ' + path.name)
@@ -49,6 +59,7 @@ def main():
         detail = {
             'file': path.name, 'targetLUFS': TARGET, 'measuredLUFS': float(measured['input_i']),
             'truePeakDb': float(measured['input_tp']), 'raw': 'raw/' + path.name,
+            'rawSha256': hashlib.sha256(raw.read_bytes()).hexdigest(),
             'pass': abs(float(measured['input_i']) - TARGET) <= .5
                     and float(measured['input_tp']) <= -1.3
                     and abs(len(audio)/rate - len(source)/source_rate) <= .01,

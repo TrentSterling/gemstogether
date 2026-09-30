@@ -112,7 +112,7 @@ def edited(plan):
             save(voice, key, text, shifted, rate, started, details)
 
 
-def fresh(plan):
+def fresh(plan, references_only=False):
     print('Importing Qwen with the local audition cache', flush=True)
     from qwen_tts import Qwen3TTSModel
     refs = []
@@ -139,6 +139,8 @@ def fresh(plan):
             del model
             gc.collect()
             torch.cuda.empty_cache()
+    if references_only:
+        return refs
     model = None
     try:
         for design, reference in refs:

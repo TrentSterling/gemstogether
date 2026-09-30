@@ -2,10 +2,56 @@
 
 ## Current direction: deep, booming Qwen
 
-Trent now wants a deeper Bejeweled-style announcer with Qwen's expressive energy.
-The warm/playful casting below is historical; the existing production voices
-still sound too high to him. Compare a new natural bass and booming baritone
-with pitch/formant edits of the approved founder and Cave performances.
+Trent wants a deeper Bejeweled-style announcer with Qwen's expressive energy.
+After round four, the fresh baritone is his favourite and Cave with darker
+resonance is also good. He explicitly requested a shotgun casting of more
+described characters, with less focus on Cave. The game pack remains unchanged
+while he listens; his audition ranking does not choose the production default.
+
+Round five casts twelve new descriptions at
+`tools/out/voices/casting-round5/index.html`: velvet arcade, bronze champion,
+thunder king, grand carnival, golden broadcaster, granite storyteller, regal
+judge, roguish champion, honey bass, heroic herald, silver master and canyon
+bass. Each uses one retained designed reference and the same three short lines.
+The favourite baritone and darker Cave are comparison rows. The page exposes
+each exact description. If a native reference measures above 165 Hz, its median
+is prepared at 115 Hz with 0.9 formants before the Base model generates the calls.
+The native reference remains retained and the final new calls have no pitch edit.
+This is local character casting; no original Bejeweled reference match is verified.
+
+Round five is ready and open in Firefox: 42/42 actual speech checks, 42/42
+level/duration checks and 55/55 browser/player checks. Final new calls measure
+66-167 Hz. Four high-register calls needed another generation seed; each kept
+its original speaker reference. Their rejected takes are retained under
+`rejected/`. `--retry-reviewed` retries high-register or speech-review calls
+without replacing a character. The two comparison rows match round four's PCM
+exactly. Playback now also handles Stop during a pending play request without
+showing an obsolete cancellation error.
+
+```powershell
+C:/py/python.exe tools/voice-casting.py
+C:/py/python.exe tools/deep-voice-level.py --round casting
+C:/py/python.exe tools/voice-check.py --round casting
+python tools/voice-lab-build.py --round casting
+node tools/voice-lab-audit.mjs --casting
+```
+
+Round four is the focused processing comparison at
+`tools/out/voices/tone-round4/index.html`: unchanged Cave / -6, darker vowel
+resonance, another two semitones down, gentle EQ/compression/short room and the
+unchanged baritone. Its fifteen clips passed speech and level checks; its player
+passed 24 checks. Both unchanged rows match the prior audition PCM exactly.
+
+```powershell
+C:/py/python.exe tools/voice-tone.py
+C:/py/python.exe tools/deep-voice-level.py --round tone
+C:/py/python.exe tools/voice-check.py --round tone
+python tools/voice-lab-build.py --round tone
+node tools/voice-lab-audit.mjs --tone
+```
+
+The warm/playful casting below is historical. Round three compared the fresh
+bass and baritone with pitch/formant edits of the earlier performances.
 
 The third round uses the exact same three lines for every candidate: Welcome
 back to Gems Together, Brilliant / Beautifully done, and Resonance / Let it
