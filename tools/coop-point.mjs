@@ -12,7 +12,7 @@ import {mkdirSync} from 'node:fs';
 const target = process.argv[2] || 'index.html';
 const base = /^https?:/.test(target) ? target : pathToFileURL(resolve(target)).href;
 const J = 'window.__jewel';
-const portA = 9460 + Math.floor(Math.random() * 20) * 2, portB = portA + 1;
+const portA = Number(process.env.GEMS_COOP_PORT) || 9460 + Math.floor(Math.random() * 20) * 2, portB = portA + 1;
 let pass = 0, fail = 0;
 const ok = (name, cond, info = '') => { cond ? pass++ : fail++; console.log(`${cond ? 'PASS' : 'FAIL'} ${name}${info ? '  ' + info : ''}`); };
 mkdirSync('tools/out', {recursive: true});

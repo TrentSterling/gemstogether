@@ -380,7 +380,7 @@ vec3 chargedInlay(vec3 col,vec3 base,vec3 lp,vec3 footprint,float special,float 
  return col;
 }
 
-vec3 shade(vec3 pos,vec3 norm,vec3 base,float kind,vec3 lp,vec2 tuv,float energy,float hover,float special,vec3 eye,float clock,float juice,float seed,vec4 life,vec3 footprint){
+vec3 shade(vec3 pos,vec3 norm,vec3 base,float kind,vec3 lp,vec2 tuv,float energy,float hover,float special,vec3 eye,float clock,float juice,float seed,vec4 life,vec3 footprint,vec2 frame){
  vec3 n=safeUnit(norm);vec3 v=safeUnit(eye-pos);vec3 l=safeUnit(vec3(-0.6,1.0,1.4));
  float ndl=clamp(dot(n,l),0.0,1.0);float ndv=clamp(dot(n,v),0.0,1.0);vec3 r=reflect(-v,n);vec3 e=environment(r);
  float fresBase=1.0-ndv;float fres=fresBase*fresBase*fresBase*fresBase;float spec=pow(max(dot(n,safeUnit(l+v)),0.0),110.0);
@@ -409,6 +409,13 @@ vec3 shade(vec3 pos,vec3 norm,vec3 base,float kind,vec3 lp,vec2 tuv,float energy
  }else if(kind>2.5&&kind<3.5){
    float wave=0.84+0.16*sin(pos.x*2.0+pos.y*1.8-clock*2.5);
    col=base*(1.4+juice*2.2+energy*3.0)*wave;
+   float rail=max(abs(pos.x),abs(pos.y));
+   if(rail>4.056&&rail<4.084&&pos.z>0.036&&pos.z<0.178){
+    float red=floor(frame.y/65536.0);
+    float green=floor((frame.y-red*65536.0)/256.0);
+    float blue=frame.y-red*65536.0-green*256.0;
+    col+=vec3(red,green,blue)/255.0*frame.x*4.5;
+   }
  }else if(kind>3.5&&kind<4.5){
    float wave=sin(pos.x*2.3+clock*0.4+sin(pos.z*0.9))*sin(pos.z*2.0-clock*0.3);
    float ripple=pow(max(0.0,sin(pos.z*7.0+wave*2.5+clock)),14.0);
@@ -464,13 +471,13 @@ const MESH_GL_FS=`#version 300 es
 precision highp float;${GL_UNIFORMS}
 in vec3 vPos;in vec3 vNorm;in vec3 vCol;in vec3 vLocal;in vec2 vUV;in vec4 vState;flat in float vSeed;out vec4 outColor;
 ${SHARED_SHADER}
-void main(){vec3 footprint=fwidth(vLocal);if(((vState.x>1.5&&vState.x<2.5)||(vState.x>8.5&&vState.x<9.5))&&cabinetApertureY(vPos,uEye.xyz)>3.90)discard;outColor=vec4(shade(vPos,vNorm,vCol,vState.x,vLocal,vUV,vState.y,vState.z,vState.w,uEye.xyz,uParams.x,uParams.y,vSeed,uLife,footprint),1.0);}`;
+void main(){vec3 footprint=fwidth(vLocal);if(((vState.x>1.5&&vState.x<2.5)||(vState.x>8.5&&vState.x<9.5))&&cabinetApertureY(vPos,uEye.xyz)>3.90)discard;outColor=vec4(shade(vPos,vNorm,vCol,vState.x,vLocal,vUV,vState.y,vState.z,vState.w,uEye.xyz,uParams.x,uParams.y,vSeed,uLife,footprint,vec2(uEye.w,uSettings.w)),1.0);}`;
 const MESH_WGSL=`${WG_UNIFORMS}
 ${toWGSL(SHARED_SHADER)}
 struct VIn { @location(0) pos: vec3f,@location(1) norm: vec3f,@location(2) col: vec3f,@location(3) kind: f32,@location(4) uv: vec2f,@location(5) m0: vec4f,@location(6) m1: vec4f,@location(7) m2: vec4f,@location(8) m3: vec4f,@location(9) tint: vec4f,@location(10) state: vec4f };
 struct VOut { @builtin(position) clip: vec4f,@location(0) pos:vec3f,@location(1) norm:vec3f,@location(2) col:vec3f,@location(3) lp:vec3f,@location(4) uv:vec2f,@location(5) state:vec4f,@location(6) @interpolate(flat) seed:f32 };
 @vertex fn vs(a:VIn)->VOut {var o:VOut;let m=mat4x4f(a.m0,a.m1,a.m2,a.m3);let p=m*vec4f(a.pos,1.0);o.pos=p.xyz;o.norm=(m*vec4f(a.norm,0.0)).xyz;o.col=a.col*a.tint.rgb;o.lp=a.pos;o.uv=a.uv;o.seed=a.state.w;var k=a.kind;if(a.state.x>=0.0){k=a.state.x;}o.state=vec4f(k,a.tint.a,a.state.y,a.state.z);o.clip=U.vp*p;o.clip.z=(o.clip.z+o.clip.w)*0.5;return o;}
-@fragment fn fs(a:VOut)->@location(0) vec4f{let footprint=fwidth(a.lp);if(((a.state.x>1.5&&a.state.x<2.5)||(a.state.x>8.5&&a.state.x<9.5))&&cabinetApertureY(a.pos,U.eye.xyz)>3.90){discard;}return vec4f(shade(a.pos,a.norm,a.col,a.state.x,a.lp,a.uv,a.state.y,a.state.z,a.state.w,U.eye.xyz,U.params.x,U.params.y,a.seed,U.life,footprint),1.0);}
+@fragment fn fs(a:VOut)->@location(0) vec4f{let footprint=fwidth(a.lp);if(((a.state.x>1.5&&a.state.x<2.5)||(a.state.x>8.5&&a.state.x<9.5))&&cabinetApertureY(a.pos,U.eye.xyz)>3.90){discard;}return vec4f(shade(a.pos,a.norm,a.col,a.state.x,a.lp,a.uv,a.state.y,a.state.z,a.state.w,U.eye.xyz,U.params.x,U.params.y,a.seed,U.life,footprint,vec2f(U.eye.w,U.settings.w)),1.0);}
 `;
 const QUAD_GL=`#version 300 es
 precision highp float;out vec2 vUV;void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));vUV=p;gl_Position=vec4(p*2.0-1.0,0.0,1.0);}`;
@@ -574,6 +581,11 @@ class ResonanceFX {
   u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5)*(.35+.65*this.F);u[29]=(this.a.prefs.flash==='low'?Math.min(u[29],1.5*low):u[29])*(.4+.6*this.F);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
+  // The beat colours the cabinet's actual emissive inlay, under the scene depth test.
+  const a=this.a,chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=this.res?.on;
+  const tint=color(res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(this.stageInfo())).map(v=>Math.round(v*255));
+  u[19]=a.panelOpen||a.gameOver?0:((.14+.6*(this.beat||0))*(.45+.55*Math.min(1,this.flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0))*this.F;
+  u[35]=tint[0]*65536+tint[1]*256+tint[2];
  }
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
@@ -1173,7 +1185,7 @@ function buildWorld(renderer){
  const crown=renderer.createMesh(gemGeometry(1,7).data(),4);
  const orbitGeo=new Geo();orbitGeo.ring([0,0,0],.84,.022,gold,1,'y',80);orbitGeo.ring([0,0,0],.75,.009,paleGold,1,'y',80);for(let j=0;j<3;j++){let a=j/3*TAU;orbitGeo.append(gemGeometry(5,7),trs([Math.cos(a)*.84,0,Math.sin(a)*.84],[0,0,0],[.12,.12,.12]));}
  const orbit=renderer.createMesh(orbitGeo.data(),1);
- const haloGeo=new Geo();for(let sx of [-1,1])for(let sy of [-1,1]){let c=[sx*.45,sy*.45,0];haloGeo.tube([[c[0]-sx*.18,c[1],0],c,[c[0],c[1]-sy*.18,0]],.015,[1,1,1],3,4);}const halos=renderer.createMesh(haloGeo.data(),8);
+ const haloGeo=new Geo();for(let sx of [-1,1])for(let sy of [-1,1]){let c=[sx*.392,sy*.392,0];haloGeo.tube([[c[0]-sx*.09,c[1],0],c,[c[0],c[1]-sy*.09,0]],.0085,[1,1,1],3,4);}const halos=renderer.createMesh(haloGeo.data(),8);
  const specialGeo=new Geo();specialGeo.ring([0,0,0],.405,.011,[1,1,1],3,'z',40);specialGeo.ring([0,0,0],.45,.007,[1,1,1],1,'z',40);const specialMesh=renderer.createMesh(specialGeo.data(),64);
  const quad=new Geo();quad.quad([-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,.5,0],[1,1,1],0,[[0,0],[1,0],[1,1],[0,1]]);
  const shard=new Geo();let p=[[0,.60,0],[-.35,-.3,.24],[.35,-.3,.24],[0,-.25,-.4]];shard.tri(p[0],p[1],p[2]).tri(p[0],p[2],p[3]).tri(p[0],p[3],p[1]).tri(p[1],p[3],p[2]);
@@ -1431,7 +1443,7 @@ class CabinetUI {
  }
  draw(){const a=this.app,p=this.ink;p.begin(a.cssWidth,a.cssHeight);this.hits=[];
   this.floats=this.floats.filter(f=>a.time-f.birth<(f.life||1.1));for(const f of this.floats){const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos,a.vp,a.cssWidth,a.cssHeight),alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);p.opacity=alpha;this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40),.12,true);}p.opacity=1;
-  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawBeat();this.drawStage();this.drawRes();this.drawBurst();this.drawCallout();this.drawComets();this.drawGameOver();this.drawPadCursor();this.drawCursor();p.submit();
+  this.drawHUD();if(a.panelOpen){this.hits=[];this.drawPanel();}this.pointMarkers();this.coopPresence();this.drawStage();this.drawRes();this.drawBurst();this.drawCallout();this.drawComets();this.drawGameOver();this.drawCursor();p.submit();
  }
 }
 
@@ -1719,8 +1731,10 @@ class JewelApp {
  draw(){this.syncAA();this.updateCamera();const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());cabinetMeshes.push(...(this.expedition?.meshes()||[]));const r=this.renderer,u=r.uniforms;u.set(this.vp,0);u.set([...this.eye,1],16);u.set([...this.right,0],20);u.set([...this.up,0],24);u.set([this.time,this.juice,this.cssWidth/this.cssHeight,this.tanFov],28);u.set([1.08+this.juice*.035,.70,this.prefs.motion?1:0,1],32);u.set([r.width,r.height,1/r.width,1/r.height],36);u.set([...this.forward,0],40);u.set([(this.effectiveAA==='fxaa'||this.effectiveAA==='hybrid')?this.prefs.aaStrength/100:0,this.prefs.sharpness/100,0,0],44);u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.music?.tick();this.pollPad?.();this.fx.uniforms(u);
   const batches=Array.from({length:6},()=>[]),special=[];for(const a of this.actors.values()){if(a.scale[0]<.001)continue;const m=trs(a.pos,a.rotation,a.scale);batches[a.tile.type].push(...packedInstance(m,GEM_COLORS[a.tile.type],a.energy,2,a.hover,a.tile.special,a.seed));}
   batches.forEach((b,i)=>r.upload(this.world.gemMeshes[i],new Float32Array(b),b.length/24));r.upload(this.world.specialMesh,new Float32Array(special),special.length/24);
-  const hover=[];let cells=new Map();for(const i of this.hintCells)cells.set(i,'hint');if(this.hover>=0)cells.set(this.hover,'hover');if(this.keyboardActive)cells.set(this.keyboardCell,'hover');if(this.selected>=0)cells.set(this.selected,'selected');
-  for(const [i,kind]of cells){const a=this.getActor(i);if(!a||a.pos[1]>3.67)continue;let col=kind==='hint'?color('#70d8ce'):kind==='selected'?color('#f8d885'):color('#b5d4d2');const scale=kind==='hint'?1+Math.sin(this.time*5)*.025:1;hover.push(...packedInstance(trs([a.pos[0],a.pos[1],.15],[0,0,0],[scale,scale,1]),vmul(col,kind==='hint'?.42:.8),0,3));}
+  const hover=[];let cells=new Map();for(const i of this.hintCells)cells.set(i,'hint');if(this.hover>=0)cells.set(this.hover,'hover');if(this.keyboardActive&&!this.auto&&!this.panelOpen)cells.set(this.keyboardCell,'keyboard');if(this.selected>=0)cells.set(this.selected,'selected');
+  for(const [i,kind]of cells){const ac=this.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.67)continue;
+   const pos=cellXY(i),armed=kind==='keyboard'&&this.padState?.aAt&&!this.padState.swapped&&this.padState.b[0],pulse=.5+.5*Math.sin(this.time*5),col=color(kind==='hint'?'#70d8ce':kind==='selected'||kind==='keyboard'?armed?'#86e5ed':'#f8d885':'#b5d4d2'),strength=kind==='hint'?.38+.18*pulse:kind==='keyboard'?.75+.4*pulse:.8;
+   hover.push(...packedInstance(trs([pos[0],pos[1],.085]),vmul(col,strength),0,3));}
   r.upload(this.world.halos,new Float32Array(hover),hover.length/24);r.upload(this.world.crown,new Float32Array(packedInstance(trs([0,4.98+Math.sin(this.time)*.03,.05],[.06,Math.sin(this.time*.35)*.35,0],[.90,1.23,.9]),color('#429dff'),this.juice*.32+this.presentation.crownEnergy,7)),1);r.upload(this.world.orbit,new Float32Array(packedInstance(trs([0,4.97,.04],[.16, this.time*.22+this.presentation.crownSpin,.16*Math.sin(this.time*.35)]))),1);
   const islandInstances=[];const idleWorld=this.prefs.motion&&!this.frozen;
   for(const is of this.world.islands){const t=this.time*is.speed+is.phase;const bob=idleWorld?Math.sin(t)*is.bob:0;const yaw=idleWorld?Math.sin(t*.67)*is.twist:0;const pitch=idleWorld?Math.cos(t*.83)*is.pitch:0;const roll=idleWorld?Math.sin(t*.51+1.2)*is.roll:0;islandInstances.push(...packedInstance(trs([is.base[0],is.base[1]+bob,is.base[2]],[pitch,yaw,roll],[is.scale,is.scale,is.scale]),is.tint,0,-1));}
@@ -2532,12 +2546,6 @@ JewelApp.prototype.pollPad=function(){
  if(!bt(0)&&P.b[0]){if(!P.swapped){this.keyboardActive=true;this.clickCell(this.keyboardCell);}P.aAt=0;}
  snap();};
 JewelApp.prototype.rumble=function(strong,weak,ms){const g=this.pad!=null&&navigator.getGamepads?navigator.getGamepads()[this.pad]:null,v=g&&g.vibrationActuator;if(!v||this.prefs.juice<=0)return;try{v.playEffect('dual-rumble',{duration:ms,strongMagnitude:clamp(strong,0,1),weakMagnitude:clamp(weak,0,1)});}catch{}};
-CabinetUI.prototype.drawPadCursor=function(){const a=this.app,p=this.ink;if(!a.keyboardActive||a.panelOpen||a.auto)return;const i=a.keyboardCell,ac=a.getActor(i);if(!ac)return;
- const pos=ac.pos,q0=project([pos[0]-.47,pos[1]+.47,.3],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.47,pos[1]-.47,.3],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
- const pulse=.5+.5*Math.sin(performance.now()*.008),col=armed?'#86e5ed':'#ffd98a',th=3+pulse*1.5,L=w*.34;p.opacity=1;
- for(const [px,py,sx,sy] of [[x,y,1,1],[X,y,-1,1],[x,Y,1,-1],[X,Y,-1,-1]])p.poly([px+sx*L,py,px,py,px,py+sy*L],th,col,.95);
- p.box(x-3,y-3,w+6,Y-y+6,col,8,.10+.08*pulse);
- if(armed){const c=[(x+X)/2,(y+Y)/2],r=w*.62+pulse*3,s=w*.13;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const tx=c[0]+dx*r,ty=c[1]+dy*r;p.poly([tx-dy*s-dx*s,ty+dx*s-dy*s,tx,ty,tx+dy*s-dx*s,ty-dx*s-dy*s],3,col,.9);}}};
 CabinetUI.prototype.resCallout=function(label){this.rc={label,birth:this.app.time};};
 CabinetUI.prototype.resPayout=function(count,team){this.rp={count,team,birth:this.app.time};};
 CabinetUI.prototype.drawRes=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||a.panelOpen)return;const R=fx.res,co=a.coop,t=a.time;p.opacity=1;
@@ -2568,12 +2576,6 @@ CabinetUI.prototype.drawGameOver=function(){const a=this.app,g=a.gameOver,p=this
  this.text(g.best&&age>1.45?'NEW BEST!':'Best '+a.best.toLocaleString('en-US'),cx,y+H*.51,bw*.05,g.best?gemHex(((a.time*8)|0)%6):UI_ART.dim,'center',W-20,.14,true);
  this.text('Reached stage '+g.stage.n+'  '+g.stage.name,cx,y+H*.63,bw*.036,UI_ART.text,'center',W-20);
  if(age>.8){p.opacity=1;this.button('again','Play again',cx-W*.32,y+H*.76,W*.64,Math.max(40,H*.15));}p.opacity=1;};
-CabinetUI.prototype.drawBeat=function(){const a=this.app,fx=a.fx,p=this.ink;if(!fx||a.panelOpen||a.gameOver)return;const {cx,cy,bw}=this.boardBox(),b=fx.beat||0,flow=Math.min(fx.flow,1.2),chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=fx.res&&fx.res.on;
- const col=res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(fx.stageInfo()),al=(.14+.6*b)*(.45+.55*Math.min(1,flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0);if(al<.02)return;
- p.opacity=1;const P=(x,y,z)=>project([x,y,z],a.vp,a.cssWidth,a.cssHeight);
- // Pinned to the real rails (patch 19): the gold frame runs at +-4.08 (outer rim 4.22), front near z .3. Projected
- // through the camera, so the glow keeps the frame's perspective at every window size instead of a guessed square.
- for(const [E,th,k] of [[4.08,6,1],[4.24,16,.45],[4.44,30,.2]]){const q=[P(-E,E,.3),P(E,E,.3),P(E,-E,.36),P(-E,-E,.36)];p.poly([q[0][0],q[0][1],q[1][0],q[1][1],q[2][0],q[2][1],q[3][0],q[3][1],q[0][0],q[0][1]],th,col,Math.min(1,al*k));}};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;
 CabinetUI.prototype.coopBadge=function(){
  const a=this.app,n=a.coop;if(!n?.publicRoom)return privateCoopBadge.call(this);
@@ -2882,14 +2884,41 @@ CabinetUI.prototype.expeditionHUD=function(){
  if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+118;this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
  const ann=e.announcement;if(ann){const age=a.time-ann.at;if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox(),al=Math.min(1,age*10)*clamp((ann.duration-age)/.4,0,1);p.opacity=al;this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);p.opacity=1;}}
 };
+// Weld the rendered mesh once. Split shared edges at facet midpoints so the
+// crown's T junctions do not turn into spurious silhouette segments.
+const gemContourMeshes=new Map();
+function gemContourMesh(type){
+ if(gemContourMeshes.has(type))return gemContourMeshes.get(type);
+ const data=gemGeometry(type).data(),vertices=[],faces=[],ids=new Map(),edges=new Map();
+ for(let offset=0;offset<data.length;offset+=36){const face=[];for(let k=0;k<3;k++){const v=Array.from(data.slice(offset+k*12,offset+k*12+3)),key=v.join(',');if(!ids.has(key)){ids.set(key,vertices.length);vertices.push(v);}face.push(ids.get(key));}faces.push(face);}
+ faces.forEach((face,f)=>{for(let k=0;k<3;k++){const from=face[k],to=face[(k+1)%3],v=vertices[from],d=vsub(vertices[to],v),len=vdot(d,d),cuts=[[0,from],[1,to]];
+  vertices.forEach((p,i)=>{if(i===from||i===to)return;const t=vdot(vsub(p,v),d)/len;if(t<=0||t>=1)return;const delta=vsub(p,vadd(v,vmul(d,t)));if(vdot(delta,delta)<1e-13)cuts.push([t,i]);});cuts.sort((a,b)=>a[0]-b[0]);
+  for(let j=1;j<cuts.length;j++){const a=cuts[j-1][1],b=cuts[j][1],key=Math.min(a,b)+':'+Math.max(a,b);if(!edges.has(key))edges.set(key,{a,b,faces:[]});edges.get(key).faces.push(f);}
+ }});
+ const mesh={vertices,faces,edges:[...edges.values()]};gemContourMeshes.set(type,mesh);return mesh;
+}
+function gemContours(actor,app){
+ const mesh=gemContourMesh(actor.tile.type),model=trs(actor.pos,actor.rotation,actor.scale),points=mesh.vertices.map(v=>project(transform(model,v),app.vp,app.cssWidth,app.cssHeight));
+ const front=mesh.faces.map(([a,b,c])=>(points[b][0]-points[a][0])*(points[c][1]-points[a][1])-(points[b][1]-points[a][1])*(points[c][0]-points[a][0])<0);
+ const edges=mesh.edges.filter(e=>e.faces.some(f=>front[f])&&(e.faces.length===1||e.faces.some(f=>!front[f]))),links=new Map();
+ edges.forEach((e,i)=>{for(const v of [e.a,e.b]){if(!links.has(v))links.set(v,[]);links.get(v).push(i);}});
+ const used=new Set(),loops=[];
+ for(let i=0;i<edges.length;i++){if(used.has(i))continue;const start=edges[i].a,path=[...points[start].slice(0,2)];let current=start,next=i;
+  while(next!==undefined&&!used.has(next)){used.add(next);const edge=edges[next];current=edge.a===current?edge.b:edge.a;path.push(...points[current].slice(0,2));if(current===start)break;next=links.get(current)?.find(k=>!used.has(k));}
+  if(current===start&&path.length>=8)loops.push(path);
+ }
+ // Facet folds can create hidden interior loops. The preview traces the outer
+ // silhouette only; keep the heart's concave notch rather than a convex hull.
+ const area=path=>{let sum=0;for(let k=2;k<path.length;k+=2)sum+=path[k-2]*path[k+1]-path[k]*path[k-1];return Math.abs(sum);};
+ loops.sort((a,b)=>area(b)-area(a));return loops.slice(0,1);
+}
 CabinetUI.prototype.expeditionDecor=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;
- const mark=(i,col,width=2)=>{const ac=a.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.75)return;const q=project([ac.pos[0],ac.pos[1],.48],a.vp,a.cssWidth,a.cssHeight),q1=project([ac.pos[0]+.39,ac.pos[1],.48],a.vp,a.cssWidth,a.cssHeight),R=Math.abs(q1[0]-q[0]),type=ac.tile.type,pts=[];
-  const count=[10,16,4,6,3,8][type];for(let k=0;k<=count;k++){const ang=(k%count)/count*TAU-PI/2;pts.push(q[0]+Math.cos(ang)*R,q[1]+Math.sin(ang)*R);}p.poly(pts,width+2,UI_ART.ink,.85);p.poly(pts,width,col,.8);
- };
+ const marks=new Map(),mark=(i,col,width=2)=>marks.set(i,{col,width});
  if(a.prefs.highContrast)for(let i=0;i<64;i++)mark(i,'#ffffff',1.5);
  if(a.selected>=0&&a.phase==='idle'){mark(a.selected,'#ffe27a',3);for(const j of [a.selected-8,a.selected+8,a.selected-1,a.selected+1])if(a.board.adjacent(a.selected,j)){const q=window.__jewel.project(j),s=window.__jewel.project(a.selected),t=(a.time*1.5)%1,x=mix(s[0],q[0],t),y=mix(s[1],q[1],t);p.box(x-2.5,y-2.5,5,5,'#8ff7ff',2,.8);mark(j,'#8ff7ff',1);}}
  if(e.run.mode==='puzzle')for(let i=0;i<64;i++)if(e.run.targets.includes(a.board.cells[i]?.id)){mark(i,'#ffe27a',3);const q=window.__jewel.project(i);p.box(q[0]-3,q[1]+19,6,6,'#ffe27a',2);}
+ for(const [i,{col,width}]of marks){const ac=a.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.75)continue;for(const pts of gemContours(ac,a))p.poly(pts,width,col,.9);}
  const f=e.forgeFocus;if(f&&a.time-f.birth<.8){const ac=a.getActor(f.at);if(ac){const q=project([ac.pos[0],ac.pos[1],.55],a.vp,a.cssWidth,a.cssHeight),R=24+(a.time-f.birth)*35,pts=[];for(let k=0;k<=32;k++){const t=k/32*TAU;pts.push(q[0]+Math.cos(t)*R,q[1]+Math.sin(t)*R);}p.poly(pts,3,f.special===2?'#8ff7ff':'#ffe27a',clamp(1-(a.time-f.birth)/.8,0,1));}}
 };
 const expeditionDrawHUD=CabinetUI.prototype.drawHUD;

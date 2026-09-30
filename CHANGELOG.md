@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.3 local playtest patch 25 (2026-09-29) Aligned highlights
+
+- Move preview follows each rendered gem's silhouette, rotation, lift and scale, including the heart notch. High contrast and puzzle targets share the same contour; each gem draws one outline.
+- Mouse, keyboard and controller focus use one depth-tested bracket fitted to the physical socket. Brightness pulses without enlarging or lifting the bracket away from its tile.
+- The frame beat lights the cabinet's existing cyan inlay with scene depth occlusion. Removed the three oversized HUD bands that floated outside the board.
+- Geometry and GPU checks: 21/21 across desktop WebGPU, phone WebGPU and desktop WebGL. Firefox 157 / WebGL 2 also renders cleanly; existing gameplay gate: 22/22; private host/peer point gate: 10/10. Screenshots and receipts: `tools/out/highlights/`.
+- This remains an unpublished browser project for tront.xyz. Trent is playtesting before deciding on a push. Deeper Qwen announcer auditions require discussion before generation.
+
 ## 3.3.3 hosting patch 24 (2026-09-29) Six worlds, six harmonies
 
 - All six worlds have distinct eight-bar progression pairs and keys relative to Gem tones. At the default setting the journey moves through D, G, E, A, F and C minor. Stage harmony starts on its travel downbeat; old pads fade and a new board promptly starts its own opening harmony.

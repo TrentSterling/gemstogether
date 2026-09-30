@@ -373,14 +373,7 @@ rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
  if(!bt(0)&&P.b[0]){if(!P.swapped){this.keyboardActive=true;this.clickCell(this.keyboardCell);}P.aAt=0;}
  snap();};
 JewelApp.prototype.rumble=function(strong,weak,ms){const g=this.pad!=null&&navigator.getGamepads?navigator.getGamepads()[this.pad]:null,v=g&&g.vibrationActuator;if(!v||this.prefs.juice<=0)return;try{v.playEffect('dual-rumble',{duration:ms,strongMagnitude:clamp(strong,0,1),weakMagnitude:clamp(weak,0,1)});}catch{}};
-CabinetUI.prototype.drawPadCursor=function(){const a=this.app,p=this.ink;if(!a.keyboardActive||a.panelOpen||a.auto)return;const i=a.keyboardCell,ac=a.getActor(i);if(!ac)return;
- const pos=ac.pos,q0=project([pos[0]-.47,pos[1]+.47,.3],a.vp,a.cssWidth,a.cssHeight),q1=project([pos[0]+.47,pos[1]-.47,.3],a.vp,a.cssWidth,a.cssHeight),x=q0[0],y=q0[1],X=q1[0],Y=q1[1],w=X-x,armed=!!(a.padState&&a.padState.aAt&&!a.padState.swapped&&a.padState.b[0]);
- const pulse=.5+.5*Math.sin(performance.now()*.008),col=armed?'#86e5ed':'#ffd98a',th=3+pulse*1.5,L=w*.34;p.opacity=1;
- for(const [px,py,sx,sy] of [[x,y,1,1],[X,y,-1,1],[x,Y,1,-1],[X,Y,-1,-1]])p.poly([px+sx*L,py,px,py,px,py+sy*L],th,col,.95);
- p.box(x-3,y-3,w+6,Y-y+6,col,8,.10+.08*pulse);
- if(armed){const c=[(x+X)/2,(y+Y)/2],r=w*.62+pulse*3,s=w*.13;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const tx=c[0]+dx*r,ty=c[1]+dy*r;p.poly([tx-dy*s-dx*s,ty+dx*s-dy*s,tx,ty,tx+dy*s-dx*s,ty-dx*s-dy*s],3,col,.9);}}};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
-rep(r"""this.drawComets();this.drawCursor();p.submit();""", r"""this.drawComets();this.drawPadCursor();this.drawCursor();p.submit();""")
 rep(r"""this.music?.tick();""", r"""this.music?.tick();this.pollPad?.();""")
 rep(r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}""",
     r"""if(this.prefs.motion)this.punch=Math.min(1.2,(this.punch||0)+(special?.9:.45+this.cascade*.04)*k);}this.rumble?.(special||this.cascade>=5?.9:this.cascade>=3?.5:.12,.3+.1*Math.min(this.cascade,6),special?260:110+this.cascade*20);""")
@@ -446,20 +439,12 @@ CabinetUI.prototype.drawGameOver=function(){const a=this.app,g=a.gameOver,p=this
  this.text('Reached stage '+g.stage.n+'  '+g.stage.name,cx,y+H*.63,bw*.036,UI_ART.text,'center',W-20);
  if(age>.8){p.opacity=1;this.button('again','Play again',cx-W*.32,y+H*.76,W*.64,Math.max(40,H*.15));}p.opacity=1;};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
-rep(r"""this.drawComets();this.drawPadCursor();""", r"""this.drawComets();this.drawGameOver();this.drawPadCursor();""")
+rep(r"""this.drawComets();this.drawCursor();p.submit();""", r"""this.drawComets();this.drawGameOver();this.drawCursor();p.submit();""")
 
 # Tront patch 14 (S94 gauntlet R10): the board breathes to the beat. The frame glows in the stage colour on every
 # beat (downbeats harder, more with flow), gems bump on the beat, and a chain of x3+ holds a tier-coloured aura.
 rep(r"""const hs=1+a.hover*.095;""", r"""const hs=(1+a.hover*.095)*(1+(this.beatBump||0));""")
-rep(r"""const privateCoopBadge=CabinetUI.prototype.coopBadge;""",
-    r"""CabinetUI.prototype.drawBeat=function(){const a=this.app,fx=a.fx,p=this.ink;if(!fx||a.panelOpen||a.gameOver)return;const {cx,cy,bw}=this.boardBox(),b=fx.beat||0,flow=Math.min(fx.flow,1.2),chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=fx.res&&fx.res.on;
- const col=res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(fx.stageInfo()),al=(.14+.6*b)*(.45+.55*Math.min(1,flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0);if(al<.02)return;
- p.opacity=1;const P=(x,y,z)=>project([x,y,z],a.vp,a.cssWidth,a.cssHeight);
- // Pinned to the real rails (patch 19): the gold frame runs at +-4.08 (outer rim 4.22), front near z .3. Projected
- // through the camera, so the glow keeps the frame's perspective at every window size instead of a guessed square.
- for(const [E,th,k] of [[4.08,6,1],[4.24,16,.45],[4.44,30,.2]]){const q=[P(-E,E,.3),P(E,E,.3),P(E,-E,.36),P(-E,-E,.36)];p.poly([q[0][0],q[0][1],q[1][0],q[1][1],q[2][0],q[2][1],q[3][0],q[3][1],q[0][0],q[0][1]],th,col,Math.min(1,al*k));}};
-const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
-rep(r"""this.coopPresence();this.drawStage();this.drawRes();""", r"""this.coopPresence();this.drawBeat();this.drawStage();this.drawRes();""")
+# The frame beat is rendered on the existing cyan inlay (patch 25), not in the HUD.
 
 # Tront patch 15 (S94, from the deep research): x5 presentation hold (slow motion) and named Resonance payouts.
 rep(" update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}", " update(dt){\n  if(this.hitstop>0){this.hitstop-=dt;return;}if(this.slowUntil>performance.now())dt*=.3;")
@@ -519,6 +504,28 @@ rep('if(a.prefs.motion&&FL>0&&ra<.16){', 'if(a.prefs.comboTreatment!==false&&b.f
 rep('this.burst={birth:a.time,real:performance.now(),c};', 'this.burst={birth:a.time,real:performance.now(),c,flash:a.fx?.flashEvent?.()??true};')
 rep('src.playbackRate.value=clamp(rate,.3,4);', 'src.playbackRate.value=clamp(rate,.3,10);')
 rep("hover(type,x){if(!this.started||this.ctx.currentTime-this.lastHover<.08)return;this.lastHover=this.ctx.currentTime;this.play(this.buffers.glass[type],1.6,.012,x*.09);}", "hover(type,x){if(!this.started||this.ctx.currentTime-this.lastHover<.08)return;this.lastHover=this.ctx.currentTime;this.play(this.buffers.glass[type],Math.pow(2,(this.key+12-69)/12),.012,x*.09);}")
+
+# Patch 25: highlights follow the actual socket and gem geometry. A single
+# depth-tested bracket handles mouse, keyboard and controller focus.
+rep("let c=[sx*.45,sy*.45,0];haloGeo.tube([[c[0]-sx*.18,c[1],0],c,[c[0],c[1]-sy*.18,0]],.015",
+    "let c=[sx*.392,sy*.392,0];haloGeo.tube([[c[0]-sx*.09,c[1],0],c,[c[0],c[1]-sy*.09,0]],.0085")
+rep("if(this.keyboardActive)cells.set(this.keyboardCell,'hover');", "if(this.keyboardActive&&!this.auto&&!this.panelOpen)cells.set(this.keyboardCell,'keyboard');")
+rep("for(const [i,kind]of cells){const a=this.getActor(i);if(!a||a.pos[1]>3.67)continue;let col=kind==='hint'?color('#70d8ce'):kind==='selected'?color('#f8d885'):color('#b5d4d2');const scale=kind==='hint'?1+Math.sin(this.time*5)*.025:1;hover.push(...packedInstance(trs([a.pos[0],a.pos[1],.15],[0,0,0],[scale,scale,1]),vmul(col,kind==='hint'?.42:.8),0,3));}",
+    """for(const [i,kind]of cells){const ac=this.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.67)continue;
+   const pos=cellXY(i),armed=kind==='keyboard'&&this.padState?.aAt&&!this.padState.swapped&&this.padState.b[0],pulse=.5+.5*Math.sin(this.time*5),col=color(kind==='hint'?'#70d8ce':kind==='selected'||kind==='keyboard'?armed?'#86e5ed':'#f8d885':'#b5d4d2'),strength=kind==='hint'?.38+.18*pulse:kind==='keyboard'?.75+.4*pulse:.8;
+   hover.push(...packedInstance(trs([pos[0],pos[1],.085]),vmul(col,strength),0,3));}""")
+# Pass the two unused uniform lanes explicitly into the shared GLSL/WGSL shader.
+rep("vec4 life,vec3 footprint){", "vec4 life,vec3 footprint,vec2 frame){")
+rep("uLife,footprint),1.0)", "uLife,footprint,vec2(uEye.w,uSettings.w)),1.0)")
+rep("U.life,footprint),1.0)", "U.life,footprint,vec2f(U.eye.w,U.settings.w)),1.0)")
+rep("col=base*(1.4+juice*2.2+energy*3.0)*wave;", """col=base*(1.4+juice*2.2+energy*3.0)*wave;
+   float rail=max(abs(pos.x),abs(pos.y));
+   if(rail>4.056&&rail<4.084&&pos.z>0.036&&pos.z<0.178){
+    float red=floor(frame.y/65536.0);
+    float green=floor((frame.y-red*65536.0)/256.0);
+    float blue=frame.y-red*65536.0-green*256.0;
+    col+=vec3(red,green,blue)/255.0*frame.x*4.5;
+   }""")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

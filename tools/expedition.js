@@ -252,14 +252,41 @@ CabinetUI.prototype.expeditionHUD=function(){
  if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+118;this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
  const ann=e.announcement;if(ann){const age=a.time-ann.at;if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox(),al=Math.min(1,age*10)*clamp((ann.duration-age)/.4,0,1);p.opacity=al;this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);p.opacity=1;}}
 };
+// Weld the rendered mesh once. Split shared edges at facet midpoints so the
+// crown's T junctions do not turn into spurious silhouette segments.
+const gemContourMeshes=new Map();
+function gemContourMesh(type){
+ if(gemContourMeshes.has(type))return gemContourMeshes.get(type);
+ const data=gemGeometry(type).data(),vertices=[],faces=[],ids=new Map(),edges=new Map();
+ for(let offset=0;offset<data.length;offset+=36){const face=[];for(let k=0;k<3;k++){const v=Array.from(data.slice(offset+k*12,offset+k*12+3)),key=v.join(',');if(!ids.has(key)){ids.set(key,vertices.length);vertices.push(v);}face.push(ids.get(key));}faces.push(face);}
+ faces.forEach((face,f)=>{for(let k=0;k<3;k++){const from=face[k],to=face[(k+1)%3],v=vertices[from],d=vsub(vertices[to],v),len=vdot(d,d),cuts=[[0,from],[1,to]];
+  vertices.forEach((p,i)=>{if(i===from||i===to)return;const t=vdot(vsub(p,v),d)/len;if(t<=0||t>=1)return;const delta=vsub(p,vadd(v,vmul(d,t)));if(vdot(delta,delta)<1e-13)cuts.push([t,i]);});cuts.sort((a,b)=>a[0]-b[0]);
+  for(let j=1;j<cuts.length;j++){const a=cuts[j-1][1],b=cuts[j][1],key=Math.min(a,b)+':'+Math.max(a,b);if(!edges.has(key))edges.set(key,{a,b,faces:[]});edges.get(key).faces.push(f);}
+ }});
+ const mesh={vertices,faces,edges:[...edges.values()]};gemContourMeshes.set(type,mesh);return mesh;
+}
+function gemContours(actor,app){
+ const mesh=gemContourMesh(actor.tile.type),model=trs(actor.pos,actor.rotation,actor.scale),points=mesh.vertices.map(v=>project(transform(model,v),app.vp,app.cssWidth,app.cssHeight));
+ const front=mesh.faces.map(([a,b,c])=>(points[b][0]-points[a][0])*(points[c][1]-points[a][1])-(points[b][1]-points[a][1])*(points[c][0]-points[a][0])<0);
+ const edges=mesh.edges.filter(e=>e.faces.some(f=>front[f])&&(e.faces.length===1||e.faces.some(f=>!front[f]))),links=new Map();
+ edges.forEach((e,i)=>{for(const v of [e.a,e.b]){if(!links.has(v))links.set(v,[]);links.get(v).push(i);}});
+ const used=new Set(),loops=[];
+ for(let i=0;i<edges.length;i++){if(used.has(i))continue;const start=edges[i].a,path=[...points[start].slice(0,2)];let current=start,next=i;
+  while(next!==undefined&&!used.has(next)){used.add(next);const edge=edges[next];current=edge.a===current?edge.b:edge.a;path.push(...points[current].slice(0,2));if(current===start)break;next=links.get(current)?.find(k=>!used.has(k));}
+  if(current===start&&path.length>=8)loops.push(path);
+ }
+ // Facet folds can create hidden interior loops. The preview traces the outer
+ // silhouette only; keep the heart's concave notch rather than a convex hull.
+ const area=path=>{let sum=0;for(let k=2;k<path.length;k+=2)sum+=path[k-2]*path[k+1]-path[k]*path[k-1];return Math.abs(sum);};
+ loops.sort((a,b)=>area(b)-area(a));return loops.slice(0,1);
+}
 CabinetUI.prototype.expeditionDecor=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;
- const mark=(i,col,width=2)=>{const ac=a.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.75)return;const q=project([ac.pos[0],ac.pos[1],.48],a.vp,a.cssWidth,a.cssHeight),q1=project([ac.pos[0]+.39,ac.pos[1],.48],a.vp,a.cssWidth,a.cssHeight),R=Math.abs(q1[0]-q[0]),type=ac.tile.type,pts=[];
-  const count=[10,16,4,6,3,8][type];for(let k=0;k<=count;k++){const ang=(k%count)/count*TAU-PI/2;pts.push(q[0]+Math.cos(ang)*R,q[1]+Math.sin(ang)*R);}p.poly(pts,width+2,UI_ART.ink,.85);p.poly(pts,width,col,.8);
- };
+ const marks=new Map(),mark=(i,col,width=2)=>marks.set(i,{col,width});
  if(a.prefs.highContrast)for(let i=0;i<64;i++)mark(i,'#ffffff',1.5);
  if(a.selected>=0&&a.phase==='idle'){mark(a.selected,'#ffe27a',3);for(const j of [a.selected-8,a.selected+8,a.selected-1,a.selected+1])if(a.board.adjacent(a.selected,j)){const q=window.__jewel.project(j),s=window.__jewel.project(a.selected),t=(a.time*1.5)%1,x=mix(s[0],q[0],t),y=mix(s[1],q[1],t);p.box(x-2.5,y-2.5,5,5,'#8ff7ff',2,.8);mark(j,'#8ff7ff',1);}}
  if(e.run.mode==='puzzle')for(let i=0;i<64;i++)if(e.run.targets.includes(a.board.cells[i]?.id)){mark(i,'#ffe27a',3);const q=window.__jewel.project(i);p.box(q[0]-3,q[1]+19,6,6,'#ffe27a',2);}
+ for(const [i,{col,width}]of marks){const ac=a.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.75)continue;for(const pts of gemContours(ac,a))p.poly(pts,width,col,.9);}
  const f=e.forgeFocus;if(f&&a.time-f.birth<.8){const ac=a.getActor(f.at);if(ac){const q=project([ac.pos[0],ac.pos[1],.55],a.vp,a.cssWidth,a.cssHeight),R=24+(a.time-f.birth)*35,pts=[];for(let k=0;k<=32;k++){const t=k/32*TAU;pts.push(q[0]+Math.cos(t)*R,q[1]+Math.sin(t)*R);}p.poly(pts,3,f.special===2?'#8ff7ff':'#ffe27a',clamp(1-(a.time-f.birth)/.8,0,1));}}
 };
 const expeditionDrawHUD=CabinetUI.prototype.drawHUD;

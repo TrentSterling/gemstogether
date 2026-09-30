@@ -97,6 +97,11 @@ class ResonanceFX {
   u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5)*(.35+.65*this.F);u[29]=(this.a.prefs.flash==='low'?Math.min(u[29],1.5*low):u[29])*(.4+.6*this.F);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
+  // The beat colours the cabinet's actual emissive inlay, under the scene depth test.
+  const a=this.a,chain=a.phase!=='idle'&&a.cascade>=3?Math.min(a.cascade,9):0,res=this.res?.on;
+  const tint=color(res?gemHex(((a.time*8)|0)%6):chain?TIER_COLS[chain]:stageHex(this.stageInfo())).map(v=>Math.round(v*255));
+  u[19]=a.panelOpen||a.gameOver?0:((.14+.6*(this.beat||0))*(.45+.55*Math.min(1,this.flow+.3))+(chain?.3+.05*chain:0)+(res?.3:0))*this.F;
+  u[35]=tint[0]*65536+tint[1]*256+tint[2];
  }
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
