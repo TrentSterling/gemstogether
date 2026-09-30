@@ -37,9 +37,9 @@ def frame(name, f, box=None):
 
 secs = []
 for r in rounds:
-    b, a = r['before'], r['after']
+    b, a = r.get('before'), r.get('after')
     vids = (f'<div class="pair"><figure><video src="{media(b)}" autoplay loop muted playsinline controls></video><figcaption>Before: {r.get("beforeLabel", b)}</figcaption></figure>'
-            f'<figure><video src="{media(a)}" autoplay loop muted playsinline controls></video><figcaption>After: {r.get("afterLabel", a)}</figcaption></figure></div>')
+            f'<figure><video src="{media(a)}" autoplay loop muted playsinline controls></video><figcaption>After: {r.get("afterLabel", a)}</figcaption></figure></div>') if b and a else ''
     pairs = ''
     for f, cap in r.get('frames', []):
         pairs += (f'<div class="pair"><figure><img src="{frame(b, f)}" alt="before {cap}"><figcaption>Before, {cap}</figcaption></figure>'
@@ -65,7 +65,7 @@ for r in rounds:
     checks = ''.join(f'<li>{c}</li>' for c in r.get('checks', []))
     notes = ''.join(f'<li>{n}</li>' for n in r.get('changes', []))
     secs.append(f'<section><h2>{r["title"]}</h2><p class="why">{r.get("why", "")}</p><h3>What changed</h3><ul>{notes}</ul>'
-                f'<h3>Clips (frame-stepped, 30 fps, same deterministic board)</h3>{vids}<h3>Matched frames</h3>{pairs}<h3>Checks</h3><ul class="checks">{checks}</ul></section>')
+                f'{"<h3>Clips (frame-stepped, 30 fps, same deterministic board)</h3>"+vids if vids else ""}{pairs}<h3>Checks</h3><ul class="checks">{checks}</ul></section>')
 
 html = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Polish Gauntlet</title><style>

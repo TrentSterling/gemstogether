@@ -74,7 +74,7 @@ The soundtrack stays at 88 BPM. Stages change chords, colour and scenery; intens
 - The music is in the player's Gem tones key (natural minor) and layers in with play: pad, then bass, arps, drums, and a lead during lasers.
 - Stings climb with the tier. The swap whoosh is never delayed. Result sounds snap to the beat.
 - A player's own loaded track always wins over the soundtrack.
-- Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. The local audition compares the same lines across voices. Select the voice before adding production assets; avoid narration on every ordinary match. VoiceStudio's default OmniVoice weights are noncommercial, so its local audition requires a separate rights decision for Steam.
+- Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. The selected synthetic Qwen identities are Warm founder and Cave-inspired clean, lowered by 2, 4 or 6 semitones. Warm founder / -4 is the default. Ordinary matches keep their musical sounds; speech ducks the music, respects mute and has a cooldown and repeat guard. Voice choice and volume stay local; Jennifer's calm preset disables speech. OmniVoice remains a local audition.
 
 ## Comfort (options, never defaults)
 

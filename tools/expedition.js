@@ -137,7 +137,7 @@ class GemsExpedition {
   if(fresh){this.highlights=[];this.current={chain:0,gems:0,points:0};this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=this.a.board.score;this.a.fx.stage=undefined;this.a.gameOver=null;}
   if(this.run.finished){this.a.gameOver={score:this.run.score,stage:this.a.fx.stageInfo(),birth:this.a.time,best:false};this.commitResult();}
  }
- info(){return {version:'3.3.0',run:this.summary(),profile:expeditionClone(this.profile),highlights:expeditionClone(this.highlights),ornaments:EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length,tutorial:this.tourVisible,photo:!!this.photo,dailyFriends:[...this.dailyFriends.values()],props:this.props.active||0,ghostScore:this.ghostScore()};}
+ info(){return {version:'3.3.1',run:this.summary(),profile:expeditionClone(this.profile),highlights:expeditionClone(this.highlights),ornaments:EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length,tutorial:this.tourVisible,photo:!!this.photo,dailyFriends:[...this.dailyFriends.values()],props:this.props.active||0,ghostScore:this.ghostScore()};}
  buildProps(){
   const meshes=[];for(let form=0;form<6;form++){const g=new Geo(),c=color(['#ffd98a','#78e4e5','#ff9159','#bda9ff','#b4d5ff','#f486ee'][form]);
    if(form===1){g.append(tintGeo(gemGeometry(1,7),c),trs([0,0,0],[0,0,0],[.7,.3,.6]));for(let k=0;k<7;k++){const an=k/7*TAU,pts=[];for(let j=0;j<10;j++)pts.push([Math.cos(an)*(.35+Math.sin(j*.7)*.08),-.2-j*.14,Math.sin(an)*.35+Math.cos(j*.65)*.1]);g.tube(pts,.019,c,3,5);}}

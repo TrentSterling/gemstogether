@@ -3,6 +3,7 @@ Exact bytes except: social meta + canonical after the description, em dashes out
 strings, and the tront.xyz About block. Every replacement must match exactly once or the script aborts.
     python tools/polish.py [versions/gemstogether-v3.2.4.html]
 """
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -474,7 +475,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.0'")
+rep("version:'3.2.4'", "version:'3.3.1'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -493,6 +494,20 @@ rep("this.lineDivider(x,yy+365,w);this.button('fullscreen','Fullscreen',x,yy+386
 rep("end=y+365;", "this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;")
 rep("this.selected=-1;this.trySwap(this.keyboardCell,to);", "this.selected=-1;this.expedition?.input('pad');this.trySwap(this.keyboardCell,to);")
 rep("Swap a prism with any gem to clear that colour. No timer or lives.", "Swap a prism with any gem to clear that colour. Endless has no timer or lives; Journey also has challenges.")
+
+# Patch 22: Trent's selected voices, lowered and embedded for browser/desktop play.
+pack_path = ROOT / 'tools' / 'announcer-pack.json'
+pack = json.loads(pack_path.read_text(encoding='utf-8'))
+expected = {'welcome', 'welcome-back', 'dawn', 'tidepool', 'ember', 'aurora', 'starfall',
+            'prism-heart', 'dazzling', 'brilliant', 'crown', 'parade', 'constellation',
+            'resonance', 'team', 'radiant', 'prismatic', 'supernova', 'complete'}
+if len(pack['profiles']) != 6 or any(set(p['clips']) != expected for p in pack['profiles'].values()):
+    sys.exit('ABORT: incomplete announcer pack')
+announcer = (ROOT / 'tools' / 'announcer.js').read_text(encoding='utf-8').replace('__ANNOUNCER_PACK__', pack_path.read_text(encoding='utf-8'))
+rep('(async function boot(){', announcer + '\n(async function boot(){')
+rep('app.expedition=new GemsExpedition(app);', 'app.expedition=new GemsExpedition(app);app.announcer=new GemsAnnouncer(app);')
+rep("this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;",
+    "this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.1 hosting patch 22 (2026-09-29) Welcome back
+
+- “Welcome back to Gems Together!” greets returning players once after their first sound interaction. First visits have their own welcome.
+- Embedded Qwen announcer pack: the selected Warm founder and Cave-inspired clean voices, each lowered by 2, 4 or 6 semitones without slowing the delivery. Warm founder / -4 is the default.
+- Audio > Announcer voices offers local voice, pitch and volume controls, an on/off toggle and previews. New stages, completed big chains, Resonance, payouts and challenge completions get occasional celebrations.
+- One speaker at a time, a minimum interval and repeat guard keep speech sparse. Music ducks and restores, including a loaded track. Master mute cancels speech; practice, Showcase, photos and Jennifer's calm preset stay quiet. Co-op players keep their own voice choices.
+- All 114 compressed clips are bundled in the single HTML and portable Windows build; playback needs no TTS service. Browser gate 136/136 and independent speech-content check 114/114 passed.
+
 ## 3.3.0 hosting patch 21 (2026-09-29) Your journey, together
 
 - Journey saves visited stages, unlocked endless starting skins, lifetime gems, six cabinet ornaments and 22 local achievements. Practice and spectators do not earn progression.

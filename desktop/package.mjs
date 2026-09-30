@@ -9,5 +9,5 @@ for(const file of ['main.cjs','preload.cjs','achievements.json'])await copyFile(
 for(const file of ['index.html','og-image.png'])await copyFile(join(repo,file),join(stage,'game',file));
 await mkdir(join(stage,'node_modules'),{recursive:true});await cp(join(root,'node_modules','steamworks.js'),join(stage,'node_modules','steamworks.js'),{recursive:true});
 const {devDependencies,scripts,...runtime}=pkg;await writeFile(join(stage,'package.json'),JSON.stringify(runtime,null,2));
-const outputs=await packager({dir:stage,name:'Gems Together',platform:'win32',arch:'x64',electronVersion:pkg.devDependencies.electron,out:join(root,'dist'),appVersion:pkg.version,buildVersion:pkg.version,prune:false,asar:false,overwrite:false});
+const outputs=await packager({dir:stage,name:'Gems Together',platform:'win32',arch:'x64',electronVersion:pkg.devDependencies.electron,out:join(root,'dist',pkg.version),appVersion:pkg.version,buildVersion:pkg.version,prune:false,asar:false,overwrite:false});
 console.log(outputs.join('\n'));

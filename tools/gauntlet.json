@@ -576,5 +576,57 @@
       "Packaged Windows executable: real WebGPU, 64 gems, isolated preload, unknown achievement rejected, resolution/fullscreen and progression pass.",
       "Before/after cascade and stage clips: zero errors. Seven voices and 28 actual WAVs; audition browser gate 34/34, independent spoken-content check 28/28 and signal/peak/duration receipts."
     ]
+  },
+  {
+    "title": "Round 18 (3.3.1 / patch 22): Welcome back",
+    "why": "Trent selected Warm founder and Cave-inspired clean, wanted both pitched down, and requested Welcome back to Gems Together.",
+    "changes": [
+      "Nineteen Qwen lines at three lower pitches for each approved synthetic voice, embedded in the standalone HTML and Windows build.",
+      "Returning-player greeting, stage welcomes, completed big chains, Resonance and challenge celebrations.",
+      "Local voice, pitch and volume controls with exact-clip previews, music ducking and restore, cooldown and one pending cue.",
+      "Master mute cancels speech. Practice, Showcase, photos and Jennifer calm stay quiet; co-op preferences stay local."
+    ],
+    "images": [
+      [
+        "tools/out/announcer/settings-desktop.png",
+        "Desktop announcer controls"
+      ],
+      [
+        "tools/out/announcer/settings-phone.png",
+        "Phone announcer controls"
+      ]
+    ],
+    "audio": [
+      [
+        "tools/out/announcer/founder-2-welcome-back.mp3",
+        "Warm founder, 2 semitones lower: Welcome back"
+      ],
+      [
+        "tools/out/announcer/founder-4-welcome-back.mp3",
+        "Warm founder, 4 semitones lower: Welcome back"
+      ],
+      [
+        "tools/out/announcer/founder-6-welcome-back.mp3",
+        "Warm founder, 6 semitones lower: Welcome back"
+      ],
+      [
+        "tools/out/announcer/cave-2-welcome-back.mp3",
+        "Cave-inspired clean, 2 semitones lower: Welcome back"
+      ],
+      [
+        "tools/out/announcer/cave-4-welcome-back.mp3",
+        "Cave-inspired clean, 4 semitones lower: Welcome back"
+      ],
+      [
+        "tools/out/announcer/cave-6-welcome-back.mp3",
+        "Cave-inspired clean, 6 semitones lower: Welcome back"
+      ]
+    ],
+    "checks": [
+      "Actual compressed spoken-content checks: 114/114; same 114 embedded MP3 checksums verified for the listening page.",
+      "Real WebAudio/GPU/private co-op gate: 136/136. First and returning greetings, audio routing, queueing, local controls and real nine-wave cascade.",
+      "Original game gate 22/22, feature/private co-op 48/48, public/spectator/migration 15/15, desktop/phone/WebGPU/WebGL/controller/photo 68/68, stage transitions 16/16.",
+      "Portable Windows executable independently smoke-tested with all six welcome-back variants decoded."
+    ]
   }
 ]

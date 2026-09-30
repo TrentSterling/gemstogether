@@ -109,8 +109,8 @@ are [CC-BY-NC](https://huggingface.co/k2-fsa/OmniVoice#license); its tokenizer
 has separate terms. VoiceStudio's application is AGPL-3.0 and its bundled
 OmniVoice implementation has its own Apache-2.0 license, described in its
 [license notice](https://github.com/debpalash/VoiceStudio/blob/main/LICENSE-NOTICE.md).
-The game and portable package contain the existing synthesized music and
-effects. No audition voice is selected or shipped as a production announcer.
+OmniVoice is excluded from the game and portable package. The later selected
+Qwen voices ship in patch 22; see [ANNOUNCER.md](ANNOUNCER.md).
 
 ## Validation
 
@@ -122,10 +122,12 @@ The stage video alongside the samples
 is a deterministic real-game capture; its fade is checked separately by
 `tools/expedition-stage.mjs`.
 
-The next voice decision is artistic: compare the samples and choose the persona.
-Then produce the full stage/chain/team vocabulary and wire a local volume,
-cooldown and music duck into the game's audio bus. Ordinary clears keep their
-existing musical sounds.
+Trent subsequently preferred Qwen / Ryan, then selected the round-two Warm
+founder and Cave-inspired clean designs and requested lower pitches. Patch 22
+ships both selected identities at -2, -4 and -6 semitones, with nineteen lines
+each, local controls, a cooldown and music ducking. The requested welcome-back
+line is included. Ordinary clears keep their existing musical sounds. The
+original and round-two audition pages remain available for comparison.
 
 Current receipts: seven candidates, 28 clips, 34/34 listening-page checks and
 28/28 independent speech-content checks. The first OmniVoice female design was

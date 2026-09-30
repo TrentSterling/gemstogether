@@ -12,7 +12,9 @@ Open the normal link and you land in the public room, on the same board as every
 
 Journey remembers the stages you've visited and grows your cabinet treasury. Endless stays at the heart, alongside shared Timed, 30-move, puzzle and daily challenges. High fives, team Resonance, photo mode and a best-run ghost add ways to enjoy the board together. Stages blend into the next background without pausing play.
 
-Built by Tront for Jennifer. Current version: 3.3.0.
+The local Qwen announcer celebrates new worlds, big chains and Resonance, and welcomes returning players back. Choose Warm founder or Cave-inspired clean, with three lower pitches and a separate voice volume, in Audio > Announcer voices.
+
+Built by Tront for Jennifer. Current version: 3.3.1.
 
 ## Tech
 
@@ -20,7 +22,7 @@ One HTML file. The cabinet, gems and the whole interface render on the GPU (WebG
 
 `python tools/polish.py` builds the single HTML from the original drop plus the hosting extensions. `tools/verify.mjs` checks the original release gate on real GPU Chrome. The feature, network, visual and transition gates are `tools/expedition-audit.mjs`, `tools/expedition-network.mjs`, `tools/expedition-visual.mjs` and `tools/expedition-stage.mjs`. Tests use solo, private rooms or random isolated public rooms.
 
-The [desktop wrapper](desktop/README.md) builds a portable Windows app with Steam preparation. Voice generation and the local listening page are documented in [tools/VOICE-AUDITIONS.md](tools/VOICE-AUDITIONS.md).
+The [desktop wrapper](desktop/README.md) builds a portable Windows app with Steam preparation. The shipped announcer pack and exact-clip listening page are documented in [tools/ANNOUNCER.md](tools/ANNOUNCER.md); the earlier engine comparisons are in [tools/VOICE-AUDITIONS.md](tools/VOICE-AUDITIONS.md).
 
 ## Credits
 
