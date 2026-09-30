@@ -8,7 +8,8 @@
 - Resonance low-passes the actual music bus, including loaded local tracks. Banked clears gently brighten the filter; payout opens it again. Speech keeps its own route and continues ducking the filtered music.
 - Journey > Comfort adds a saved Big combo screen flash switch, enabled by default. Flashes Low shares a 350 ms interval across large flash events; Full retains every effect. Turning off the combo screen flash preserves speed lines, banners, lasers and audio.
 - Real audio/GPU/private co-op gate: 121/121. Separate stage-clock gate: 30/30; announcer: 136/136. Before/after eight-bar audio samples and matched Low-flash cascade clips are in the gauntlet.
-- The final Windows package and extracted ZIP contain the exact browser-tested HTML. Their native verification remains pending: the restricted test launch failed Electron's install-directory ACL check and displayed a Windows breakpoint dialog. Earlier native receipts precede the final pitch-range and loaded-track fixes; they do not verify this final artifact.
+- The final Windows package and extracted ZIP both pass native smoke checks on the exact browser-tested HTML: WebGPU, 64 gems, isolated preload, achievement allowlist, resolution/fullscreen, all six welcome-back variants, stage harmonies and Resonance filtering.
+- The Windows test launcher now refuses restricted security tokens before starting Electron, suppresses crash dialogs for its own child processes, enforces a timeout and rejects stale receipts. This replaces the restricted test path that triggered a Windows breakpoint dialog; the game's sandbox stays enabled.
 
 ## 3.3.2 hosting patch 23 (2026-09-29) Travel on the beat
 

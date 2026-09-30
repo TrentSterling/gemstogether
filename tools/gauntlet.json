@@ -681,7 +681,7 @@
   },
   {
     "title": "Round 20 (3.3.3 / patch 24): Six worlds, six harmonies",
-    "why": "Complete the six stage harmonies, matching result tones, Resonance filtering and independent combo screen comfort. Final Windows verification remains pending after the test launch failed its permission check.",
+    "why": "Complete the six stage harmonies, matching result tones, Resonance filtering and independent combo screen comfort. Both final Windows artifacts now pass the guarded native gate.",
     "before": "harmony-before-3.3.2-cascade",
     "beforeLabel": "3.3.2, Low flashes",
     "after": "harmony-3.3.3-cascade",
@@ -692,7 +692,7 @@
       "The actual procedural or loaded music bus is filtered during Resonance, brightens with banked clears and opens on payout. Voice and gem sounds stay clear.",
       "Saved Big combo screen flash toggle preserves speed lines, banners and lasers. Low spaces large flash events; Full retains its original effects.",
       "Matched clips are silent visual captures; the paired music clips use the real in-page offline music scheduler.",
-      "Final native launch failed Electron install-directory ACL validation and raised a Windows breakpoint dialog. Test processes were confirmed gone. Historical native passes are explicitly separated from this final artifact."
+      "The test launcher refuses restricted tokens before starting Electron and applies inherited process-local error-dialog suppression. Normal native checks pass without changing directory permissions or disabling the game sandbox."
     ],
     "frames": [
       [
@@ -770,7 +770,8 @@
       "Journey audio-clock gate 30/30; announcer playback gate 136/136; original game gate 22/22.",
       "Actual result sounds 23/23 on the beat grid; invalid swaps return home for solo, host and peer with matching hashes and zero errors.",
       "Twelve before/after music renders at 88 BPM are unclipped. Both matched cascade captures reach five waves with zero runtime errors.",
-      "Source, packaged, extracted and ZIP-entry HTML hashes match exactly. This file check does not establish a native boot."
+      "Source, packaged, extracted and ZIP-entry HTML hashes match exactly. This file check does not establish a native boot.",
+      "Final packaged executable and executable extracted from the exact ZIP each pass: WebGPU, 64 gems, isolated preload, achievement allowlist, resolution/fullscreen, six welcome-back variants, stage harmonies and music filtering. Both test processes exited cleanly."
     ]
   }
 ]

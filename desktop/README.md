@@ -44,11 +44,21 @@ decodes all six welcome-back variants through WebAudio, checks the six stage
 harmonies and exercises the Resonance music filter.
 Pass `--smoke` to a packaged executable to run the same test on that build.
 
-The final local 3.3.3 artifact still needs a native smoke pass. A restricted test
-launch failed Electron's Windows install-directory permission check and raised a
-breakpoint dialog. Browser checks passed, and the packaged and extracted HTML
-match the tested source; these checks do not establish that the final executable
-boots. Do not repeat that restricted launch or disable the sandbox to bypass it.
+The final local 3.3.3 executable and the executable extracted from its ZIP both
+passed this native gate. Their embedded HTML matches the browser-tested source.
+For automated packaged checks, run the guarded launcher from a normal Windows
+shell in the repository root:
+
+```powershell
+python tools/windows-smoke.py 'desktop/dist/3.3.3/Gems Together-win32-x64/Gems Together.exe' 'tools/out/harmony/windows-final-smoke' --preflight
+python tools/windows-smoke.py 'desktop/dist/3.3.3/Gems Together-win32-x64/Gems Together.exe' 'tools/out/harmony/windows-final-smoke'
+```
+
+The launcher refuses restricted security tokens before starting Electron,
+keeps crash dialogs out of automated checks, enforces a 45-second timeout and
+rejects stale receipts. Its error mode is local to the test process and inherited
+by its children ([Windows process error mode](https://devblogs.microsoft.com/oldnewthing/20160204-00/?p=92972)).
+The game's Electron sandbox remains enabled; no directory ACL changes are needed.
 
 Primary API references: [Electron context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation)
 and [Steamworks.js](https://github.com/ceifa/steamworks.js).
