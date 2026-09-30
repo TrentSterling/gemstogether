@@ -18,8 +18,8 @@ class ResonanceMusic {
  constructor(app){this.a=app;this.bpm=88;this.step=0;this.next=0;this.ctx=null;this.lv=[0,0,0,0,0];this.stats={notes:0};}
  hz(m){return 440*Math.pow(2,(m-69)/12);}
  // Layer targets from the game state: pad, bass, arp, drums, lead.
- targets(s){if(s.res)return [1,1,1,1,1];if(this.a.gameOver)return [.7,0,0,0,0];const f=s.flow,c=s.cascade;return [.9,clamp((f-.10)*3,0,1),clamp((f-.32)*2.4,0,1),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
- state(){const fx=this.a.fx;return {flow:fx?fx.flow:0,laser:fx?fx.laser:0,cascade:this.a.phase==='idle'?0:this.a.cascade,res:!!(fx&&fx.res&&fx.res.on)};}
+ targets(s){if(s.res)return [1,1,1,1,1];if(this.a.gameOver)return [.7,0,0,0,0];const f=s.flow,c=s.cascade,p=s.phase||0;return [.9,Math.max(p>=1?.65:0,clamp((f-.10)*3,0,1)),Math.max(p>=2?.65:0,clamp((f-.32)*2.4,0,1)),Math.max(clamp((f-.62)*2.2,0,1),c>=4?1:0),s.laser>.3?1:0];}
+ state(){const fx=this.a.fx;return {flow:fx?fx.flow:0,laser:fx?fx.laser:0,cascade:this.a.phase==='idle'?0:this.a.cascade,res:!!(fx&&fx.res&&fx.res.on),phase:this.a.practice?0:this.phase||0};}
  build(ctx,dest){
   this.ctx=ctx;this.bus=ctx.createGain();this.bus.gain.value=1.4;this.bus.connect(dest);
   const d=this.delay=ctx.createDelay(1.5),fb=ctx.createGain(),lp=ctx.createBiquadFilter();d.delayTime.value=60/this.bpm*.75;fb.gain.value=.38;lp.type='lowpass';lp.frequency.value=2600;
@@ -52,15 +52,16 @@ class ResonanceMusic {
  // Beat snap (patch 12): result sounds wait for the next 1/32 of the music grid (always < 90 ms at 84 BPM, less when
  // faster), so clears land in time with the soundtrack. Swaps, clicks and the reject buzz are never delayed.
  snapWait(d=0){const c=this.ctx,au=this.a.audio;if(!c||!au||au.ctx!==c||!this.next||au.loadedTrack||au.muted)return 0;const g=60/this.bpm/8,now=c.currentTime+d;return ((this.next-now)%g+g)%g;}
+ // Use an unscheduled bar so the new progression and scenery can enter together.
+ nextDownbeat(){const au=this.a.audio,c=this.ctx;if(!c||au.ctx!==c||c.state!=='running'||au.muted||au.loadedTrack||!au.musicVolume||!this.next||this.next<c.currentTime-.1)return null;return this.next+(16-this.step%16)%16*60/this.bpm/4;}
  hookSnap(au){if(au.snapHooked)return;au.snapHooked=true;const B=au.buffers||{},set=new Set();for(const [k,v] of Object.entries(B))if(!['tick','whoosh','reject','land'].includes(k))for(const b of [].concat(v))set.add(b);
   const play=au.play.bind(au);au.play=(buffer,rate,volume,pan,delay=0)=>play(buffer,rate,volume,pan,delay+(set.has(buffer)?this.snapWait(delay):0));}
  // Realtime: called every frame; keeps ~0.15 s scheduled ahead (1.2 s while the tab is hidden).
  tick(){const au=this.a.audio;const live=au?.ctx&&au.ctx.state==='running'&&!au.muted&&!au.loadedTrack&&au.music;
   if(!live){if(this.ctx&&au?.ctx===this.ctx)this.next=0;return;}
   if(this.ctx!==au.ctx)this.build(au.ctx,au.music);this.hookSnap(au);const now=this.ctx.currentTime;if(this.next<now)this.next=now+.05;
-  const info=this.a.fx?.stageInfo?.();if(info)this.prog=info.prog;const ex=this.exhaleUntil>now;
-  const tg=this.targets(this.state()),ahead=document.hidden?1.2:.15;
-  while(this.next<now+ahead){this.latch(tg,this.next,ex);if(this.step%4===0){(this.beats=this.beats||[]).push({t:this.next,down:this.step%16===0});if(this.beats.length>32)this.beats.shift();}this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
+  const ex=this.exhaleUntil>now,ahead=document.hidden?1.2:.15;
+  while(this.next<now+ahead){if(this.step%16===0){const fx=this.a.fx,info=fx?.stageInfo?.();if(info)this.prog=info.prog;this.phase=fx?.stagePhase?.()||0;}this.latch(this.targets(this.state()),this.next,ex);if(this.step%4===0){(this.beats=this.beats||[]).push({t:this.next,down:this.step%16===0});if(this.beats.length>32)this.beats.shift();}this.play(this.step,this.next,this.lv,au.key||62,this.a.fx?.flow||0);this.next+=60/this.bpm/4;this.step++;}}
  // Offline: schedule [0, seconds) from a state curve fn(t) -> {flow, laser, cascade}.
  render(ctx,seconds,fn,key=62){this.build(ctx,ctx.destination);this.step=0;this.hold=null;this.lvLog=[];const sp=60/this.bpm/4;for(let t=0;t<seconds;t+=sp){const s=fn(t),tg=this.targets(s);this.latch(tg,t,!!s.exhale);if(this.step%4===0)this.lvLog.push([+t.toFixed(2),...this.lv.map(v=>+v.toFixed(3)),+s.flow.toFixed(3)]);this.play(this.step++,t,this.lv,key,s.flow);}}
 }

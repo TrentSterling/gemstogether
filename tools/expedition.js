@@ -137,7 +137,7 @@ class GemsExpedition {
   if(fresh){this.highlights=[];this.current={chain:0,gems:0,points:0};this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=this.a.board.score;this.a.fx.stage=undefined;this.a.gameOver=null;}
   if(this.run.finished){this.a.gameOver={score:this.run.score,stage:this.a.fx.stageInfo(),birth:this.a.time,best:false};this.commitResult();}
  }
- info(){return {version:'3.3.1',run:this.summary(),profile:expeditionClone(this.profile),highlights:expeditionClone(this.highlights),ornaments:EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length,tutorial:this.tourVisible,photo:!!this.photo,dailyFriends:[...this.dailyFriends.values()],props:this.props.active||0,ghostScore:this.ghostScore()};}
+ info(){return {version:'3.3.2',run:this.summary(),profile:expeditionClone(this.profile),highlights:expeditionClone(this.highlights),ornaments:EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length,tutorial:this.tourVisible,photo:!!this.photo,dailyFriends:[...this.dailyFriends.values()],props:this.props.active||0,ghostScore:this.ghostScore()};}
  buildProps(){
   const meshes=[];for(let form=0;form<6;form++){const g=new Geo(),c=color(['#ffd98a','#78e4e5','#ff9159','#bda9ff','#b4d5ff','#f486ee'][form]);
    if(form===1){g.append(tintGeo(gemGeometry(1,7),c),trs([0,0,0],[0,0,0],[.7,.3,.6]));for(let k=0;k<7;k++){const an=k/7*TAU,pts=[];for(let j=0;j<10;j++)pts.push([Math.cos(an)*(.35+Math.sin(j*.7)*.08),-.2-j*.14,Math.sin(an)*.35+Math.cos(j*.65)*.1]);g.tube(pts,.019,c,3,5);}}
@@ -145,15 +145,16 @@ class GemsExpedition {
    else if(form===3){const pts=[];for(let k=0;k<48;k++){const t=k/47;pts.push([Math.sin(t*TAU)*.5,t*3-1.5,Math.cos(t*TAU)*.3]);}g.tube(pts,.06,c,3,6);}
    else if(form===4){g.tube([[-.75,0,0],[.75,0,0]],.03,c,3,5);g.tube([[0,-.75,0],[0,.75,0]],.03,c,3,5);g.append(tintGeo(gemGeometry(2,7),c),trs([0,0,0],[0,0,0],[.3,.3,.3]));}
    else {g.append(tintGeo(gemGeometry(form===5?5:2,7),c),trs([0,0,0],[0,0,.15],[.65,1.25,.65]));g.ring([0,0,0],.9,.022,c,3,'y',36);}
-   meshes.push(this.a.renderer.createMesh(g.data(),4));
+   meshes.push(this.a.renderer.createMesh(g.data(),8));
   }return {meshes,active:0};
  }
  meshes(){
   const a=this.a,r=a.renderer,out=[],form=a.fx.fieldForm,t=a.prefs.motion&&!a.frozen?a.time:0,b=a.fx.fieldBlend;
-  const forms=b?[[b.form,1-b.progress],[form,b.progress]]:[[form,1]];this.props.active=0;
-  for(const [kind,weight]of forms){if(weight<.001)continue;const instances=[],scale=.001+.999*weight;
-   for(let i=0;i<4;i++){const side=i&1?1:-1,row=i>>1,phase=i*1.8,beat=a.fx.beat||0;instances.push(...packedInstance(trs([side*(7.4+row*3),-1.4+row*4.2+Math.sin(t*.5+phase)*.35-(1-weight)*.8,-4-row*3],[.04*Math.sin(t*.3+phase),Math.sin(t*.2+phase)*.3,kind===4?t*.08:Math.sin(t*.3+phase)*.08],[scale*(1+beat*.025),scale*(1+beat*.025),scale]),[weight,weight,weight],(.35+beat*.15)*weight,-1));}
-   r.upload(this.props.meshes[kind],new Float32Array(instances),4);out.push(this.props.meshes[kind]);this.props.active+=4;
+  const forms=b?[[b.form,1-b.progress,b.phase],[form,b.progress,a.fx.propPhase]]:[[form,1,a.fx.propPhase]];this.props.active=0;
+  for(const [kind,weight,phaseDepth=0]of forms){if(weight<.001)continue;const instances=[];let count=0;
+   for(let i=0;i<8;i++){const opacity=weight*(i<4?1:clamp(phaseDepth-(i<6?0:1),0,1));if(opacity<.001)continue;count++;const scale=.001+.999*opacity,side=i&1?1:-1,row=i>>1,phase=i*1.8,beat=a.fx.beat||0,x=i<4?7.4+row*3:i<6?5.8:10.8,y=i<4?-1.4+row*4.2:i<6?-5.4:4.9,z=i<4?-4-row*3:i<6?-3.6:-8;
+    instances.push(...packedInstance(trs([side*x,y+Math.sin(t*.5+phase)*.35-(1-opacity)*.8,z],[.04*Math.sin(t*.3+phase),Math.sin(t*.2+phase)*.3,kind===4?t*.08:Math.sin(t*.3+phase)*.08],[scale*(1+beat*.025),scale*(1+beat*.025),scale]),[opacity,opacity,opacity],(.35+phaseDepth*.1+beat*.15)*opacity,-1));}
+   r.upload(this.props.meshes[kind],new Float32Array(instances),count);out.push(this.props.meshes[kind]);this.props.active+=count;
   }
   const ornaments=[];this.ornaments=EXPEDITION_ORNAMENTS.filter(v=>this.profile.gems>=v).length;
   for(let i=0;i<this.ornaments;i++){const side=i&1?1:-1,at=1.2+(i>>1)*.9;ornaments.push(...packedInstance(trs([side*at,-4.40,.43],[0,t*.13,side*.08],[.20,.24,.19]),GEM_COLORS[i%6],.3,-1));}
@@ -196,11 +197,11 @@ ResonanceFX.prototype.stageTick=function(dt){const tint=this.stTint.slice(),old=
 // settle into place; the board, score and input continue throughout the journey.
 const expeditionBuildField=ResonanceFX.prototype.buildField;
 ResonanceFX.prototype.buildField=function(k){const form=k<6?k:1+(k-6)%5;if(form===this.fieldForm)return;
- const previous=this.fieldForm,old=this.a.expedition&&this.field.count?this.field.data.slice():null;
- expeditionBuildField.call(this,k);if(!old)return;
+ const previous=this.fieldForm,phase=this.propPhase||0,old=this.a.expedition&&this.field.count?this.field.data.slice():null;
+ expeditionBuildField.call(this,k);this.propPhase=0;if(!old)return;
  if(!this.outgoingField){const q=new Geo();q.quad([-.5,-.5,0],[.5,-.5,0],[.5,.5,0],[-.5,.5,0],[1,1,1],0,[[0,0],[1,0],[1,1],[0,1]]);this.outgoingField=new ParticlePool(this.a.renderer,q.data(),FX_FIELD,true);}
  this.outgoingField.data.set(old);this.outgoingField.count=FX_FIELD;
- this.fieldBlend={form:previous,from:old,to:this.field.data.slice(),elapsed:0,progress:0};this.blendField(0);
+ this.fieldBlend={form:previous,phase,from:old,to:this.field.data.slice(),elapsed:0,progress:0};this.blendField(0);
 };
 ResonanceFX.prototype.blendField=function(dt){const b=this.fieldBlend;if(!b)return;b.elapsed+=Math.max(0,dt);const x=clamp(b.elapsed/3.2,0,1);b.progress=x*x*(3-2*x);
  const count=this.a.prefs.quality<.9?Math.floor(FX_FIELD*.45):FX_FIELD;

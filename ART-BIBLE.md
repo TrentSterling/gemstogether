@@ -51,7 +51,7 @@ The stage comes from the shared score, so co-op partners always travel together.
 | 6 | PRISM HEART | 214 94 178 | 88 | magenta climax |
 | 7+ | ENCORE | loops stages 2 to 6 | | |
 
-The soundtrack stays at 88 BPM. Stages change chords, colour and scenery; intensity comes from earned layers. Background fields crossfade for 3.2 seconds, with outgoing props shrinking into darkness and incoming props growing into place. Travel never pauses the board. Reduced motion keeps the fade and removes the floating and spinning.
+The soundtrack stays at 88 BPM. Stages change chords, colour and scenery on the next unscheduled downbeat. Background fields crossfade for 3.2 seconds, with outgoing props shrinking into darkness and incoming props growing into place. Each stage has three phases: four opening props, then bass and two more props, then arpeggios and another two. Flow and chains still add drums, lead and the earned layer holds. Shared score and Resonance advance immediately while local presentation waits for its bar. Travel never pauses the board. Reduced motion keeps the fade and removes the floating and spinning. Muted music and loaded tracks use an immediate fade.
 
 ## Particle language
 

@@ -13,8 +13,8 @@ npm run smoke
 npm run package
 ```
 
-`dist/3.3.1/Gems Together-win32-x64/Gems Together.exe` is the portable Windows build.
-The release receipt also includes `dist/GemsTogether-3.3.1-win-x64.zip`; extract
+`dist/3.3.2/Gems Together-win32-x64/Gems Together.exe` is the portable Windows build.
+The release receipt also includes `dist/GemsTogether-3.3.2-win-x64.zip`; extract
 the whole folder before running the executable.
 Journey > Comfort exposes window sizes and fullscreen. Controllers can navigate
 menus with the D-pad, select with A/Cross, return with B/Circle, and scroll with

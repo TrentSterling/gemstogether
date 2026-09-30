@@ -475,7 +475,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.1'")
+rep("version:'3.2.4'", "version:'3.3.2'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -508,6 +508,11 @@ rep('(async function boot(){', announcer + '\n(async function boot(){')
 rep('app.expedition=new GemsExpedition(app);', 'app.expedition=new GemsExpedition(app);app.announcer=new GemsAnnouncer(app);')
 rep("this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;",
     "this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;")
+
+# Patch 23: score remains authoritative while scenery enters on the local music bar.
+rep("this.text('STAGE '+info.n+(info.loop?'  ENCORE':''),x+4,yy,11,col", "this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+4,yy,11,col")
+rep("if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);}", "if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);for(const n of [1,2])p.box(x+4+(w-8)*n/3,yy+39,2,5,'#071418',0,1);}")
+rep("if(f>0)p.box(x+w*.64+2,yy+6,Math.max(4,(w*.36-6)*f),4,col,2,1);}}", "if(f>0)p.box(x+w*.64+2,yy+6,Math.max(4,(w*.36-6)*f),4,col,2,1);for(const n of [1,2])p.box(x+w*.64+2+(w*.36-6)*n/3,yy+6,2,4,'#071418',0,1);}}")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

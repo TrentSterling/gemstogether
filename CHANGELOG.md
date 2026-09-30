@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.2 hosting patch 23 (2026-09-29) Travel on the beat
+
+- Scenery and chord changes enter together on the next soundtrack downbeat, then the background and props crossfade over 3.2 seconds. Swaps and score continue immediately.
+- Each stage has three phases: the opening scenery, then bass and more props, then arpeggios and another pair of props. Beat response grows with the scenery; tempo stays at 88 BPM. Progress bars show thirds.
+- Travel uses each player's local audio clock. Shared Resonance capacity still follows score immediately. Muted music and loaded tracks use an immediate fade; starting a new board cancels a queued entrance.
+- Thirty real audio-clock, phase and private co-op checks passed on WebGPU and WebGL, alongside the existing sixteen transition checks. The announcer still passes all 136 playback checks.
+
 ## 3.3.1 hosting patch 22 (2026-09-29) Welcome back
 
 - “Welcome back to Gems Together!” greets returning players once after their first sound interaction. First visits have their own welcome.

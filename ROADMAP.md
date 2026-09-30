@@ -52,8 +52,7 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 ## Current follow-through
 
 - **Announcer:** added in patch 22 / 3.3.1. Trent selected Qwen's Warm founder and Cave-inspired clean, both lowered. Nineteen lines at three pitches per voice include “Welcome back to Gems Together!” Local voice/pitch/volume controls, previews, occasional celebrations and music ducking work in the single HTML and Windows app. Real browser gate 136/136, compressed speech-content check 114/114. OmniVoice's audition remains local.
-- **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Verified on both GPU backends, including a real swap during travel.
-- **Journey timing follow-through:** the current crossfade starts at the score threshold. Align its entrance with the soundtrack's next downbeat and add the three within-stage phases requested in section 2.
+- **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Patch 23 / 3.3.2 aligns scenery and chord changes on the soundtrack's next downbeat. Three phases add bass, arpeggios, scenery and beat response at a steady 88 BPM. Real audio-clock checks passed 30/30 across both GPU backends and private co-op, including a swap before travel and different local audio settings.
 - **Steam account work:** create an App ID, register the 22 exact achievement API names, then verify activation and delivery with the real Steam client. Local wrapper smoke checks cover the GPU game, preload isolation, ID validation, resolution and fullscreen.
 
 ## Standing direction (Tront's calls, these override research)
@@ -116,6 +115,7 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 ## Done
 
+- Patch 23 (3.3.2): stage travel and chord changes enter on a downbeat, three within-stage phases add musical layers and scenery, and the stage progress indicator shows thirds. Shared scoring and Resonance capacity advance immediately; the presentation uses each player's audio clock.
 - Patch 22 (3.3.1): embedded Qwen announcer, two selected synthetic identities at three lower pitches, returning-player greeting, stage/chain/team/payout cues, local controls and music ducking. Practice, Showcase and calm stay quiet.
 - Patch 21 (3.3.0): saved journey and treasury, input onboarding, shared modes, team moments, highlights, living gems, stage props and crossfades, photos, daily friends, spectator cheers, accessibility, ghost, music meters, calm preset, desktop/Steam preparation and local voice audition tools. MIDI cancelled.
 - Patch 6: combo ladder (callouts SPARKLING..TRANSCENDENT, chord stings, x5+ sky lasers, speed lines, strobe).

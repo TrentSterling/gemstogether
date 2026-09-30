@@ -628,5 +628,55 @@
       "Original game gate 22/22, feature/private co-op 48/48, public/spectator/migration 15/15, desktop/phone/WebGPU/WebGL/controller/photo 68/68, stage transitions 16/16.",
       "Portable Windows executable independently smoke-tested with all six welcome-back variants decoded."
     ]
+  },
+  {
+    "title": "Round 19 (3.3.2 / patch 23): Travel on the beat",
+    "why": "Complete the requested downbeat entrances and three phases per stage while keeping swaps, shared score and Resonance immediate.",
+    "before": "journey-before-3.3.1-stage",
+    "beforeLabel": "3.3.1: threshold fade, four props",
+    "after": "journey-3.3.2-stage",
+    "afterLabel": "3.3.2: phase scenery and segmented progress",
+    "changes": [
+      "Scenery and chord progression enter on the same unscheduled soundtrack bar, then blend for 3.2 seconds. Muted music and loaded tracks use an immediate fade.",
+      "Three phases per stage: four opening props, bass plus two props, arpeggios plus another pair; stronger beat response and segmented progress.",
+      "Shared stage and Resonance capacity still follow score immediately. Audio-clock travel is local and a new board cancels a pending entrance.",
+      "The matched clips are silent, deterministic visual captures. Real downbeat timing is measured separately by journey-audit.mjs."
+    ],
+    "frames": [
+      [
+        30,
+        "Start of travel"
+      ],
+      [
+        75,
+        "Fields and phase props overlap"
+      ],
+      [
+        150,
+        "Incoming stage settled"
+      ]
+    ],
+    "images": [
+      [
+        "tools/out/journey/WebGPU-phase-1.png",
+        "Opening phase"
+      ],
+      [
+        "tools/out/journey/WebGPU-phase-2.png",
+        "Bass and more scenery"
+      ],
+      [
+        "tools/out/journey/phase-preview.png",
+        "Third-phase prop placement"
+      ]
+    ],
+    "checks": [
+      "Real audio-clock/phase gate 30/30: both GPU backends, swaps accepted before travel, matching bar entries, phase layers, muted fallback and cancelled travel.",
+      "Private co-op with one active music clock and one silent player: immediate shared capacity, matching team Resonance and board hashes.",
+      "Original game gate 22/22, feature/private co-op 48/48, public/spectator/migration 15/15, visual/controller/photo 68/68, stage fade 16/16, co-op point 10/10 and Resonance 10/10.",
+      "Announcer 136/136 still passes after travel changes. Actual result sounds 23/23 on the soundtrack grid; maximum wait 84 ms, zero errors.",
+      "Invalid swaps return home in solo, host and peer; matching hashes and zero errors.",
+      "Final packaged Windows build and the extracted ZIP independently boot WebGPU, render 64 gems, verify preload/window controls and decode all six welcome-back variants."
+    ]
   }
 ]

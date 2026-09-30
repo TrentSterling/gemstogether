@@ -10,11 +10,11 @@ A co-op match-three game on one shared 3D jewel board. Tap a gem and its neighbo
 
 Open the normal link and you land in the public room, on the same board as everyone else playing right now, with their cursors and grabs showing live. Co-op Room makes a private code for just the two of you. Showcase lets the board play itself.
 
-Journey remembers the stages you've visited and grows your cabinet treasury. Endless stays at the heart, alongside shared Timed, 30-move, puzzle and daily challenges. High fives, team Resonance, photo mode and a best-run ghost add ways to enjoy the board together. Stages blend into the next background without pausing play.
+Journey remembers the stages you've visited and grows your cabinet treasury. Endless stays at the heart, alongside shared Timed, 30-move, puzzle and daily challenges. High fives, team Resonance, photo mode and a best-run ghost add ways to enjoy the board together. Stages blend into the next background on the soundtrack's downbeat without pausing play; three phases add scenery and musical layers along the way.
 
 The local Qwen announcer celebrates new worlds, big chains and Resonance, and welcomes returning players back. Choose Warm founder or Cave-inspired clean, with three lower pitches and a separate voice volume, in Audio > Announcer voices.
 
-Built by Tront for Jennifer. Current version: 3.3.1.
+Built by Tront for Jennifer. Current version: 3.3.2.
 
 ## Tech
 

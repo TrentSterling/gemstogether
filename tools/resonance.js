@@ -12,9 +12,9 @@
 // Journey stages (patch 8). Derived from the shared score, so co-op partners are always on the same stage.
 // Stage k starts at 5000*k*(k+1)/2 points (5K, 15K, 30K, 50K...): every stage is a little longer than the last.
 // tint = sky grade as a multiplier * 128 (128 = unchanged), packed into uUp.w. After stage 6 it loops 2..6.
-const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:84,prog:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:92,prog:1},
- {name:'EMBER REEF',tint:[210,112,78],bpm:104,prog:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:116,prog:3},
- {name:'STARFALL',tint:[70,96,204],bpm:96,prog:1},{name:'PRISM HEART',tint:[214,94,178],bpm:128,prog:2}];
+const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:88,prog:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:88,prog:1},
+ {name:'EMBER REEF',tint:[210,112,78],bpm:88,prog:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:88,prog:3},
+ {name:'STARFALL',tint:[70,96,204],bpm:88,prog:1},{name:'PRISM HEART',tint:[214,94,178],bpm:88,prog:2}];
 const FX_STAGE_GL=`vec3 fxStage(vec3 c,vec2 uv){float p=uUp.w;if(p<1.0)return c;float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;vec3 m=vec3(r,g,b)/128.0;return c*m+max(m-1.0,vec3(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_STAGE_WG=`fn fxStage(c:vec3f,uv:vec2f)->vec3f{let p=U.up.w;if(p<1.0){return c;}let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;let m=vec3f(r,g,b)/128.0;return c*m+max(m-1.0,vec3f(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_FIELD=7000;
@@ -64,7 +64,7 @@ class ResonanceFX {
   // Beat (patch 14): the soundtrack's own beat times when it is playing, else a game-time clock at the stage tempo.
   {const mu=a.music,ac=a.audio?.ctx;let fire=0;if(mu&&mu.beats&&ac&&mu.ctx===ac&&ac.state==='running'&&!a.audio.muted&&!a.audio.loadedTrack){const now=ac.currentTime;while(mu.beats.length&&mu.beats[0].t<=now)fire=Math.max(fire,mu.beats.shift().down?1:.7);}
    else{const bpm=a.music?.bpm||88,b=Math.floor(a.time*bpm/60);if(b!==this.lastBeat){fire=b%4===0?1:.7;this.lastBeat=b;}}
-   if(fire){this.beat=Math.max(this.beat||0,fire);this.beats=(this.beats||0)+1;}this.beat=(this.beat||0)*Math.exp(-dt*7);a.beatBump=a.prefs.motion?this.beat*.022*(.45+Math.min(this.flow,1)):0;}
+   if(fire){this.beat=Math.max(this.beat||0,fire);this.beats=(this.beats||0)+1;}this.beat=(this.beat||0)*Math.exp(-dt*7);a.beatBump=a.prefs.motion?this.beat*.022*(.45+Math.min(this.flow,1))*(1+(this.propPhase||0)*.15):0;}
   const k=1-Math.exp(-dt*3.2);for(let i=0;i<3;i++)this.tint[i]=mix(this.tint[i],this.target[i],k);
   if(a.prefs.motion&&!a.frozen)this.swirl+=dt*(.05+this.flow*.55+this.bass*.45+this.pulse*.65);
   // Hot board: thin streams of light pour out of the vortex into the crown.
@@ -96,7 +96,7 @@ class ResonanceFX {
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }
- info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,...this.stats};}
+ info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
  match(center,type,cascade,count,mode,mag,removed){
   const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.stats.matches++;this.tier(cascade);
@@ -180,10 +180,20 @@ class ResonanceFX {
   f.flush();this.stats.fieldForm=form;}
  stageAt(s){let k=0;while(k<60&&5000*(k+1)*(k+2)/2<=s)k++;return k;}
  stageInfo(k=this.stage||0){const s=FX_STAGES[k<6?k:1+((k-6)%5)];return {...s,n:k+1,loop:k>=6,start:k?5000*k*(k+1)/2:0,end:5000*(k+1)*(k+2)/2};}
- stageTick(dt){const a=this.a,k=this.stageAt(a.board?.score||0);
-  if(this.stage===undefined||k<this.stage){this.stage=k;this.stTint=this.stageInfo(k).tint.slice();this.buildField(k);}
-  else if(k>this.stage){this.stage=k;if(!a.practice)this.stageShow(k);}
-  const tg=this.stageInfo(this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
+ stagePhase(k=this.stage||0){const info=this.stageInfo(k);return clamp(Math.floor(((this.a.board?.score||0)-info.start)/(info.end-info.start)*3),0,2);}
+ stageTick(dt){const a=this.a,k=this.stageAt(a.board?.score||0),phase=this.stagePhase(k);
+  if(this.stage===undefined||k<this.stage){this.stage=k;this.visualStage=k;this.visualPhase=phase;this.stageTravel=null;this.stTint=this.stageInfo(k).tint.slice();this.buildField(k);}
+  else{this.stage=k; // Shared Resonance capacity follows score immediately; travel stays local.
+   if(!a.practice&&(k!==this.visualStage||phase!==this.visualPhase)){
+    const beat=a.music?.nextDownbeat?.()??null;if(!this.stageTravel)this.stageTravel={k,phase,at:beat};else Object.assign(this.stageTravel,{k,phase});
+    const next=this.stageTravel;if(next.at===null||beat===null||a.audio.ctx.currentTime>=next.at){const previous=this.visualPhase;this.stageTravel=null;this.visualPhase=next.phase;
+     if(next.k!==this.visualStage){this.visualStage=next.k;this.stageEntrance={k:next.k,scheduled:next.at,actual:a.audio.ctx?.currentTime??null};this.stageShow(next.k);}
+     else if(next.phase>previous){this.flow=Math.max(this.flow,.3);this.pulse=Math.max(this.pulse,.55);if(this.on)this.trace(this.stageInfo(k).tint.map(v=>clamp(v/160,.25,1)),a.time,.8);}
+    }
+   }else this.stageTravel=null;
+  }
+  this.propPhase=mix(this.propPhase||0,this.visualPhase||0,1-Math.exp(-dt*1.6));
+  const tg=this.stageInfo(this.visualStage??this.stage).tint,e=1-Math.exp(-dt*.7);for(let i=0;i<3;i++)this.stTint[i]=mix(this.stTint[i],tg[i],e);}
  stageShow(k){const a=this.a,t=a.time,info=this.stageInfo(k);this.stats.stages=(this.stats.stages||0)+1;this.flow=Math.max(this.flow,1.1);this.pulse=1.5;this.laser=Math.max(this.laser,1.2);
   const col=info.tint.map(v=>clamp(v/160,.25,1));this.target=col;a.ui?.stageCallout?.(info);this.buildField(k);a.rumble?.(1,1,480);
   if(!this.on)return;const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,-2.5-r],[14+r*6,0,0],vmul(col,.6),1,t+r*.18,1.4,12,0,0);
