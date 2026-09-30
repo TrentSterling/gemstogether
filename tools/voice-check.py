@@ -10,7 +10,9 @@ import torch
 from faster_whisper import WhisperModel
 
 out=Path(__file__).resolve().parent/'out/voices'
-parser=argparse.ArgumentParser();parser.add_argument('--voice');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--voice');parser.add_argument('--round', choices=['original','ryan'], default='original');args=parser.parse_args()
+if args.round=='ryan':
+    out=out/'ryan-round2'
 cache=Path.home()/'.cache/huggingface/hub/models--Systran--faster-whisper-base/snapshots'
 model=WhisperModel(str(next(cache.iterdir())),device='cuda',compute_type='float16')
 norm=lambda s: re.sub('[^a-z]','',s.lower())
@@ -26,7 +28,7 @@ for clip in json.loads((out/'catalog.json').read_text(encoding='utf-8')):
     energy=float(np.sqrt(np.mean(audio**2)))
     result={'file':clip['file'],'expected':clip['text'],'heard':text,
             'similarity':round(similarity,3),'rms':round(energy,4),
-            'pass':similarity>=.72 and energy>.025 and float(np.max(np.abs(audio)))<.98}
+            'pass':similarity>=.95 and energy>.025 and float(np.max(np.abs(audio)))<.98}
     receipts.append(result)
     print(json.dumps(result),flush=True)
 prior=out/'speech-results.json'

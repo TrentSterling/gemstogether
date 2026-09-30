@@ -22,7 +22,7 @@ Co-op match-three (one HTML file, own GPU renderer: WebGPU with WebGL2 fallback,
 
 ## Handoff (2026-09-29, after patch 21 / 3.3.0)
 
-Start here next session: `ROADMAP.md` (Andre's feedback, delivered tasks and current follow-through), `ART-BIBLE.md`, `CHANGELOG.md`. Trent authorized all prioritized work and brainstorm items except MIDI. Voice direction is warm and playful; compare the local auditions before adding a production announcer. Steam account setup remains external.
+Start here next session: `ROADMAP.md` (Andre's feedback, delivered tasks and current follow-through), `ART-BIBLE.md`, `CHANGELOG.md`. Trent authorized all prioritized work and brainstorm items except MIDI. Voice direction is warm and playful; Trent selected Qwen3 / Ryan. Lower-register Ryan and Cave-inspired VoiceDesign auditions live in `tools/out/voices/ryan-round2/index.html`; the final variant remains pending before adding a production announcer. Steam account setup remains external.
 
 Receipts page: `python tools/gauntlet-report.py` -> `tools/out/gauntlet/index.html`; rounds are logged in `tools/gauntlet.json`. Feature screenshots and JSON gates are under `tools/out/expedition/`. The voice listening page is `tools/out/voices/index.html`; generation instructions are in `tools/VOICE-AUDITIONS.md`.
 
