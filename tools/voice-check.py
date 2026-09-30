@@ -10,9 +10,11 @@ import torch
 from faster_whisper import WhisperModel
 
 out=Path(__file__).resolve().parent/'out/voices'
-parser=argparse.ArgumentParser();parser.add_argument('--voice');parser.add_argument('--round', choices=['original','ryan'], default='original');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--voice');parser.add_argument('--round', choices=['original','ryan','deep'], default='original');args=parser.parse_args()
 if args.round=='ryan':
     out=out/'ryan-round2'
+elif args.round=='deep':
+    out=out/'deep-round3'
 cache=Path.home()/'.cache/huggingface/hub/models--Systran--faster-whisper-base/snapshots'
 model=WhisperModel(str(next(cache.iterdir())),device='cuda',compute_type='float16')
 norm=lambda s: re.sub('[^a-z]','',s.lower())

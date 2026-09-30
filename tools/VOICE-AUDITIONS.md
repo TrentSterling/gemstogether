@@ -1,5 +1,59 @@
 # Local announcer auditions
 
+## Current direction: deep, booming Qwen
+
+Trent now wants a deeper Bejeweled-style announcer with Qwen's expressive energy.
+The warm/playful casting below is historical; the existing production voices
+still sound too high to him. Compare a new natural bass and booming baritone
+with pitch/formant edits of the approved founder and Cave performances.
+
+The third round uses the exact same three lines for every candidate: Welcome
+back to Gems Together, Brilliant / Beautifully done, and Resonance / Let it
+shine. Two current-pack rows provide listening baselines. Fresh characters use
+one designed reference each, lowered before the cached Base model generates the
+three lines. Descriptions alone produced 223-308 Hz calls; those raw casting
+experiments are retained locally. The reference-first variants have no final
+pitch shift. Speaker identity stays tied to the same retained reference.
+The edited rows preserve relative pitch across the three performances and
+their duration, with a 0.9 formant ratio. Auditions do not change the game pack.
+
+```powershell
+C:/py/python.exe tools/deep-voice-plan.py
+C:/py/python.exe tools/deep-voice-audition.py --mode compare --low-reference
+C:/py/python.exe tools/deep-voice-level.py
+C:/py/python.exe tools/voice-check.py --round deep
+python tools/voice-lab-build.py --round deep
+node tools/voice-lab-audit.mjs --deep
+```
+
+Open `tools/out/voices/deep-round3/index.html` after generation. Exact descriptions,
+seeds, reference hashes, offline model revisions, processing and measurements
+live alongside the audio. `deep-voice-plan.py` only prepares and measures; it
+does not synthesize. The generator sets a workspace-local Numba cache so its
+Librosa import can run without writing to the Python installation. Both models
+are already cached; no model download is required.
+
+Measurements of the actual embedded MP3s: Warm founder / -4 is approximately
+203, 274 and 253 Hz for the three lines; Cave / -6 is 139, 185 and 175 Hz.
+These describe measured median pitch, not expression or perceived quality.
+A 105 Hz source-set target requires about -19 semitones for founder and -15
+for Cave, so compare the edited versions by ear rather than assuming they
+will sound natural. The listening page retains current voices as a baseline.
+
+Trent's round-three listening ranking is **Current Cave / -6** first and
+**Fresh booming baritone / low reference** second. Neither yet matches his
+desired Bejeweled announcer tone. Keep these performances as the next comparison
+bases. Discuss modest additional pitch lowering, separate formant changes and
+light compression / short reverb before rendering more variants. His favourite
+was not the deepest Cave edit; a numerical pitch target cannot choose the voice.
+The specific Bejeweled reference is pending. This is a provisional audition
+ranking, not a production-pack selection.
+
+The reference-first generation yielded 87-138 Hz calls without shifting the
+finished clips. The audition clips are matched to -24 LUFS, with original
+renders retained under `raw/`; exact loudness, peaks and duration receipts are
+in `level-results.json`. Cached Whisper checks the actual normalized audio.
+
 Trent chose **warm and playful** for occasional stage welcomes, big chains and
 team moments. The listening lab uses identical lines for each candidate:
 
