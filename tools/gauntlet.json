@@ -678,5 +678,99 @@
       "Invalid swaps return home in solo, host and peer; matching hashes and zero errors.",
       "Final packaged Windows build and the extracted ZIP independently boot WebGPU, render 64 gems, verify preload/window controls and decode all six welcome-back variants."
     ]
+  },
+  {
+    "title": "Round 20 (3.3.3 / patch 24): Six worlds, six harmonies",
+    "why": "Complete the six stage harmonies, matching result tones, Resonance filtering and independent combo screen comfort. Final Windows verification remains pending after the test launch failed its permission check.",
+    "before": "harmony-before-3.3.2-cascade",
+    "beforeLabel": "3.3.2, Low flashes",
+    "after": "harmony-3.3.3-cascade",
+    "afterLabel": "3.3.3, Low flashes with shared event spacing",
+    "changes": [
+      "Six distinct progression pairs and relative minor keys, timed to each stage entrance; old pads fade and new boards reset the soundtrack.",
+      "All selectable Gem tones keys retain their pitch through every stage and high chain. Shared base key stays shared in co-op.",
+      "The actual procedural or loaded music bus is filtered during Resonance, brightens with banked clears and opens on payout. Voice and gem sounds stay clear.",
+      "Saved Big combo screen flash toggle preserves speed lines, banners and lasers. Low spaces large flash events; Full retains its original effects.",
+      "Matched clips are silent visual captures; the paired music clips use the real in-page offline music scheduler.",
+      "Final native launch failed Electron install-directory ACL validation and raised a Windows breakpoint dialog. Test processes were confirmed gone. Historical native passes are explicitly separated from this final artifact."
+    ],
+    "frames": [
+      [
+        40,
+        "Same deterministic cascade"
+      ],
+      [
+        100,
+        "Later chain flashes"
+      ]
+    ],
+    "images": [
+      [
+        "tools/out/harmony/WebGPU-comfort.png",
+        "Desktop comfort controls"
+      ],
+      [
+        "tools/out/harmony/WebGPU-comfort-phone.png",
+        "Phone comfort controls"
+      ]
+    ],
+    "audio": [
+      [
+        "tools/out/harmony/before-stage-0.mp3",
+        "3.3.2: DAWN SHALLOWS, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-0.mp3",
+        "3.3.3: DAWN SHALLOWS, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/before-stage-1.mp3",
+        "3.3.2: TIDEPOOL, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-1.mp3",
+        "3.3.3: TIDEPOOL, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/before-stage-2.mp3",
+        "3.3.2: EMBER REEF, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-2.mp3",
+        "3.3.3: EMBER REEF, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/before-stage-3.mp3",
+        "3.3.2: AURORA DEEP, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-3.mp3",
+        "3.3.3: AURORA DEEP, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/before-stage-4.mp3",
+        "3.3.2: STARFALL, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-4.mp3",
+        "3.3.3: STARFALL, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/before-stage-5.mp3",
+        "3.3.2: PRISM HEART, eight bars at 88 BPM"
+      ],
+      [
+        "tools/out/harmony/after-stage-5.mp3",
+        "3.3.3: PRISM HEART, eight bars at 88 BPM"
+      ]
+    ],
+    "checks": [
+      "Actual audio/GPU/private co-op: 121/121, including all 48 selectable stage/key combinations on each GPU backend.",
+      "Live audio spectrum proves Resonance attenuation and restore; an actual loaded WAV and live voice ducking use the same filtered bus.",
+      "Journey audio-clock gate 30/30; announcer playback gate 136/136; original game gate 22/22.",
+      "Actual result sounds 23/23 on the beat grid; invalid swaps return home for solo, host and peer with matching hashes and zero errors.",
+      "Twelve before/after music renders at 88 BPM are unclipped. Both matched cascade captures reach five waves with zero runtime errors.",
+      "Source, packaged, extracted and ZIP-entry HTML hashes match exactly. This file check does not establish a native boot."
+    ]
   }
 ]

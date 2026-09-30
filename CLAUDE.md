@@ -20,7 +20,7 @@ Co-op match-three (one HTML file, own GPU renderer: WebGPU with WebGL2 fallback,
 
 `window.__jewel`: `ready`, `diagnostics()`, `state()` (cells, score, moves, legalMoves, errors), `ui()` (GPU hit boxes in CSS px), `project(i)` (cell to screen), `swap(x,y)`, `hint()`, `showcase()`/`stop()`, `fixture(name)`, `burst()`, `advance(s)`, `resume()`, `stats()`, `net()`, `point(i)` (same path as a right click on a gem), `points()` ({local:{i,seq,age}|null, remote:[{peer,i,seq,age}]}), `audio`, `living()`, `presentation()`, `aa()`, `point(i)`, `points()` (local + remote point pings). `fx()` (Resonance FX state: flow, pulse, swirl, field, fireworks). Tront patches (point ping, input fixes, renames, Resonance FX) live as rep() pairs in `tools/polish.py`; Resonance's class and shader snippets live in `tools/resonance.js` and are injected before `SKY_GL_FS`. Look-check FX with `node tools/fx-shot.mjs` (FORCE=1 fires a synthetic x6 payoff, WEBGL=1 forces the fallback) and `node tools/fx-iso.mjs`; when ChatGPT ships a drop that already has one, drop that section.
 
-## Handoff (2026-09-29, after patch 23 / 3.3.2)
+## Handoff (2026-09-29, after patch 24 / 3.3.3)
 
 Start here next session: `ROADMAP.md` (Andre's feedback, delivered tasks and current follow-through), `ART-BIBLE.md`, `CHANGELOG.md`. Trent authorized all prioritized work and brainstorm items except MIDI. Voice direction is warm and playful. After preferring Qwen / Ryan over the other engines, he selected the Warm founder and Cave-inspired clean designs, both pitched down. Patch 22 ships nineteen lines at three depths per voice, including the requested “Welcome back to Gems Together!” Default is Warm founder / -4; Audio exposes the alternatives. Steam account setup remains external. Publication requires explicit approval; current work is local.
 
@@ -32,9 +32,11 @@ Direction, never break these:
 - Ground every light to real geometry (rails +-4.08, outer rim 4.22, corner orbs (+-4.10, +-4.10) at z .30 top / .40 bottom, crown [0, 4.98, .05], plinth front z .32). 2D overlays that frame 3D things project real world points.
 - Intensity in the music comes from layering (latched), never from tempo; one steady 88 BPM.
 
-Patch code lives in `tools/polish.py` (rep() pairs, patches 1-23 in order), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser and desktop versions are 3.3.2. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
+Patch code lives in `tools/polish.py` (rep() pairs, patches 1-24 in order), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser and desktop versions are 3.3.3. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
 
 Patch 23 aligns stage entrances and progression changes on the local soundtrack bar and adds three phases per stage. `fx.stage` remains score-derived for shared Resonance capacity; `fx.visualStage`, `visualPhase` and `stageTravel` are local presentation. Never delay the board or sync these local clocks. A loaded track or muted music uses an immediate fade. `__jewel.fx()` exposes entrance timestamps for verification.
+
+Patch 24 finishes distinct harmonies for all six stages. `music.key(at)` follows the harmony audible at a scheduled time, including pending travel; it is relative to the existing shared Gem tones key. Only pitched buffers transpose. Pads fade at a key change; new boards reset the local music scheduler and earned layers. Music routes through `audio.resonanceFilter`, then the announcer's ducker, then the compressor. Voice and SFX bypass that filter. `comboTreatment` is a local preference, true unless explicitly false; Low's large-flash interval is shared across match, Resonance and combo effects. The listening comparison is `tools/out/harmony/index.html`.
 
 Test and receipts tools:
 - `tools/verify.mjs` (22 checks, also the live URL)
@@ -43,6 +45,8 @@ Test and receipts tools:
 - `tools/expedition-visual.mjs` (68 desktop/phone, WebGPU/WebGL, controller, keyboard and PNG checks)
 - `tools/expedition-stage.mjs` (16 checks for both backend fades, input during travel, reduced motion and Starfall shooting stars)
 - `tools/journey-audit.mjs` (30 real audio-clock/phase checks on both backends, plus private co-op with different local clocks)
+- `tools/harmony-audit.mjs` (121 actual tone, spectrum, comfort, offline audio and private co-op checks); `tools/harmony-listen.mjs` renders the before/after listening page
+- The harmony gate tests all 48 selectable stage/key combinations on both backends and loads an actual WAV through `audio.loadTrack`. It measures the live filtered bus; analyser smoothing is disabled for these spectrum comparisons.
 - `tools/announcer-audit.mjs` (136 real WebAudio/GPU/private co-op checks) and `tools/announcer-check.py` (114 compressed speech-content checks)
 - `tools/coop-point.mjs` and `tools/coop-res.mjs` (two browsers, private room)
 - `tools/swap-audit.mjs` (illegal swap: solo, host, peer)
@@ -50,7 +54,9 @@ Test and receipts tools:
 - `tools/music-render.mjs`, `tools/music-latch.mjs` and `tools/beat-audit.mjs` (audio)
 - `tools/align-audit.mjs` + `tools/align-sheet.py` (perspective alignment at 3 sizes)
 
-`desktop/` contains the secure Electron wrapper, 22 allowlisted Steam achievement IDs and packaging. `npm run smoke` runs the real game; `npm run package` produces `desktop/dist/3.3.2/Gems Together-win32-x64/Gems Together.exe`. Pass `--smoke` to test the packaged executable. No fallback Steam App ID is substituted.
+`desktop/` contains the secure Electron wrapper, 22 allowlisted Steam achievement IDs and packaging. `npm run smoke` runs the real game; `npm run package` produces `desktop/dist/3.3.3/Gems Together-win32-x64/Gems Together.exe`. Pass `--smoke` to test the packaged executable. No fallback Steam App ID is substituted.
+
+Current native gate is pending. Two outside-sandbox launches did not start because automatic approval review timed out. A fallback restricted launch then failed Electron's `install_dir_access.cc` ACL check with exit `0x80000003` and displayed a Windows error dialog. The owned game and crash-report processes were subsequently confirmed absent through an outside-sandbox process check. Do not repeat that restricted launch, disable Electron's sandbox, or broadly change permissions to bypass it. Earlier 3.3.3 native receipts predate the final pitch-range and loaded-track fixes; retain them as historical receipts only. The final HTML SHA-256 is `bd9b32c080a3a00da66b2336a42156ce98af5aee2bfc5668280962d468192b04` in the browser source, packaged game and extracted final ZIP.
 
 Progression key: `gemstogether-expedition-v1`. Comfort settings are local; timers, move budgets, seeds and scoring are host-authoritative. Snapshot/heartbeat challenge state, Resonance and contribution identity survive host migration. `__jewel.expedition()`, `challenge(mode, options)` and `cheer()` expose the new harness hooks.
 

@@ -71,15 +71,17 @@ The soundtrack stays at 88 BPM. Stages change chords, colour and scenery on the 
 ## Audio
 
 - **Generative soundtrack and effects.** Music stays WebAudio synthesis in one HTML file. MIDI work is cancelled.
-- The music is in the player's Gem tones key (natural minor) and layers in with play: pad, then bass, arps, drums, and a lead during lasers.
-- Stings climb with the tier. The swap whoosh is never delayed. Result sounds snap to the beat.
+- Each stage transposes the player's Gem tones key in natural minor: Dawn +0, Tidepool +5, Ember +2, Aurora +7, Starfall +3 and Prism Heart -2 semitones. Six unique progression pairs alternate every eight bars. Layers add pad, bass, arps, drums and a lead during lasers.
+- Stings climb the stage scale with the tier; pitched gem sounds and fanfares share that harmony. Result and landing sounds snap to the beat. The swap whoosh stays immediate.
+- Resonance filters the music bus from 2.2 kHz toward 4.2 kHz as clears bank, then restores 20 kHz at payout. Loaded tracks use the same filter. Gem effects and narration have their own route.
 - A player's own loaded track always wins over the soundtrack.
+- Loading a track fades the old synth bus and pads; removing it starts the current stage's harmony again. All eight Gem tones choices retain pitch across six stages. Team phrases shift by a whole octave when needed to keep their top notes in range.
 - Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. The selected synthetic Qwen identities are Warm founder and Cave-inspired clean, lowered by 2, 4 or 6 semitones. Warm founder / -4 is the default. Ordinary matches keep their musical sounds; speech ducks the music, respects mute and has a cooldown and repeat guard. Voice choice and volume stay local; Jennifer's calm preset disables speech. OmniVoice remains a local audition.
 
 ## Comfort (options, never defaults)
 
 - Reduced motion: no camera punch, no strobe, the swirl freezes, flashes soften (already honoured).
-- Flash Intensity has Full (default), Low and Off. Tap-only swapping, high contrast outlines, a larger cursor and Jennifer's calm preset are local choices. Default effects remain at full juice.
+- Flash Intensity has Full (default), Low and Off. Low shares a 350 ms interval across large flash events and eases their light envelope. Big combo screen flash is independently selectable in Journey > Comfort, on by default. Speed lines, lasers and audio remain available with that flash disabled. Tap-only swapping, high contrast outlines, a larger cursor and Jennifer's calm preset are local choices.
 
 ## Receipts standard
 

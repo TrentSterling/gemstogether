@@ -14,7 +14,9 @@ Journey remembers the stages you've visited and grows your cabinet treasury. End
 
 The local Qwen announcer celebrates new worlds, big chains and Resonance, and welcomes returning players back. Choose Warm founder or Cave-inspired clean, with three lower pitches and a separate voice volume, in Audio > Announcer voices.
 
-Built by Tront for Jennifer. Current version: 3.3.2.
+Each world has its own musical key and chord progression. Gem tones and celebrations follow that key, while Resonance draws the music into a softer filter and opens it again for the payout. Journey > Comfort offers a separate big-combo screen flash toggle; Flashes Low limits large flash events to three per second.
+
+Built by Tront for Jennifer. Current version: 3.3.3.
 
 ## Tech
 

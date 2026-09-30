@@ -48,5 +48,5 @@ let A,B;try{
  ok('real co-op clear starts matching team Resonance through travel',await A.eval(`${J}.app.fx.res?.on&&${J}.app.fx.res.team`)&&await B.eval(`${J}.app.fx.res?.on&&${J}.app.fx.res.team`));
  ok('different local travel clocks preserve board hashes',await A.eval(`${J}.net().hash`)===await B.eval(`${J}.net().hash`));
  for(const p of [A,B])ok('private journey has no runtime errors',await p.eval(`${J}.diagnostics().errors.length===0`)&&!p.logs.some(x=>x.startsWith('EXCEPTION')));
-}catch(error){fail++;console.error(error.stack);}finally{A?.kill();B?.kill();}
+}catch(error){fail++;console.error(error.stack);for(const p of [A,B])if(p)try{console.error(await p.eval(`JSON.stringify(${J}.net())`));}catch{}}finally{A?.kill();B?.kill();}
 writeFileSync(out+'/results.json',JSON.stringify({pass,fail,receipts},null,2));console.log(`${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

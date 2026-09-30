@@ -12,8 +12,8 @@ class GemsAnnouncer {
  }
  route(){
   const au=this.a.audio,c=au.ctx;if(!c||!au.music||!au.compressor||this.ctx===c)return;
-  this.ctx=c;this.voiceGain=c.createGain();this.voiceGain.connect(au.compressor);this.level();
-  this.ducker=c.createGain();this.ducker.gain.value=1;au.music.disconnect(au.compressor);au.music.connect(this.ducker);this.ducker.connect(au.compressor);
+  this.a.music.routeMusic();this.ctx=c;this.voiceGain=c.createGain();this.voiceGain.connect(au.compressor);this.level();
+  this.ducker=c.createGain();this.ducker.gain.value=1;const musicOutput=au.resonanceFilter;musicOutput.disconnect(au.compressor);musicOutput.connect(this.ducker);this.ducker.connect(au.compressor);
  }
  level(){if(this.voiceGain&&this.ctx)this.voiceGain.gain.setTargetAtTime(this.a.prefs.announcerVolume/100*.95,this.ctx.currentTime,.025);}
  eligible(preview=false){const a=this.a,au=a.audio;return !!(a.prefs.announcer&&a.prefs.announcerVolume>0&&!au.muted&&au.volume>0&&au.ctx?.state==='running'&&!document.hidden&&(preview||!a.practice&&!a.auto&&!a.frozen&&!a.expedition?.photo));}

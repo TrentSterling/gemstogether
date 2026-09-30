@@ -12,9 +12,9 @@
 // Journey stages (patch 8). Derived from the shared score, so co-op partners are always on the same stage.
 // Stage k starts at 5000*k*(k+1)/2 points (5K, 15K, 30K, 50K...): every stage is a little longer than the last.
 // tint = sky grade as a multiplier * 128 (128 = unchanged), packed into uUp.w. After stage 6 it loops 2..6.
-const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:88,prog:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:88,prog:1},
- {name:'EMBER REEF',tint:[210,112,78],bpm:88,prog:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:88,prog:3},
- {name:'STARFALL',tint:[70,96,204],bpm:88,prog:1},{name:'PRISM HEART',tint:[214,94,178],bpm:88,prog:2}];
+const FX_STAGES=[{name:'DAWN SHALLOWS',tint:[128,128,128],bpm:88,prog:0,keyShift:0},{name:'TIDEPOOL',tint:[76,168,196],bpm:88,prog:1,keyShift:5},
+ {name:'EMBER REEF',tint:[210,112,78],bpm:88,prog:2,keyShift:2},{name:'AURORA DEEP',tint:[150,88,214],bpm:88,prog:3,keyShift:7},
+ {name:'STARFALL',tint:[70,96,204],bpm:88,prog:4,keyShift:3},{name:'PRISM HEART',tint:[214,94,178],bpm:88,prog:5,keyShift:-2}];
 const FX_STAGE_GL=`vec3 fxStage(vec3 c,vec2 uv){float p=uUp.w;if(p<1.0)return c;float r=floor(p/65536.0);float g=floor((p-r*65536.0)/256.0);float b=p-r*65536.0-g*256.0;vec3 m=vec3(r,g,b)/128.0;return c*m+max(m-1.0,vec3(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_STAGE_WG=`fn fxStage(c:vec3f,uv:vec2f)->vec3f{let p=U.up.w;if(p<1.0){return c;}let r=floor(p/65536.0);let g=floor((p-r*65536.0)/256.0);let b=p-r*65536.0-g*256.0;let m=vec3f(r,g,b)/128.0;return c*m+max(m-1.0,vec3f(0.0))*(0.05+0.09*exp(-abs(uv.y-0.44)*5.0));}`;
 const FX_FIELD=7000;
@@ -53,6 +53,8 @@ class ResonanceFX {
  get on(){return !!this.a.prefs.particles;}
  // Flashes setting (patch 10): full (default) 1, low .35, off 0. Scales the sky/rim flash, bloom swell and the drop's juice glow.
  get F(){const v=({full:1,low:.35,off:0})[this.a.prefs.flash||'full'];return v===undefined?1:v;}
+ // Low shares a 350 ms interval across match, Resonance and combo screen flashes.
+ flashEvent(){if(this.F===0)return false;if(this.a.prefs.flash!=='low')return true;const now=performance.now(),age=now-(this.lowFlashAt??-10000);if(age<20)return true;if(age<350)return false;this.lowFlashAt=now;return true;}
  get j(){return (this.a.prefs.juice||100)/100;}
  pick(){return mixColor(GEM_COLORS[(Math.random()*6)|0],this.tint,.45);}
  frame(){
@@ -91,15 +93,15 @@ class ResonanceFX {
    for(let k=0;k<7;k++)sp.emit(a0,a1,vmul(bright,2.2-k*.25),.95-k*.11,b+k*.0045,dur,6,e*7+k,0);}
   for(const q of c){sp.emit(q.slice(),[0,0,0],bright,1.1,t+dur*4,.3,8,0,0);sp.emit(q.slice(),[0,0,0],vmul(bright,2),1.6,t+dur*4,.35,1,0,0);}}
  uniforms(u){
-  const on=this.on?1:0,calm=(this.a.prefs.motion?1:.45)*this.F,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,pulse=Math.min(1.5,this.pulse*this.j)*on*calm;
-  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5)*(.35+.65*this.F);u[29]*=.4+.6*this.F;const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
+  const on=this.on?1:0,calm=(this.a.prefs.motion?1:.45)*this.F,flow=Math.min(1.5,this.flow*this.j+this.bass*.3)*on,low=this.a.prefs.flash==='low'?Math.exp(-Math.max(0,performance.now()-(this.lowFlashAt??-10000))/170):1,pulse=Math.min(1.5*low,this.pulse*this.j)*on*calm;
+  u[43]=this.swirl;u[46]=flow;u[47]=pulse;u[23]=Math.min(1.5,this.laser*this.j)*on*(this.a.prefs.motion?1:.5)*(.35+.65*this.F);u[29]=(this.a.prefs.flash==='low'?Math.min(u[29],1.5*low):u[29])*(.4+.6*this.F);const st=this.stTint.map(v=>clamp(Math.round(v),1,255));u[27]=st[0]*65536+st[1]*256+st[2];
   const c=this.tint.map(v=>clamp(Math.round(v*255),0,255));u[51]=c[0]*65536+c[1]*256+c[2];
   u[32]+=pulse*.02;u[33]+=flow*.06+pulse*.12;
  }
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
  match(center,type,cascade,count,mode,mag,removed){
-  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.stats.matches++;this.tier(cascade);
+  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.flashEvent();this.stats.matches++;this.tier(cascade);
   this.flow=Math.min(1.5,this.flow+.13+cascade*.055+count*.012+(special?.28:0));
   this.pulse=Math.min(1.5,this.pulse*.35+.5+cascade*.11+(special?.4:0));
   const gc=GEM_COLORS[type]||GEM_COLORS[5],m=Math.max(gc[0],gc[1],gc[2],1e-4);const n=gc.map(v=>v/m),l=(n[0]+n[1]+n[2])/3;this.target=n.map(v=>clamp(mix(l,v,2.2),.08,1));
@@ -206,7 +208,7 @@ class ResonanceFX {
  resonate(removed,owner){const a=this.a,n=removed?removed.length:0;if(!n||a.practice)return;const R=this.res||(this.res={fill:0,mine:0,theirs:0,on:false,until:0,count:0});
   if(R.on){R.count+=n;this.sting(Math.min(9,3+Math.floor(R.count/10)));this.laser=Math.max(this.laser,1.4);this.pulse=Math.min(1.5,this.pulse+.4);return;}
   R.fill+=n;if(owner==='partner')R.theirs+=n;else R.mine+=n;if(R.fill>=this.resCap())this.resStart();}
- resStart(){const a=this.a,R=this.res,t=a.time;R.on=true;R.start=t;R.until=t+8;R.count=0;R.team=R.theirs>=R.fill*.2&&R.mine>=R.fill*.2;this.stats.resonances=(this.stats.resonances||0)+1;
+ resStart(){const a=this.a,R=this.res,t=a.time;this.flashEvent();R.on=true;R.start=t;R.until=t+8;R.count=0;R.team=R.theirs>=R.fill*.2&&R.mine>=R.fill*.2;this.stats.resonances=(this.stats.resonances||0)+1;
   this.flow=1.5;this.pulse=1.5;this.laser=1.5;a.ui?.resCallout?.(R.team?'TEAM RESONANCE':'RESONANCE');a.rumble?.(1,1,600);
   if(this.on){const sp=a.world.sparks;for(let r=0;r<4;r++)sp.emit([0,0,-2-r],[16+r*5,0,0],[1,.85,.45],1,t+r*.12,1.5,12,0,0);this.nova([0,0,0],Math.round(900*this.j),GEM_COLORS,t);}}
  resTick(){const a=this.a,s=a.board?.score||0;if(s<(this.resScore||0))this.res=null;this.resScore=s;const R=this.res;if(!R||!R.on)return;const t=a.time;
@@ -226,7 +228,7 @@ class ResonanceFX {
    this.pulse=1.5;this.flow=1.5;if(this.on){const sp=a.world.sparks;for(let r=0;r<3;r++)sp.emit([0,0,.4-r*1.5],[9+r*7,0,0],[1,.86,.5],1.2,t+.05+r*.07,.9,12,0,0);}}}
  riser(){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime,s=x.createBufferSource(),f=x.createBiquadFilter(),g=x.createGain(),n=x.sampleRate,b=x.createBuffer(1,n,n),d=b.getChannelData(0);
   for(let i=0;i<n;i++)d[i]=Math.random()*2-1;s.buffer=b;f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(350,t);f.frequency.exponentialRampToValueAtTime(6000,t+.85);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16*Math.min(1.3,this.j),t+.8);g.gain.exponentialRampToValueAtTime(.0001,t+.95);s.connect(f);f.connect(g);g.connect(au.sfx);s.start(t);s.stop(t+1);}
- fanfare(){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.27,j=Math.min(1.3,this.j),key=(au.key||62)+12,hz=m=>440*Math.pow(2,(m-69)/12);
+ fanfare(){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.27,j=Math.min(1.3,this.j),key=(this.a.music?.key(t)||au.key||62)+12,hz=m=>440*Math.pow(2,(m-69)/12);
   const out=x.createGain();out.gain.value=.55*j;out.connect(au.sfx);[0,3,7,10,12,15,19,24].forEach((iv,i)=>{for(const [ty,det,v] of [['square',-6,.05],['sawtooth',6,.05]]){const o=x.createOscillator(),e=x.createGain();o.type=ty;o.frequency.value=hz(key+iv);o.detune.value=det;const s=t+i*.045;e.gain.setValueAtTime(0,s);e.gain.linearRampToValueAtTime(v,s+.01);e.gain.exponentialRampToValueAtTime(.0005,s+.9);o.connect(e);e.connect(out);o.start(s);o.stop(s+1);}});
   const o=x.createOscillator(),e=x.createGain();o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(30,t+.6);e.gain.setValueAtTime(.5*j,t);e.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(e);e.connect(au.sfx);o.start(t);o.stop(t+.85);
   const n=x.sampleRate*1.4,b=x.createBuffer(1,n,x.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(x.sampleRate*.35));const s=x.createBufferSource(),f=x.createBiquadFilter(),cg=x.createGain();s.buffer=b;f.type='highpass';f.frequency.value=4500;cg.gain.value=.22*j;s.connect(f);f.connect(cg);cg.connect(au.sfx);s.start(t);
@@ -234,9 +236,9 @@ class ResonanceFX {
  tier(c){if(c<3)return;const a=this.a;this.stats.tiers=(this.stats.tiers||0)+1;this.climax(c);
   if(c>=5)this.laser=Math.min(1.5,Math.max(this.laser,.8)+.25+(c-5)*.1);a.ui?.callout?.(c);this.sting(c);}
  sting(c){const au=this.a.audio;if(!au?.ctx||au.muted||au.ctx.state!=='running'||!au.sfx)return;const x=au.ctx,t=x.currentTime+.01+(this.a.music?.snapWait?.(.01)||0),j=Math.min(1.3,this.j);
-  const root=196*Math.pow(2,Math.min(c-3,9)*2/12),notes=[1,1.25,1.5,2,2.5,3].slice(0,Math.min(6,c));
+  const key=(this.a.music?.key(t)||au.key||62)-12,degree=Math.min(c-3,6),scale=[0,2,3,5,7,8,10],notes=[0,2,4,7,9,11].slice(0,Math.min(6,c)).map(n=>{n+=degree;return 440*Math.pow(2,(key+scale[n%7]+12*Math.floor(n/7)-69)/12);});
   const lp=x.createBiquadFilter();lp.type='lowpass';lp.Q.value=5;lp.frequency.setValueAtTime(700,t);lp.frequency.exponentialRampToValueAtTime(7000,t+.35);const g=x.createGain();g.gain.value=.5*j;lp.connect(g);g.connect(au.sfx);
-  notes.forEach((m,i)=>{for(const [type,det,v] of [['sawtooth',-7,.04],['sawtooth',7,.04],['triangle',0,.06]]){const o=x.createOscillator(),e=x.createGain();o.type=type;o.frequency.value=root*m;o.detune.value=det;const s=t+i*.055;
+   notes.forEach((hz,i)=>{for(const [type,det,v] of [['sawtooth',-7,.04],['sawtooth',7,.04],['triangle',0,.06]]){const o=x.createOscillator(),e=x.createGain();o.type=type;o.frequency.value=hz;o.detune.value=det;const s=t+i*.055;
    e.gain.setValueAtTime(0,s);e.gain.linearRampToValueAtTime(v,s+.012);e.gain.exponentialRampToValueAtTime(.0005,s+.55+c*.04);o.connect(e);e.connect(lp);o.start(s);o.stop(s+.7+c*.04);}});
   if(c>=4){const o=x.createOscillator(),e=x.createGain();o.type='sine';o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(38,t+.4);e.gain.setValueAtTime(.32*j,t);e.gain.exponentialRampToValueAtTime(.001,t+.55);o.connect(e);e.connect(au.sfx);o.start(t);o.stop(t+.6);}
   setTimeout(()=>{try{lp.disconnect();g.disconnect();}catch{}},3000);}

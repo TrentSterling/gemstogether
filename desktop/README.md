@@ -13,8 +13,8 @@ npm run smoke
 npm run package
 ```
 
-`dist/3.3.2/Gems Together-win32-x64/Gems Together.exe` is the portable Windows build.
-The release receipt also includes `dist/GemsTogether-3.3.2-win-x64.zip`; extract
+`dist/3.3.3/Gems Together-win32-x64/Gems Together.exe` is the portable Windows build.
+The release receipt also includes `dist/GemsTogether-3.3.3-win-x64.zip`; extract
 the whole folder before running the executable.
 Journey > Comfort exposes window sizes and fullscreen. Controllers can navigate
 menus with the D-pad, select with A/Cross, return with B/Circle, and scroll with
@@ -40,8 +40,15 @@ back to Gems Together!” and both selected voices at three lower pitches.
 
 The smoke test boots the real GPU game, checks the isolated preload, rejects an
 unknown achievement ID, changes window resolution, toggles fullscreen and
-decodes all six welcome-back variants through WebAudio.
+decodes all six welcome-back variants through WebAudio, checks the six stage
+harmonies and exercises the Resonance music filter.
 Pass `--smoke` to a packaged executable to run the same test on that build.
+
+The final local 3.3.3 artifact still needs a native smoke pass. A restricted test
+launch failed Electron's Windows install-directory permission check and raised a
+breakpoint dialog. Browser checks passed, and the packaged and extracted HTML
+match the tested source; these checks do not establish that the final executable
+boots. Do not repeat that restricted launch or disable the sandbox to bypass it.
 
 Primary API references: [Electron context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation)
 and [Steamworks.js](https://github.com/ceifa/steamworks.js).

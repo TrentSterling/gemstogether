@@ -45,7 +45,7 @@ try{
  B=await launch({port:9974});await boot(B);await B.eval(`${J}.app.audio.start()`);
  await A.eval(`${J}.app.ui.activate('coop-host')`);const code=await until(()=>A.eval(`${J}.net().code`),{timeout:30000,label:'private code'});await B.eval(`${J}.app.coop.join(${JSON.stringify(code)})`);
  await until(async()=>await A.eval(`${J}.net().connected`)&&await B.eval(`${J}.net().connected&&${J}.app.coop.synced`),{timeout:60000,every:250,label:'private connection'});
- await A.eval(`${J}.challenge('zen',{seed:1})`);await until(()=>B.eval(`${J}.state().score===0&&${J}.app.phase==='idle'`),{label:'fresh shared board'});
+ await A.eval(`${J}.challenge('zen',{seed:1})`);await idle(A);await until(()=>B.eval(`${J}.app.seed===1&&${J}.state().score===0&&${J}.app.phase==='idle'`),{label:'fresh shared board'});
  await B.eval(`${J}.app.announcer.setProfile('founder-2')`);await sleep(1000);ok('host and peer keep their own voices',await A.eval(`${J}.announcer().profile==='cave-6'`)&&await B.eval(`${J}.announcer().profile==='founder-2'`));
  for(const p of [A,B]){await ready(p);await p.eval(`${J}.app.announcer.history=[]`);}
  await A.eval(`(()=>{const a=${J}.app;a.fx.res={fill:57,mine:30,theirs:27,on:false,until:0,count:0};a.coop.fullSync();})()`);await until(()=>B.eval(`${J}.app.fx.res?.fill===57`),{label:'charged mirror'});await A.eval(`${J}.swap(1,2)`);

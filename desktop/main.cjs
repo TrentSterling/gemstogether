@@ -33,7 +33,25 @@ app.whenReady().then(async()=>{
  win.on('close',saveConfig);
  await win.loadURL('gems://cabinet/index.html'+(smoke?'#solo=1':''));
  if(smoke){let result;try{for(let i=0;i<100;i++){if(await win.webContents.executeJavaScript('!!window.__jewel?.ready'))break;await new Promise(r=>setTimeout(r,100));}
-  result=await win.webContents.executeJavaScript(`(async()=>{const J=window.__jewel;if(!J?.ready)throw Error(document.querySelector('#failure-detail')?.textContent||'GPU boot failed');J.advance(2);const d=J.diagnostics(),s=J.state(),desktop=await window.gemsDesktop.status();const rejected=await window.gemsDesktop.unlock('UNRECOGNIZED').then(()=>false,()=>true);await window.gemsDesktop.resolution(1280,720);const resized=await window.gemsDesktop.status();const full=await window.gemsDesktop.fullscreen();await window.gemsDesktop.fullscreen();await J.app.audio.start();const n=J.app.announcer;n.stop();const voices=[];for(const p of n.info().profiles){const b=await n.decode(p.id,'welcome-back');voices.push({profile:p.id,duration:b.duration});}return {version:d.version,backend:d.backend,errors:d.errors,cells:s.cells.length,solo:!J.net().connected,desktop,achievementAllowlist:rejected,resolution:resized.size,fullscreen:full,contextIsolation:typeof window.require==='undefined',progression:!!J.expedition(),announcer:voices,pass:d.errors.length===0&&s.cells.length===64&&rejected&&full&&typeof window.require==='undefined'&&voices.length===6&&voices.every(v=>v.duration>1)};})()`);
+  result=await win.webContents.executeJavaScript(`(async()=>{
+   const J=window.__jewel;if(!J?.ready)throw Error(document.querySelector('#failure-detail')?.textContent||'GPU boot failed');
+   J.advance(2);const a=J.app,d=J.diagnostics(),s=J.state(),desktop=await window.gemsDesktop.status();
+   const rejected=await window.gemsDesktop.unlock('UNRECOGNIZED').then(()=>false,()=>true);
+   await window.gemsDesktop.resolution(1280,720);const resized=await window.gemsDesktop.status();
+   const full=await window.gemsDesktop.fullscreen();await window.gemsDesktop.fullscreen();await a.audio.start();
+   const n=a.announcer;n.stop();const voices=[];
+   for(const p of n.info().profiles){const b=await n.decode(p.id,'welcome-back');voices.push({profile:p.id,duration:b.duration});}
+   const stages=FX_STAGES.map(s=>({key:a.audio.key+s.keyShift,progression:s.prog}));
+   a.fx.res={on:true,count:0,until:a.time+8};a.music.filterResonance();const filtered=a.music.filterTarget;
+   a.fx.res.on=false;a.music.filterResonance();const restored=a.music.filterTarget;
+   const harmony=new Set(stages.map(s=>s.key)).size===6&&new Set(stages.map(s=>s.progression)).size===6;
+   const musicFilter=!!a.audio.resonanceFilter&&filtered===2200&&restored===20000;
+   return {version:d.version,backend:d.backend,errors:d.errors,cells:s.cells.length,solo:!J.net().connected,desktop,
+    achievementAllowlist:rejected,resolution:resized.size,fullscreen:full,contextIsolation:typeof window.require==='undefined',
+    progression:!!J.expedition(),announcer:voices,stages,musicFilter,comboTreatment:a.prefs.comboTreatment,
+    pass:d.errors.length===0&&s.cells.length===64&&rejected&&full&&typeof window.require==='undefined'&&
+     voices.length===6&&voices.every(v=>v.duration>1)&&harmony&&musicFilter&&a.prefs.comboTreatment===true};
+  })()`);
  }catch(err){result={pass:false,error:err.stack};}
   const report=process.env.GEMSTOGETHER_SMOKE_REPORT;if(report)writeFileSync(report,JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));app.exit(result.pass?0:1);
  }

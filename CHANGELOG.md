@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.3.3 hosting patch 24 (2026-09-29) Six worlds, six harmonies
+
+- All six worlds have distinct eight-bar progression pairs and keys relative to Gem tones. At the default setting the journey moves through D, G, E, A, F and C minor. Stage harmony starts on its travel downbeat; old pads fade and a new board promptly starts its own opening harmony.
+- Glass tones, special-gem tones, chord stings and fanfares follow the audible stage scale. A result queued across a stage boundary uses the upcoming key. Landing sounds now snap to the grid; swap whooshes, interface ticks and rejects keep their timing.
+- All eight selectable Gem tones keys retain pitch in all six worlds, including the highest chain notes. The team phrase moves down a whole octave when needed to keep its upper notes in range. Loading a local track fades the old synth tails; clearing it restarts the generative soundtrack.
+- Resonance low-passes the actual music bus, including loaded local tracks. Banked clears gently brighten the filter; payout opens it again. Speech keeps its own route and continues ducking the filtered music.
+- Journey > Comfort adds a saved Big combo screen flash switch, enabled by default. Flashes Low shares a 350 ms interval across large flash events; Full retains every effect. Turning off the combo screen flash preserves speed lines, banners, lasers and audio.
+- Real audio/GPU/private co-op gate: 121/121. Separate stage-clock gate: 30/30; announcer: 136/136. Before/after eight-bar audio samples and matched Low-flash cascade clips are in the gauntlet.
+- The final Windows package and extracted ZIP contain the exact browser-tested HTML. Their native verification remains pending: the restricted test launch failed Electron's install-directory ACL check and displayed a Windows breakpoint dialog. Earlier native receipts precede the final pitch-range and loaded-track fixes; they do not verify this final artifact.
+
 ## 3.3.2 hosting patch 23 (2026-09-29) Travel on the beat
 
 - Scenery and chord changes enter together on the next soundtrack downbeat, then the background and props crossfade over 3.2 seconds. Swaps and score continue immediately.

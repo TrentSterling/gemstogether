@@ -40,7 +40,7 @@ class GemsExpedition {
  constructor(app){
   this.a=app;this.profile=expeditionProfile(readStorage(EXPEDITION_KEY,{}));this.lastClear=new Map();this.dailyFriends=new Map();this.socialRates=new Map();this.social=null;this.socialRoom=null;this.announcement=null;this.photo=null;this.saving=false;this.selectedStage=0;this.selectedPuzzle=0;this.tourVisible=!this.profile.onboarded;this.ghost=true;
   this.run=this.makeRun('zen');this.lastClock=performance.now();this.current={chain:0,gems:0,points:0};this.highlights=[];this.forgeFocus=null;this.props=this.buildProps();this.ornamentMesh=app.renderer.createMesh(gemGeometry(5,7).data(),6);this.ornaments=0;
-  app.prefs.tapOnly=!!app.prefs.tapOnly;app.prefs.highContrast=!!app.prefs.highContrast;app.prefs.largeCursor=!!app.prefs.largeCursor;app.prefs.ghost=app.prefs.ghost!==false;
+  app.prefs.tapOnly=!!app.prefs.tapOnly;app.prefs.highContrast=!!app.prefs.highContrast;app.prefs.largeCursor=!!app.prefs.largeCursor;app.prefs.ghost=app.prefs.ghost!==false;app.prefs.comboTreatment=app.prefs.comboTreatment!==false;
   window.__jewel.expedition=()=>this.info();window.__jewel.challenge=(mode,options)=>this.start(mode,options);window.__jewel.cheer=()=>this.cheer();
   window.addEventListener('pagehide',()=>this.save());
   window.addEventListener('keydown',event=>{if(event.key.startsWith('Arrow')||event.key===' '||event.key==='Enter')app.lastInputDevice='keyboard';},true);
@@ -118,7 +118,7 @@ class GemsExpedition {
  ghostScore(){const samples=this.profile.bests.timed?.samples||[],t=this.run.elapsed;let score=0;for(const x of samples){if(x[0]>t)break;score=x[1];}return score;}
  announce(label,col='#ffd98a',duration=2){this.announcement={label,col,at:this.a.time,duration};}
  teamMoment(){if(this.a.time-(this.lastHighFive??-100)<1)return;this.lastHighFive=this.a.time;this.unlock('HIGH_FIVE');this.announce('HIGH FIVE','#8ff7ff',1.8);const fx=this.a.fx,t=this.a.time;fx.trace([.55,1,1],t,1.4);if(fx.on){for(const side of [-1,1])fx.firework([side*4.10,4.10,.30],[.55,1,1],t,1.4);}this.teamFanfare(false);}
- teamFanfare(resonance=true){const a=this.a,au=a.audio;if(!au.started||au.muted||!au.buffers?.glass)return;const root=(au.key||62)+(resonance?12:7);[0,7,12,15,19,24].slice(0,resonance?6:3).forEach((v,i)=>au.play(au.buffers.glass[i%6],Math.pow(2,(root+v-69)/12),.075,i%2?.3:-.3,i*.095));}
+ teamFanfare(resonance=true){const a=this.a,au=a.audio;if(!au.started||au.muted||!au.buffers?.glass)return;const key=a.music?.key(au.ctx.currentTime+.6)||au.key||62,root=(au.key||62)+(resonance?12:7)-(key+(resonance?36:19)>105?12:0);[0,7,12,15,19,24].slice(0,resonance?6:3).forEach((v,i)=>au.play(au.buffers.glass[i%6],Math.pow(2,(root+v-69)/12),.075,i%2?.3:-.3,i*.095));}
  calm(){const a=this.a;Object.assign(a.prefs,{flash:'low',juice:80,motion:false,idleMotion:true,musicVolume:28,muted:false,endRun:false});a.applyPreferences();a.savePreferences();a.audio.start().catch(()=>{});if(this.authority)this.start('zen',{stage:0});else a.toast("Jennifer's calm preset applied");}
  connectSocial(){const n=this.a.coop;if(!n?.room){this.social=null;this.socialRoom=null;return;}if(this.socialRoom!==n.room){this.socialRoom=n.room;const [send,on]=n.room.makeAction('gems_social');this.social=send;on((m,id)=>this.receiveSocial(m,id));this.socialPeers='';}const peers=Object.keys(n.room.getPeers()).sort().join(',');if(peers&&peers!==this.socialPeers||performance.now()-(this.dailySent||0)>5000){this.socialPeers=peers;this.dailySent=performance.now();this.shareDaily();}}
  receiveSocial(m,id){
@@ -170,7 +170,7 @@ class GemsExpedition {
 
 // Wire progression and modes into real host and peer events.
 const expeditionNewBoard=JewelApp.prototype.newBoard;
-JewelApp.prototype.newBoard=function(seed,fixture){if(this.expedition&&!this.coop?.mirror)this.expedition.resetForBoard(fixture);return expeditionNewBoard.call(this,seed,fixture);};
+JewelApp.prototype.newBoard=function(seed,fixture){if(this.expedition&&!this.coop?.mirror)this.expedition.resetForBoard(fixture);const result=expeditionNewBoard.call(this,seed,fixture);if(result!==false)this.music?.reset();return result;};
 const expeditionUpdate=JewelApp.prototype.update;
 JewelApp.prototype.update=function(dt){this.expedition?.tick(dt);return expeditionUpdate.call(this,dt);};
 const expeditionTrySwap=JewelApp.prototype.trySwap;
@@ -292,7 +292,7 @@ CabinetUI.prototype.expeditionPanel=function(){
   row('exp-cheer','Send a cheer');title('Achievements');EXPEDITION_ACHIEVEMENTS.forEach(([id,name,desc])=>{const on=e.profile.achievements.includes(id);this.text((on?'* ':'')+name,x,y,14,on?UI_ART.highlight:UI_ART.dim,'left',w);y+=25;para(desc);});
  }else if(this.tab==='comfort'){
   row('exp-calm',"Jennifer's calm preset");para('Endless, Flashes Low, Juice 80, music on and a steady camera.');
-  for(const [key,label]of [['tapOnly','Tap-tap swaps only'],['highContrast','High contrast outlines'],['largeCursor','Larger cursor'],['ghost','Best run ghost']])row('exp-pref-'+key,label+': '+(a.prefs[key]?'On':'Off'),!!a.prefs[key]);
+  for(const [key,label]of [['tapOnly','Tap-tap swaps only'],['highContrast','High contrast outlines'],['largeCursor','Larger cursor'],['comboTreatment','Big combo screen flash'],['ghost','Best run ghost']])row('exp-pref-'+key,label+': '+(a.prefs[key]?'On':'Off'),!!a.prefs[key]);
   const i=e.profile.input;para('Swap gestures: '+i.tap+' tap / '+i.drag+' drag / '+i.pad+' pad / '+i.keyboard+' keyboard.');row('exp-tutorial','Show tap-to-swap hint');row('exp-photo','Photo mode');row('fullscreen','Fullscreen');
   if(window.gemsDesktop){title('Window size');for(const [W,H]of [[1280,720],[1600,900],[1920,1080]])row('exp-resolution-'+W+'x'+H,W+' x '+H);}
  }else{
@@ -310,7 +310,7 @@ CabinetUI.prototype.activate=function(id){const a=this.app,e=a.expedition;if(!e)
  if(id==='journey'){a.openPanel('journey');return;}if(id==='exp-dismiss'){e.dismissTour();return;}
  if(id.startsWith('exp-tab-')){this.tab=id.slice(8);this.scroll=0;return;}if(id.startsWith('exp-stage-')){const k=Number(id.slice(10));if(e.profile.visited.includes(k)){e.selectedStage=k;e.start('zen',{stage:k});}return;}
  if(id.startsWith('exp-mode-')){e.start(id.slice(9));return;}if(id.startsWith('exp-puzzle-')){e.selectedPuzzle=Number(id.slice(11));e.start('puzzle',{puzzle:e.selectedPuzzle});return;}
- if(id.startsWith('exp-pref-')){const key=id.slice(9);if(['tapOnly','highContrast','largeCursor','ghost'].includes(key)){a.prefs[key]=!a.prefs[key];a.savePreferences();}return;}
+ if(id.startsWith('exp-pref-')){const key=id.slice(9);if(['tapOnly','highContrast','largeCursor','comboTreatment','ghost'].includes(key)){a.prefs[key]=!a.prefs[key];a.savePreferences();}return;}
  if(id==='exp-calm'){e.calm();return;}if(id==='exp-cheer'){e.cheer();return;}if(id==='exp-tutorial'){e.tourVisible=true;a.closePanel();return;}if(id==='exp-audio'){a.openPanel('audio');return;}if(id==='exp-comfort'){a.openPanel('comfort');return;}if(id==='exp-music'){a.openPanel('music-toys');return;}
  if(id==='exp-photo'){e.enterPhoto();return;}if(id==='exp-photo-left'||id==='exp-photo-right'){if(e.photo)e.photo.yaw=clamp(e.photo.yaw+(id.endsWith('left')?-.06:.06),-.3,.3);return;}
  if(id==='exp-photo-save'){if(e.photo&&!e.saving)e.photo.wantCapture=true;return;}if(id.startsWith('exp-resolution-')){const [w,h]=id.slice(15).split('x').map(Number);window.gemsDesktop?.resolution(w,h).catch(err=>a.toast(err.message));return;}
