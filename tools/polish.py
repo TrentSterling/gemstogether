@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.4'")
+rep("version:'3.2.4'", "version:'3.3.5'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -494,7 +494,7 @@ rep('app.expedition=new GemsExpedition(app);', 'app.expedition=new GemsExpeditio
 rep("this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;",
     "this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;")
 
-# Patch 26: Silver master and a visible independent voice switch on Audio.
+# Patches 26-27: selected Silver crystal and the independent voice switch.
 rep("this.text('Gem tones',x,y+206,15);", "this.toggle('announcer-on','Announcer voice',a.prefs.announcer,x,y+193,w);this.text('Gem tones',x,y+267,15);")
 rep("this.button('key',label+' >',x+w-132,y+193,132,39);", "this.button('key',label+' >',x+w-132,y+254,132,39);")
 rep("this.lineDivider(x,y+253,w);this.button('music-load',a.audio.loadedTrack?'Change music':'Load music',x,y+273,w-(a.audio.loadedTrack?109:0),42);if(a.audio.loadedTrack)this.button('music-clear','Remove',x+w-101,y+273,101,42);this.text(this.fitLine(a.trackName||'Local audio file / nothing uploaded',w,12),x,y+330,12,UI_ART.dim);this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;",

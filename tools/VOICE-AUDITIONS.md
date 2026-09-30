@@ -1,5 +1,180 @@
 # Local announcer auditions
 
+## Selected production voice: Original 07 / Tuned stereo crystal
+
+Trent approved **Original 07: stereo crystal**, shown at row 03 of the
+round-ten page, for the final voice. It supersedes the unprocessed Silver
+selection and the four later mix candidates. Version 3.3.5 freezes all nineteen
+exact selected MP3s in `tools/voice-references/silver-crystal/`; production uses
+those bytes without resynthesis or re-encoding. The existing voice-off switch
+and saved volume remain. See `tools/ANNOUNCER.md` for rebuilding and validation.
+The unselected audit rows below document the earlier listening state.
+
+## Round ten: blend the three closer crystal voices
+
+Trent said round-nine 06, 07 and 08 were closer, but 06 alone was too robotic.
+He requested mixing the three. `tools/voice-blends.py` creates four candidates,
+retaining shipped Silver and the exact original three as controls. The local
+page is `tools/out/voices/blends-round10/index.html`, opened in his existing
+Firefox. Its controls are renumbered 02/03/04 and identify their original
+06/07/08 names explicitly.
+
+- 05, All three: balanced. Literal blend of original 06/07/08 at 20/45/35%.
+- 06, All three: softer robot. Literal blend at 10/60/30%.
+- 07, Locked crystal, layered. One voice locked at F-sharp 2, formant ratio
+  0.88, low-mid EQ, stronger short stereo layers and a 0.25-second bloom.
+- 08, Almost locked, layered. The same treatment with 88% pitch range
+  reduction, 65% note attraction and a 25 ms retune time constant.
+
+Literal mixes retain the two original pitch centres and align the shared
+performance timing; shorter tails are zero-padded. The combined treatments
+test a single main pitch rather than mixing 82 Hz and 92 Hz voices. On the
+welcome, dry resynthesis in 07/08 measures 92.48/92.37 Hz with 0.08/0.89
+semitone 10th-to-90th-percentile spans. The integrated takes use dark vowels
+and stereo settings with centre/wet gains 0.50/0.72, +/-12-cent doubles at
+12/27 ms, and a short bloom. New combined renders have compensated transient
+limiting; all new audio is linearly matched to -24 LUFS. Exact control PCM
+and MP3 hashes are retained.
+
+All 38 actual pitch checks, 152 level/peak checks and 32 compressed preview
+speech checks pass. The actual Chrome/game/file player passes 42/42 checks;
+native Firefox passes 13/13. All nineteen calls exist for every candidate,
+including selected-treatment automatic announcements during solo play.
+Favourites, voice-only playback, the real music/ducking/compressor path and
+the retained Bejeweled listening references are available. Production and
+round-nine sources retain their hashes. These results verify processing and
+playback, not perceived quality; no new default has been chosen.
+
+```powershell
+python tools/voice-blends.py --check
+node tools/voice-processing-audit.mjs blends-round10
+node tools/voice-processing-firefox.mjs blends-round10
+```
+
+## Round nine: actual pitch correction
+
+Trent requested AutoTune-style processing: the reference sounds like deep,
+dark crystals, while Silver sounds like a dude yelling in a tube. The local
+comparison is `tools/out/voices/tuning-round9/index.html`, opened in Firefox.
+`tools/voice-tuning.py` edits voiced Praat PitchTier frequencies and resynthesizes
+with overlap-add. It follows the local GLaDOS correction approach, with lower
+tracking bounds, logarithmic range control, explicit retune time and measured
+output. This is custom pitch correction, not an installed Antares plug-in.
+Historical Bejeweled processing remains unknown.
+
+Eight rows, each with all nineteen retained Silver performances:
+
+1. Exact shipped Silver MP3s.
+2. Exact round-seven row 17, Deep echo and room, retained for comparison.
+3. Four semitones down and 8% darker formants, without tuning or ambience.
+4. Gentle tuning around F-sharp 2, 60% range reduction, 55% note attraction,
+   45 ms retune time constant.
+5. Hard chromatic tuning, 35% range reduction, full snap, 5 ms time constant.
+6. Fixed F-sharp 2 (92.50 Hz) for all voiced syllables.
+7. Full tuning with 65% range reduction, 12 ms time constant, low-mid EQ,
+   prominent short stereo microshift and a 0.25-second bloom.
+8. Lower E2 (82.41 Hz), 85% range reduction, 8 ms time constant, darker
+   formants, stronger stereo microshift and a 0.30-second bloom.
+
+The new renders use latency-compensated transient limiting before linear
+-24 LUFS matching; retained controls preserve exact PCM/MP3 bytes. The dry
+tuned-only FLOAT renders and pitch contours are retained separately. The
+welcome output confirms actual correction: gentle/hard median note errors
+are 26.6/5.9 cents; the fixed-note version measures 92.49 Hz with a 0.06-semitone
+10th-to-90th-percentile span. Rows 7/8 measure 92.39/82.32 Hz with 2.95/1.02
+semitone spans before stereo effects. Full-clip stereo difference energy in
+rows 7/8 is 28.4/38.0%, versus 2.3% in the previous closest control. Those
+full-clip figures are not direct same-word matches to the round-eight reference.
+
+All 23 actual pitch checks, 152 level/peak checks and 32 compressed preview
+speech checks pass. Chrome's real-game/file player passes 41/41 checks;
+native Firefox passes 13/13. Inside-the-game comparisons route through the
+real music, SFX, compressor, ducking and voice gain. Voice only, favourites,
+Stop and automatic selected-treatment announcements remain available.
+The solo sandbox has isolated saves. Production HTML and the pack retain
+their original hashes. These checks establish technical behavior, not a
+successful perceptual match. No production treatment has been approved.
+
+```powershell
+python tools/voice-tuning.py --check
+node tools/voice-processing-audit.mjs tuning-round9
+node tools/voice-processing-firefox.mjs tuning-round9
+```
+
+## Round eight: diagnose the reference before more processing
+
+Trent rejected the round-seven treatments as a final sound; row 17, Deep echo
+and room, was closest. He requested diagnosis of the original Bejeweled 2 voice,
+including whether pitch correction might explain the missing quality.
+`tools/voice-diagnose.py` measures nine retained clips with two Praat pitch
+trackers, stereo structure, stereo-power spectra and cached Whisper word timing.
+The local report is `tools/out/voices/diagnosis-round8/index.html`, opened in
+Firefox. It includes four plots, matched two-word excerpts and centre/difference
+reference playback. Its asset/player gate passes 26/26 checks.
+
+For only "Welcome back", reference versus row 17: median pitch about 91/95 Hz;
+10th-to-90th percentile pitch span 3.6/8.9 semitones; estimated word-aligned
+duration 0.97/0.71 seconds; stereo difference energy 29.6/2.2%; stereo power in
+120-250 Hz 65.3/35.4%. Spectral power averages channel powers, avoiding mono
+phase cancellation. Pitch still needs caution: averaging wide channels changes
+some estimates, particularly Excellent. Per-channel and cross-correlation
+measurements are retained in `analysis.json`; the final snippets do not reveal
+the historical plugin chain or separate the actor's work from effects.
+
+The evidence supports testing steadier, slower delivery, stronger low-mid/vowel
+resonance and stronger short stereo layering. Pitch correction remains a
+hypothesis; no Auto-Tune usage is verified. The measured reference retains
+continuous pitch movement. A quiet double or another longer echo does not test
+the full observed gap. No new TTS or production changes in this diagnosis.
+
+```powershell
+python tools/voice-diagnose.py
+node tools/voice-diagnose-audit.mjs
+```
+
+## Round seven: processing in the actual game
+
+After listening to shipped 3.3.4, Trent said Silver feels out of place and
+requested a processing gauntlet for deeper resonance, echo and ambience.
+The new local page is `tools/out/voices/processing-round7/index.html`.
+It compares twenty treatments of the **exact shipped Silver performances**,
+with all nineteen lines available in every treatment (380 clips). No new TTS.
+
+The first six rows isolate body EQ/compression, vowel resonance and pitch.
+Rows 7-10 compare short room, plate, hall and early reflections. Rows 11-14
+compare 90/160 ms and 88 BPM eighth/quarter-note echoes. Rows 15-20 combine
+depth and ambience, including a quiet stereo double and the gem sound room's
+decay/filter/seed. The baseline MP3s retain the exact production bytes.
+Other outputs are linearly matched to -24 LUFS with bounded peaks and retained
+raw renders; linear gain preserves the entire tail. Exact settings and hashes
+are in `plan.json`, `catalog.json` and each clip's receipt.
+
+Listening defaults to **Inside the game**. The embedded cabinet runs the real
+3.3.4 music, SFX, compressor, announcer volume and ducking, with separate save
+keys and `#solo=1`. Preview four common calls, mark multiple favourites and
+compare them sequentially, or enable **Announce while I play**. Every automatic
+call uses the selected processing treatment. **Voice only** silences the
+cabinet for isolated playback; Stop cancels speech and its full baked tail.
+The Bejeweled 2 snippets remain local listening references only.
+
+All 380 level/peak checks pass. Cached Whisper recognizes 78/80 representative
+compressed calls exactly enough for the existing speech threshold. Two
+quarter-note echo calls repeat their endings audibly and the recognizer
+transcribes those repetitions; the page marks those heavy-echo buttons.
+Perceived fit and the production processing choice still await listening.
+The live game and its production pack have unchanged hashes.
+The actual Chrome/file player passes 52/52 checks, including all 380 MP3
+decodes, full-tail sequential comparisons, cancellation, saved favourites,
+automatic stage calls and a playable board. Native Firefox 157 / WebGL passes
+13/13 local-file checks, including all eighty preview decodes and real pointer
+playback. Browser receipts and desktop/phone screenshots are in the round folder.
+
+```powershell
+python tools/voice-processing.py --check
+node tools/voice-processing-audit.mjs
+node tools/voice-processing-firefox.mjs
+```
+
 ## Current direction: smooth, deep Silver master
 
 Trent selected **Silver master** from round five: the bass he wanted without

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.5 hosting patch 27 (2026-09-30) Silver crystal
+
+- Silver crystal is the selected default: exact Original 07 / Tuned stereo crystal from the voice auditions. All nineteen performances retain the approved compressed bytes, with low pitch correction, darker vowels, short stereo layers and a small bloom.
+- Audio settings name the selected voice and its tuned stereo treatment. The saved Announcer voice off switch and independent volume remain available; upgrading preserves both preferences.
+- Selected MP3s are frozen in the repository. Default pack rebuilds install those takes without synthesis or re-encoding; the earlier six voice options retain their exact assets.
+- Compressed speech: 133/133. Real audio, settings, stereo and private co-op: 163/163. Browser release gate: 22/22. Firefox verifies stereo playback and immediate voice disable.
+
 ## 3.3.4 hosting patch 26 (2026-09-30) Silver master
 
 - Silver / arcade lift is the default announcer selected by Trent. Nineteen lines use the retained synthetic speaker, with a smooth greeting and expressive celebrations. The three approved audition performances are preserved; the new Silver clips have no final pitch, EQ, reverb or doubling effects.

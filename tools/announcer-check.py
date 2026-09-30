@@ -1,5 +1,6 @@
 """Transcribe the actual compressed game clips with the cached local Whisper."""
 import argparse
+import hashlib
 import json
 import re
 from difflib import SequenceMatcher
@@ -25,10 +26,23 @@ for clip in json.loads((out/'catalog.json').read_text(encoding='utf-8')):
         initial_prompt=prompt, condition_on_previous_text=False)
     heard = ' '.join(s.text.strip() for s in segments)
     score = SequenceMatcher(None, normalize(heard), normalize(clip['text'])).ratio()
+    attempts=[{'prompt':'game glossary','heard':heard,'similarity':round(score,3)}]
+    if score < .95:
+        # The glossary can bias "done" toward the stage name "Dawn". Retain
+        # that result and independently retry without any lexical prompt.
+        plain,_=model.transcribe(str(out/clip['mp3']),language='en',beam_size=5,
+                                condition_on_previous_text=False)
+        plain_heard=' '.join(s.text.strip() for s in plain)
+        plain_score=SequenceMatcher(None,normalize(plain_heard),normalize(clip['text'])).ratio()
+        attempts.append({'prompt':'none','heard':plain_heard,'similarity':round(plain_score,3)})
+        if plain_score>score:
+            heard,score=plain_heard,plain_score
     peak = float(np.max(np.abs(audio)))
     energy = float(np.sqrt(np.mean(audio**2)))
     result = {'voice': clip['voice'], 'line': clip['line'], 'file': clip['mp3'],
+        'mp3Sha256': hashlib.sha256((out/clip['mp3']).read_bytes()).hexdigest(),
         'expected': clip['text'], 'heard': heard, 'similarity': round(score, 3),
+        'recognitionAttempts': attempts,
         'peak': round(peak, 4), 'rms': round(energy, 4),
         'pass': score >= .95 and energy > .025 and peak < .98}
     results.append(result)

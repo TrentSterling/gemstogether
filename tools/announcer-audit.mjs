@@ -2,7 +2,8 @@
 import {launch,sleep,until} from './cdp.mjs';
 import {pathToFileURL} from 'node:url';
 import {resolve} from 'node:path';
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+const selected=JSON.parse(readFileSync('tools/voice-references/silver-crystal/manifest.json','utf8'));
 const target=process.argv[2]||'index.html',remote=/^https?:/.test(target),out='tools/out/announcer'+(remote?'/live':''),base=remote?target:pathToFileURL(resolve(target)).href,J='window.__jewel';
 mkdirSync(out,{recursive:true});let A,B,pass=0,fail=0;const receipts=[];
 const ok=(name,value,detail)=>{value?pass++:fail++;receipts.push({name,pass:!!value,detail});console.log(`${value?'PASS':'FAIL'} ${name}${detail?' / '+JSON.stringify(detail):''}`);};
@@ -18,9 +19,12 @@ try{
  const decoded=await A.eval(`(async()=>{const a=${J}.app,n=a.announcer,rows=[];for(const [profile,p]of Object.entries(ANNOUNCER_PACK.profiles))for(const [key,c]of Object.entries(p.clips)){const b=await n.decode(profile,key),x=b.getChannelData(0);let energy=0,peak=0;for(const v of x){energy+=v*v;peak=Math.max(peak,Math.abs(v));}rows.push({profile,key,duration:b.duration,expected:c.duration,rms:Math.sqrt(energy/x.length),peak});}return rows;})()`);
  for(const clip of decoded)ok(clip.profile+'/'+clip.key+' embedded MP3 decodes',Math.abs(clip.duration-clip.expected)<.15&&clip.rms>.025&&clip.peak<.98);
  ok('selected Silver and six legacy profiles contain nineteen lines',decoded.length===133&&await A.eval(`${J}.announcer().profiles.length===7&&${J}.announcer().profiles.every(p=>p.clips===19)`));
- ok('Silver is the natural default',await A.eval(`${J}.announcer().profile==='silver'&&ANNOUNCER_PACK.defaultProfile==='silver'&&ANNOUNCER_PACK.profiles.silver.semitones===0`));
+ ok('selected Silver crystal is the default',await A.eval(`${J}.announcer().profile==='silver'&&ANNOUNCER_PACK.defaultProfile==='silver'&&ANNOUNCER_PACK.profiles.silver.name==='Silver crystal'&&ANNOUNCER_PACK.profiles.silver.pitchLabel==='Tuned stereo'`));
+ const exact=await A.eval(`(async()=>{const n=${J}.app.announcer,rows=[];for(const [key,c]of Object.entries(ANNOUNCER_PACK.profiles.silver.clips)){const bytes=Uint8Array.from(atob(c.data),v=>v.charCodeAt(0)),sha=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join(''),b=await n.decode('silver',key);let side=0,total=0;if(b.numberOfChannels===2){const l=b.getChannelData(0),r=b.getChannelData(1);for(let i=0;i<l.length;i++){side+=(l[i]-r[i])**2;total+=2*(l[i]**2+r[i]**2);}}rows.push({key,sha,channels:b.numberOfChannels,sideEnergy:side/Math.max(total,1e-12)});}return rows;})()`);
+ ok('all nineteen game clips are byte-identical to selected Original 07',exact.length===19&&exact.every(c=>c.sha===selected.clips[c.key].sha256));
+ ok('all selected calls retain real stereo layers',exact.every(c=>c.channels===2&&c.sideEnergy>.01),exact.map(c=>({key:c.key,channels:c.channels,sideEnergy:+c.sideEnergy.toFixed(3)})));
  await ready(A);await A.eval(`${J}.app.ui.activate('announcer-preview-welcome-back')`);await spoken(A,'welcome-back');await sleep(200);
- ok('preview starts a real BufferSource and ducks music',await A.eval(`!!${J}.app.announcer.source&&${J}.app.announcer.source.buffer.duration>1&&${J}.announcer().duck<.4`));
+ ok('preview starts a real stereo BufferSource and ducks music',await A.eval(`!!${J}.app.announcer.source&&${J}.app.announcer.source.buffer.numberOfChannels===2&&${J}.app.announcer.source.buffer.duration>1&&${J}.announcer().duck<.4`));
  await A.eval(`${J}.app.announcer.stop()`);await sleep(800);ok('music returns after speech stops',await A.eval(`${J}.announcer().duck>.98`));
  await ready(A);await A.eval(`${J}.app.announcer.request('team');${J}.app.announcer.request('dazzling');${J}.app.announcer.request('supernova',{priority:3})`);
  await until(()=>A.eval(`${J}.announcer().history.at(-1)?.key==='team'`),{label:'team starts'});
@@ -34,9 +38,9 @@ try{
  await ready(A);await A.eval(`${J}.app.announcer.request('brilliant');${J}.app.announcer.request('supernova',{priority:3})`);await until(()=>A.eval(`${J}.announcer().speaking`),{label:'voice before quick disable'});
  await A.mouse('mousePressed',off.x+off.w/2,off.y+off.h/2);await A.mouse('mouseReleased',off.x+off.w/2,off.y+off.h/2);await sleep(200);
  ok('real voice switch cancels active and queued speech while music stays enabled',await A.eval(`!${J}.announcer().enabled&&!${J}.announcer().speaking&&!${J}.announcer().pending&&!${J}.app.prefs.muted&&${J}.app.prefs.musicVolume>0&&!${J}.app.announcer.request('team')`));
- await A.eval(`(()=>{const a=${J}.app;a.prefs.announcerPackVersion=1;a.prefs.announcerProfile='founder-4';a.prefs.announcerVolume=38;a.savePreferences();window.__offReloadMarker=true;})()`);await A.call('Page.reload',{ignoreCache:true});await until(()=>A.eval(`!window.__offReloadMarker&&!!${J}?.ready`),{timeout:60000,label:'voice-off reload'});await idle(A);await A.eval(`${J}.app.audio.start()`);await sleep(250);
+ await A.eval(`(()=>{const a=${J}.app;a.prefs.announcerPackVersion=2;a.prefs.announcerProfile='founder-4';a.prefs.announcerVolume=38;a.savePreferences();window.__offReloadMarker=true;})()`);await A.call('Page.reload',{ignoreCache:true});await until(()=>A.eval(`!window.__offReloadMarker&&!!${J}?.ready`),{timeout:60000,label:'voice-off reload'});await idle(A);await A.eval(`${J}.app.audio.start()`);await sleep(250);
  ok('voice-off persists through reload and suppresses the return greeting',await A.eval(`!${J}.announcer().enabled&&${J}.announcer().stats.played===0&&${J}.announcer().profile==='silver'`));
- ok('pack upgrade selects Silver and preserves saved off and volume choices',await A.eval(`${J}.announcer().volume===38&&${J}.app.prefs.announcerPackVersion===2&&!${J}.announcer().enabled`));
+ ok('3.3.4 pack upgrade selects Silver crystal and preserves saved off and volume choices',await A.eval(`${J}.announcer().volume===38&&${J}.app.prefs.announcerPackVersion===3&&!${J}.announcer().enabled`));
  await A.eval(`${J}.app.openPanel('audio');${J}.app.ui.activate('announcer-on')`);await sleep(120);
  await A.eval(`${J}.app.ui.activate('announcer-open')`);await sleep(120);await A.shot(out+'/settings-desktop.png');
  const voiceBefore=await A.eval(`${J}.announcer().profile`);await A.eval(`${J}.app.ui.activate('announcer-voice-cave');${J}.app.ui.activate('announcer-depth-6');document.querySelector('#announcer-volume').value=40;document.querySelector('#announcer-volume').dispatchEvent(new Event('input'))`);

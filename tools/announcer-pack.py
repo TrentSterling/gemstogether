@@ -1,8 +1,9 @@
-"""Build the selected natural Silver announcer, keeping the legacy voice options.
+"""Build the selected Silver crystal announcer, keeping the legacy options.
 
-The default preserves the three approved round-six performances and generates
-remaining lines from the exact frozen Silver reference. No final pitch or tone
-effects. --legacy rebuilds the earlier pitch-shifted pack for archival work.
+--natural preserves the three approved round-six performances and generates
+remaining lines from the exact frozen Silver reference, without pitch or tone
+effects. The default installs frozen Original 07 MP3s.
+--legacy rebuilds the earlier pitch-shifted pack for archival work.
 """
 import argparse
 import gc
@@ -291,5 +292,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--legacy', action='store_true')
     parser.add_argument('--retry-reviewed', action='store_true')
+    parser.add_argument('--natural', action='store_true', help='Rebuild the earlier unprocessed Silver pack')
     args = parser.parse_args()
-    build_legacy() if args.legacy else build_silver(args.retry_reviewed)
+    if args.legacy:
+        build_legacy()
+    elif args.natural:
+        build_silver(args.retry_reviewed)
+    else:
+        if args.retry_reviewed:
+            parser.error('--retry-reviewed requires --natural; crystal takes are frozen')
+        load_module('selected_crystal', 'announcer-crystal.py').install()

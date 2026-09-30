@@ -1,90 +1,80 @@
 # Gems Together announcer
 
-Trent selected **Silver / arcade lift** from round six, at its original pitch
-with no final EQ, compression, reverb, doubling or pitch effects. Silver master
-is the default in 3.3.4. Nineteen lines cover greetings, all six stages, chains,
-Resonance and completion. The three approved audition WAVs are retained exactly
-in `voice-references/silver-approved-*.wav` before MP3 encoding.
+Trent selected **Original 07 / Tuned stereo crystal** on 2026-09-30. It is
+shown as **Silver crystal** in 3.3.5. All nineteen lines use the exact approved
+compressed takes: low pitch correction, darker vowels, short stereo layers
+and a small bloom. It was row 07 in round nine and row 03 in round ten.
+The selected page is `tools/out/voices/blends-round10/index.html`.
 
-The main Audio tab has a visible **Announcer voice** on/off switch. It saves
-locally and cancels active and queued speech without muting music or gem sounds.
-Audio > Announcer voices has independent volume, previews and the earlier Warm
-founder/Cave choices at -2, -4 and -6 semitones. A one-time pack upgrade selects
-Silver while keeping existing voice-off and volume preferences; subsequent
-voice choices persist normally.
+The main Audio tab has a visible **Announcer voice** switch. It saves locally
+and cancels active and queued speech without muting music or gem sounds.
+Audio > Announcer voices has independent volume, previews and the earlier
+Warm founder/Cave choices at -2, -4 and -6 semitones. Pack version 3 selects
+Silver crystal once while preserving saved voice-off and volume preferences;
+subsequent voice choices persist. The Silver profile ID remains `silver`.
 
-Current casting review is at `tools/out/voices/silver-round6/index.html`.
-Trent selected **Silver master** from the twelve-character round five: smooth
-bass without rasp. He wants a deep, calming welcome and more expressive wins,
-with **Bejeweled 2** as the reference. Thirty local clips compare the exact
-liked Silver, three requested deliveries and six processing treatments.
-The exact synthetic speaker is frozen in `voice-references/silver-reference.wav`;
-its transcript and provenance are in the matching JSON. The page also has
-three local Bejeweled listening references, never used in the game or as
-cloning inputs. Trent chose arcade lift unprocessed and authorized publishing
-the browser game with its remaining lines on 2026-09-30.
-See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
-
-The exact new line is **“Welcome back to Gems Together!”** It plays once after
-the first audio interaction on a return visit. New players hear “Welcome to
-Gems Together!” instead. Ordinary clears keep their musical sounds. New worlds,
-completed large chains, Resonance, payouts and challenge completions get short
-celebrations.
-
-## Generate and listen
+## Rebuild and listen
 
 ```powershell
-cd C:/trontstack/gemstogether
-C:/py/python.exe tools/announcer-pack.py
-C:/py/python.exe tools/announcer-check.py
+python tools/announcer-pack.py
 python tools/announcer-lab.py
 python tools/polish.py
+python tools/announcer-check.py
 node tools/announcer-audit.mjs
+node tools/verify.mjs
+node tools/firefox-highlight.mjs
+python tools/crystal-release-audit.py
 ```
 
-Open `tools/out/announcer/index.html` to compare the exact compressed clips.
-The welcome-back line appears first. Silver filenames use
-`silver-<line>.mp3`, for example `silver-welcome-back.mp3`. Legacy filenames use
-`<voice>-<depth>-<line>.mp3`, for example `founder-4-welcome-back.mp3`.
-Depth is the number of semitones below the original take; a larger number is
-deeper. `cave` is Cave-inspired clean and `founder` is Warm founder.
-WAVs and generation receipts are kept beside the MP3s in the ignored output
-folder. Unnumbered WAVs are the original, unshifted synthesized takes.
+The default pack rebuild installs the selected MP3s frozen in
+`voice-references/silver-crystal/`. Its manifest records all nineteen hashes,
+source performance hashes, the audition identity and exact processing settings.
+Rebuilding needs no TTS model or processing pass and does not re-encode audio.
+`announcer-crystal.py --adopt` was the one-time freeze operation; normal runs
+install the retained selection. `announcer-pack.py --natural` explicitly
+rebuilds the earlier unprocessed Silver pack for archival work.
 
-The voices use Qwen3-TTS 1.7B Base with the approved synthetic reference takes
-in `tools/voice-references/`. Silver's exact prepared speaker reference and
-transcript are in `silver-reference.wav` and its JSON; the new lines use the
-selected seed 42 and arcade delivery directions retained in `voice-silver.py`.
-Base instruction embeddings are an experimental local model path, preserving
-the same method as the approved take. The sixteen new calls measure 79-158 Hz.
-The old references use “Supernova! That was beautiful!” and their legacy pitch
-shifting uses Praat PSOLA. Silver's finished clips receive no pitch or tone
-effects. New generation trims silence, matches loudness to -24 LUFS and adds
-short edge fades; FFmpeg encodes final mono clips at 24 kHz / 64 kbps.
+Open `tools/out/announcer/index.html` to hear the exact compressed game clips.
+Silver filenames are `silver-<line>.mp3`, such as `silver-welcome-back.mp3`.
+Legacy filenames are `<voice>-<depth>-<line>.mp3`, such as
+`founder-4-welcome-back.mp3`. Depth is semitones below the original take.
+The selected Silver audio is stereo, 24 kHz / 96 kbps. Source WAVs are matched
+to -24 LUFS; the frozen MP3s measure about -24.4 LUFS.
+Original unprocessed WAVs and generation receipts remain in the ignored output;
+selected production receipts use `silver-crystal-<line>.json`.
 
-`announcer-pack.json` contains 133 MP3s and their checksums. `polish.py` embeds
-it into the single HTML file. The browser lazily decodes the selected clips.
-Playback needs no TTS service or model.
-Only the selected Qwen voices ship; the earlier OmniVoice audition remains
-local. The Qwen model's recorded license is Apache-2.0.
+The voice uses the retained synthetic Silver speaker and approved arcade-lift
+performances from Qwen3-TTS 1.7B Base. Pitch correction edits Praat PitchTier
+frequencies and uses overlap-add resynthesis. It is custom correction, not the
+Antares plugin. The recipe uses a 92 Hz centre, 65% pitch-range reduction,
+full note attraction, a 12 ms retune time constant, formant ratio 0.92,
+low-mid EQ, +/-12-cent doubles at 12/27 ms and a 0.25-second bloom. Frozen
+compressed audio is authoritative; later DSP code changes cannot alter it.
+
+`announcer-pack.json` contains 133 MP3s and checksums; `polish.py` embeds the
+pack into the single HTML file. The browser lazily decodes selected clips;
+playback needs no TTS service or model. The six legacy profiles retain their
+exact previous bytes. Qwen's recorded model license is Apache-2.0. The three
+Bejeweled snippets remain local listening references only, never synthesis
+inputs or product assets. See [VOICE-AUDITIONS.md](VOICE-AUDITIONS.md).
 
 ## Playback and validation
 
-The voice bus respects master mute and volume, and gently ducks both generated
-music and a loaded track. It allows one speaker and one pending cue, with a
-seven-second minimum interval and a 45-second repeat guard. Pending cues can
-wait through the interval; changing boards or voices, muting or hiding the tab
-cancels them. Practice, Showcase and photo mode stay quiet; explicit previews
-remain available in the settings panel. Jennifer's calm preset disables speech.
-Voice and pitch choices stay local when sharing a board.
+First interaction welcomes new players; returning players hear **Welcome
+back to Gems Together!** once. Ordinary clears retain musical sounds. New
+worlds, large chains, Resonance and completion receive occasional narration.
+The voice respects master mute and volume and ducks generated music or loaded
+tracks. One speaker and one pending cue are allowed, with a seven-second
+minimum interval and 45-second repeat guard. Board/voice changes, mute and
+hiding the tab cancel speech. Practice, Showcase and photo mode stay quiet;
+explicit previews remain available. Calm disables speech. Voice choices are local.
 
-The real Chrome gate passed **161/161**: all 133 embedded clips decode with
-bounded peaks and nonzero energy, first and returning greetings, duck/restore,
-mute, queueing, saved settings, phone layout, a real nine-wave cascade,
-stage travel, payouts and private host/peer playback with matching hashes.
-The main-tab switch is exercised with real pointer input, including active
-and queued cancellation, reload persistence and visible phone placement.
-Cached Whisper checked the actual compressed audio: **133/133** spoken-content
-checks passed.
-Receipts are `tools/out/announcer/runtime-results.json` and
-`tools/out/announcer/speech-results.json`.
+The current runtime gate passes **163/163**, including all embedded MP3s,
+exact selected-byte equality, stereo energy, real pointer disabling, saved
+preferences, pack migration, phone layout, greetings, actual cascades, stage
+travel and private host/peer playback with matching board hashes. Firefox
+verifies stereo playback and disabling. The game release gate passes **22/22**.
+Speech receipts include MP3 hashes and preserve recognition attempts; a retry
+without glossary hints handles done/Dawn confusion without changing audio.
+The release audit measures the actual compressed stereo clips and checks their
+exact selected hashes before publishing.

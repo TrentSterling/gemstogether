@@ -1,5 +1,7 @@
 tools/out/
 ref/
+__pycache__/
+*.pyc
 desktop/node_modules/
 desktop/dist/
 desktop/.stage/

@@ -20,19 +20,50 @@ Co-op match-three (one HTML file, own GPU renderer: WebGPU with WebGL2 fallback,
 
 `window.__jewel`: `ready`, `diagnostics()`, `state()` (cells, score, moves, legalMoves, errors), `ui()` (GPU hit boxes in CSS px), `project(i)` (cell to screen), `swap(x,y)`, `hint()`, `showcase()`/`stop()`, `fixture(name)`, `burst()`, `advance(s)`, `resume()`, `stats()`, `net()`, `point(i)` (same path as a right click on a gem), `points()` ({local:{i,seq,age}|null, remote:[{peer,i,seq,age}]}), `audio`, `living()`, `presentation()`, `aa()`, `point(i)`, `points()` (local + remote point pings). `fx()` (Resonance FX state: flow, pulse, swirl, field, fireworks). Tront patches (point ping, input fixes, renames, Resonance FX) live as rep() pairs in `tools/polish.py`; Resonance's class and shader snippets live in `tools/resonance.js` and are injected before `SKY_GL_FS`. Look-check FX with `node tools/fx-shot.mjs` (FORCE=1 fires a synthetic x6 payoff, WEBGL=1 forces the fallback) and `node tools/fx-iso.mjs`; when ChatGPT ships a drop that already has one, drop that section.
 
-## Handoff (2026-09-30 / 3.3.4)
+## Handoff (2026-09-30 / 3.3.5)
 
-Trent selected **Silver / arcade lift** at its original pitch, asked for the remaining lines, an easy voice disable control, and explicitly authorized shipping the browser game. This supersedes the earlier requests to wait for playtesting and voice selection. The platform is **browser on tront.xyz only**, with commercial release quality; no Steam release, Windows packaging or MIDI. Publish after the final browser gates, then verify the live site.
+Trent selected **Original 07 / Tuned stereo crystal**, displayed as row 03 in
+round ten. This supersedes the earlier unprocessed Silver and later mix trials.
+The browser release uses the exact selected MP3 bytes for all nineteen lines.
+The platform is **browser on tront.xyz only**, with commercial release quality;
+no Steam release, Windows packaging or MIDI. Publishing was already authorized.
 
-The nineteen-line Silver pack is generated with the exact retained synthetic reference and the chosen seed 42 / arcade delivery directions. The three approved audition WAVs are tracked in `tools/voice-references/silver-approved-*.wav`; finished Silver clips have no final pitch, EQ, reverb or doubling effects. New generation receives silence trimming, loudness matching and MP3 encoding. The speaker reference and transcript are in `silver-reference.wav` and its JSON. Base instruction embeddings use the same experimental local path as the approved take. Three original Bejeweled 2 snippets exist only in the ignored audition folder, never as cloning inputs or product assets.
+Selected audio is frozen in `tools/voice-references/silver-crystal/` with a
+manifest recording checksums, the audition identity, original performance
+hashes and the processing recipe. `tools/announcer-crystal.py` installs it;
+`tools/announcer-pack.py` now uses that installer by default. No new synthesis,
+pitch rendering or MP3 encoding occurs during a normal rebuild. The earlier
+unprocessed WAVs and generation receipts remain in the ignored announcer output.
+`announcer-pack.py --natural` explicitly rebuilds the earlier natural pack.
 
-`tools/announcer-pack.json` version 2 has Silver as default plus the six legacy profiles (133 clips). Audio has an **Announcer voice** switch visible without scrolling on desktop and phone. Turning it off cancels active and queued speech, keeps music and gem sounds, and saves the choice. The one-time pack migration selects Silver while preserving off/volume; later voice choices persist. Audio > Announcer voices still has previews, independent voice volume and the earlier voice/pitch options. Calm, Practice and Showcase stay quiet.
+Pack version 3 retains the `silver` ID, now named **Silver crystal**, and all
+six legacy profiles unchanged (133 clips). All nineteen selected calls retain
+stereo layers. Settings display **Tuned stereo**. The main Audio tab still has
+a visible, saved **Announcer voice** switch; switching it off cancels active
+and queued speech while keeping music and gem sounds. Pack migration preserves
+voice-off and volume preferences. Later voice choices persist normally.
 
-Final local browser gates: gameplay 22/22; progression/private co-op 48/48; isolated public/spectator/migration 15/15; desktop/phone/WebGPU/WebGL/controller/photo 68/68; stage fades 16/16; audio-clock journey 30/30; harmony/comfort/private co-op 121/121; aligned highlights 21/21; announcer 161/161. Exact compressed speech checks pass 133/133. Firefox 157 / WebGL 2 verifies Silver playback, voice disable and aligned highlights with no errors. Announcer receipts are in `tools/out/announcer/`; the final gate also exercises real pointer disabling, pack migration and voice-off reload persistence. Release asset audit: `tools/out/release/silver-3.3.4.json` (24/24).
+Current release gates: gameplay 22/22; actual WebAudio, selected-byte equality,
+stereo, settings and private host/peer co-op 163/163; Firefox 157 / WebGL 2
+verifies selected stereo playback, voice disable and aligned highlights.
+Compressed speech receipts identify each MP3 hash; glossary-free fallback
+retains the first transcript when the Dawn stage hint biases the word done.
+`tools/crystal-release-audit.py` gates exact selected audio, compressed levels,
+current speech/runtime receipts and the browser version. Release receipts are
+in `tools/out/release/`; audio checks are in `tools/out/announcer/`.
 
-Patch 25 fixes Trent's highlight feedback: keep move preview, trace actual rendered gem silhouettes with the actor transform, fit one depth-tested focus bracket to the physical socket, and pulse the existing frame inlay instead of detached HUD bands. Receipts: `tools/out/highlights/`. Patch 26 adds the selected Silver pack and the main Audio switch. Original `versions/gemstogether-v3.2.4.html` remains unchanged.
+Patch 25 fixes aligned gem contours, socket brackets and frame inlays. Patch
+26 adds Silver and the main Audio switch. Patch 27 selects the tuned stereo
+voice and updates its settings labels. The exact original
+`versions/gemstogether-v3.2.4.html` remains unchanged. Earlier progression,
+harmony, stage and network checks are historical receipts from 3.3.4; this
+patch changes voice assets and labels, not gameplay or stage timing.
 
-Start with `CHANGELOG.md`, `ROADMAP.md` and `ART-BIBLE.md` for the accumulated feature work. Historical voice casting and feedback are in `tools/VOICE-AUDITIONS.md`; the exact production listening page is `tools/out/announcer/index.html`. The selected audition remains at `tools/out/voices/silver-round6/index.html`. Receipts page: `python tools/gauntlet-report.py` -> `tools/out/gauntlet/index.html`; earlier rounds are logged in `tools/gauntlet.json`.
+See `CHANGELOG.md`, `ROADMAP.md` and `ART-BIBLE.md` for the feature work, and
+`tools/VOICE-AUDITIONS.md` for casting and processing history. The selected
+review remains `tools/out/voices/blends-round10/index.html`; production clips
+are at `tools/out/announcer/index.html`. The original Bejeweled snippets stay
+in ignored audition folders, never as synthesis input or shipped audio.
 
 Direction, never break these:
 - MORE juice, never less. Fix a weak or wrong effect by changing its shape, colour or timing; comfort lives in options (the Flashes setting).
@@ -40,7 +71,7 @@ Direction, never break these:
 - Ground every light to real geometry. The cyan rail inlay is centered at +-4.07, z .107 with .14 mesh depth; socket brackets sit at local +- .392, z .077. Corner gems are (+-4.10, +-4.10) at z .30 top / .40 bottom, crown [0, 4.98, .05], plinth front z .32. Project actual mesh vertices and transforms for gem outlines.
 - Intensity in the music comes from layering (latched), never from tempo; one steady 88 BPM.
 
-Patch code lives in `tools/polish.py` (rep() pairs, patches 1-26), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser version is 3.3.4. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
+Patch code lives in `tools/polish.py` (rep() pairs, patches 1-27), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser version is 3.3.5. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
 
 Patch 23 aligns stage entrances and progression changes on the local soundtrack bar and adds three phases per stage. `fx.stage` remains score-derived for shared Resonance capacity; `fx.visualStage`, `visualPhase` and `stageTravel` are local presentation. Never delay the board or sync these local clocks. A loaded track or muted music uses an immediate fade. `__jewel.fx()` exposes entrance timestamps for verification.
 
