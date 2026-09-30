@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.3'")
+rep("version:'3.2.4'", "version:'3.3.4'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -480,19 +480,25 @@ rep("end=y+365;", "this.button('exp-music','Live music layers',x,y+361,w,42);end
 rep("this.selected=-1;this.trySwap(this.keyboardCell,to);", "this.selected=-1;this.expedition?.input('pad');this.trySwap(this.keyboardCell,to);")
 rep("Swap a prism with any gem to clear that colour. No timer or lives.", "Swap a prism with any gem to clear that colour. Endless has no timer or lives; Journey also has challenges.")
 
-# Patch 22: Trent's selected voices, lowered and embedded for browser/desktop play.
+# Patch 22: selected local voices embedded for browser play.
 pack_path = ROOT / 'tools' / 'announcer-pack.json'
 pack = json.loads(pack_path.read_text(encoding='utf-8'))
 expected = {'welcome', 'welcome-back', 'dawn', 'tidepool', 'ember', 'aurora', 'starfall',
             'prism-heart', 'dazzling', 'brilliant', 'crown', 'parade', 'constellation',
             'resonance', 'team', 'radiant', 'prismatic', 'supernova', 'complete'}
-if len(pack['profiles']) != 6 or any(set(p['clips']) != expected for p in pack['profiles'].values()):
+if pack['defaultProfile'] not in pack['profiles'] or any(set(p['clips']) != expected for p in pack['profiles'].values()):
     sys.exit('ABORT: incomplete announcer pack')
 announcer = (ROOT / 'tools' / 'announcer.js').read_text(encoding='utf-8').replace('__ANNOUNCER_PACK__', pack_path.read_text(encoding='utf-8'))
 rep('(async function boot(){', announcer + '\n(async function boot(){')
 rep('app.expedition=new GemsExpedition(app);', 'app.expedition=new GemsExpedition(app);app.announcer=new GemsAnnouncer(app);')
 rep("this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;",
     "this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;")
+
+# Patch 26: Silver master and a visible independent voice switch on Audio.
+rep("this.text('Gem tones',x,y+206,15);", "this.toggle('announcer-on','Announcer voice',a.prefs.announcer,x,y+193,w);this.text('Gem tones',x,y+267,15);")
+rep("this.button('key',label+' >',x+w-132,y+193,132,39);", "this.button('key',label+' >',x+w-132,y+254,132,39);")
+rep("this.lineDivider(x,y+253,w);this.button('music-load',a.audio.loadedTrack?'Change music':'Load music',x,y+273,w-(a.audio.loadedTrack?109:0),42);if(a.audio.loadedTrack)this.button('music-clear','Remove',x+w-101,y+273,101,42);this.text(this.fitLine(a.trackName||'Local audio file / nothing uploaded',w,12),x,y+330,12,UI_ART.dim);this.button('exp-music','Live music layers',x,y+361,w,42);this.button('announcer-open','Announcer voices',x,y+414,w,42);end=y+477;",
+    "this.lineDivider(x,y+314,w);this.button('music-load',a.audio.loadedTrack?'Change music':'Load music',x,y+334,w-(a.audio.loadedTrack?109:0),42);if(a.audio.loadedTrack)this.button('music-clear','Remove',x+w-101,y+334,101,42);this.text(this.fitLine(a.trackName||'Local audio file / nothing uploaded',w,12),x,y+391,12,UI_ART.dim);this.button('exp-music','Live music layers',x,y+422,w,42);this.button('announcer-open','Announcer voices',x,y+475,w,42);end=y+538;")
 
 # Patch 23: score remains authoritative while scenery enters on the local music bar.
 rep("this.text('STAGE '+info.n+(info.loop?'  ENCORE':''),x+4,yy,11,col", "this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+4,yy,11,col")

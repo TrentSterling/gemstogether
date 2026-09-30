@@ -3,7 +3,7 @@ import {launch,sleep,until} from './cdp.mjs';
 import {pathToFileURL} from 'node:url';
 import {resolve} from 'node:path';
 import {mkdirSync,writeFileSync} from 'node:fs';
-const out='tools/out/announcer',base=pathToFileURL(resolve('index.html')).href,J='window.__jewel';
+const target=process.argv[2]||'index.html',remote=/^https?:/.test(target),out='tools/out/announcer'+(remote?'/live':''),base=remote?target:pathToFileURL(resolve(target)).href,J='window.__jewel';
 mkdirSync(out,{recursive:true});let A,B,pass=0,fail=0;const receipts=[];
 const ok=(name,value,detail)=>{value?pass++:fail++;receipts.push({name,pass:!!value,detail});console.log(`${value?'PASS':'FAIL'} ${name}${detail?' / '+JSON.stringify(detail):''}`);};
 const idle=p=>until(()=>p.eval(`${J}.app.phase==='idle'`),{timeout:30000,every:60,label:'idle'});
@@ -17,7 +17,8 @@ try{
  ok('first visit welcomes the player',true);
  const decoded=await A.eval(`(async()=>{const a=${J}.app,n=a.announcer,rows=[];for(const [profile,p]of Object.entries(ANNOUNCER_PACK.profiles))for(const [key,c]of Object.entries(p.clips)){const b=await n.decode(profile,key),x=b.getChannelData(0);let energy=0,peak=0;for(const v of x){energy+=v*v;peak=Math.max(peak,Math.abs(v));}rows.push({profile,key,duration:b.duration,expected:c.duration,rms:Math.sqrt(energy/x.length),peak});}return rows;})()`);
  for(const clip of decoded)ok(clip.profile+'/'+clip.key+' embedded MP3 decodes',Math.abs(clip.duration-clip.expected)<.15&&clip.rms>.025&&clip.peak<.98);
- ok('all six lowered profiles contain nineteen lines',decoded.length===114&&await A.eval(`${J}.announcer().profiles.every(p=>p.clips===19)`));
+ ok('selected Silver and six legacy profiles contain nineteen lines',decoded.length===133&&await A.eval(`${J}.announcer().profiles.length===7&&${J}.announcer().profiles.every(p=>p.clips===19)`));
+ ok('Silver is the natural default',await A.eval(`${J}.announcer().profile==='silver'&&ANNOUNCER_PACK.defaultProfile==='silver'&&ANNOUNCER_PACK.profiles.silver.semitones===0`));
  await ready(A);await A.eval(`${J}.app.ui.activate('announcer-preview-welcome-back')`);await spoken(A,'welcome-back');await sleep(200);
  ok('preview starts a real BufferSource and ducks music',await A.eval(`!!${J}.app.announcer.source&&${J}.app.announcer.source.buffer.duration>1&&${J}.announcer().duck<.4`));
  await A.eval(`${J}.app.announcer.stop()`);await sleep(800);ok('music returns after speech stops',await A.eval(`${J}.announcer().duck>.98`));
@@ -29,11 +30,20 @@ try{
  const before=await A.eval(`${J}.announcer().stats.played`);await A.eval(`${J}.app.practice=true;${J}.app.announcer.request('supernova');${J}.app.practice=false;${J}.app.auto=true;${J}.app.announcer.request('team');${J}.app.auto=false`);await sleep(200);
  ok('practice and showcase remain quiet',await A.eval(`${J}.announcer().stats.played===${before}`));
  await A.eval(`${J}.app.openPanel('audio')`);await sleep(150);ok('audio settings expose announcer',await A.eval(`${J}.ui().hits.some(h=>h.id==='announcer-open')`));
+ const off=await A.eval(`${J}.ui().hits.find(h=>h.id==='announcer-on')`);ok('main Audio tab shows the voice switch without scrolling',!!off&&off.h===39);
+ await ready(A);await A.eval(`${J}.app.announcer.request('brilliant');${J}.app.announcer.request('supernova',{priority:3})`);await until(()=>A.eval(`${J}.announcer().speaking`),{label:'voice before quick disable'});
+ await A.mouse('mousePressed',off.x+off.w/2,off.y+off.h/2);await A.mouse('mouseReleased',off.x+off.w/2,off.y+off.h/2);await sleep(200);
+ ok('real voice switch cancels active and queued speech while music stays enabled',await A.eval(`!${J}.announcer().enabled&&!${J}.announcer().speaking&&!${J}.announcer().pending&&!${J}.app.prefs.muted&&${J}.app.prefs.musicVolume>0&&!${J}.app.announcer.request('team')`));
+ await A.eval(`(()=>{const a=${J}.app;a.prefs.announcerPackVersion=1;a.prefs.announcerProfile='founder-4';a.prefs.announcerVolume=38;a.savePreferences();window.__offReloadMarker=true;})()`);await A.call('Page.reload',{ignoreCache:true});await until(()=>A.eval(`!window.__offReloadMarker&&!!${J}?.ready`),{timeout:60000,label:'voice-off reload'});await idle(A);await A.eval(`${J}.app.audio.start()`);await sleep(250);
+ ok('voice-off persists through reload and suppresses the return greeting',await A.eval(`!${J}.announcer().enabled&&${J}.announcer().stats.played===0&&${J}.announcer().profile==='silver'`));
+ ok('pack upgrade selects Silver and preserves saved off and volume choices',await A.eval(`${J}.announcer().volume===38&&${J}.app.prefs.announcerPackVersion===2&&!${J}.announcer().enabled`));
+ await A.eval(`${J}.app.openPanel('audio');${J}.app.ui.activate('announcer-on')`);await sleep(120);
  await A.eval(`${J}.app.ui.activate('announcer-open')`);await sleep(120);await A.shot(out+'/settings-desktop.png');
  const voiceBefore=await A.eval(`${J}.announcer().profile`);await A.eval(`${J}.app.ui.activate('announcer-voice-cave');${J}.app.ui.activate('announcer-depth-6');document.querySelector('#announcer-volume').value=40;document.querySelector('#announcer-volume').dispatchEvent(new Event('input'))`);
  ok('voice pitch and volume controls save local choices',await A.eval(`${J}.announcer().profile==='cave-6'&&${J}.announcer().volume===40&&JSON.parse(localStorage.getItem('gemstogether-settings-v1')).announcerProfile==='cave-6'`));
  await A.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});await sleep(150);await A.shot(out+'/settings-phone.png');
  ok('phone controls stay inside the panel',await A.eval(`(()=>{const a=${J}.app,m=a.ui.panelRect;return a.ui.hits.filter(h=>h.id.startsWith('announcer')).every(h=>h.x>=m.x&&h.x+h.w<=m.x+m.w+1);})()`));
+ await A.eval(`${J}.app.openPanel('audio')`);await sleep(100);await A.shot(out+'/audio-phone.png');ok('phone voice switch is visible without scrolling',await A.eval(`${J}.ui().hits.some(h=>h.id==='announcer-on'&&h.h===39)`));
  await A.call('Emulation.setDeviceMetricsOverride',{width:1280,height:800,deviceScaleFactor:1,mobile:false});
  await A.eval(`window.__announcerReloadMarker=true`);await A.call('Page.reload',{ignoreCache:true});await until(()=>A.eval(`!window.__announcerReloadMarker&&!!${J}?.ready`),{timeout:60000,label:'new document'});await idle(A);await A.eval(`${J}.app.audio.start()`);await spoken(A,'welcome-back');ok('return visit uses Welcome back to Gems Together',await A.eval(`${J}.announcer().history.at(-1).text==='Welcome back to Gems Together!'&&${J}.announcer().profile==='cave-6'&&${J}.announcer().volume===40`));
  await ready(A);await A.eval(`${J}.challenge('zen',{seed:43})`);await idle(A);await A.eval(`${J}.swap(11,19)`);await idle(A);await spoken(A,'constellation');ok('real nine-wave cascade speaks its highest tier once',await A.eval(`${J}.announcer().history.filter(h=>h.key==='constellation').length===1`));
@@ -46,7 +56,7 @@ try{
  await A.eval(`${J}.app.ui.activate('coop-host')`);const code=await until(()=>A.eval(`${J}.net().code`),{timeout:30000,label:'private code'});await B.eval(`${J}.app.coop.join(${JSON.stringify(code)})`);
  await until(async()=>await A.eval(`${J}.net().connected`)&&await B.eval(`${J}.net().connected&&${J}.app.coop.synced`),{timeout:60000,every:250,label:'private connection'});
  await A.eval(`${J}.challenge('zen',{seed:1})`);await idle(A);await until(()=>B.eval(`${J}.app.seed===1&&${J}.state().score===0&&${J}.app.phase==='idle'`),{label:'fresh shared board'});
- await B.eval(`${J}.app.announcer.setProfile('founder-2')`);await sleep(1000);ok('host and peer keep their own voices',await A.eval(`${J}.announcer().profile==='cave-6'`)&&await B.eval(`${J}.announcer().profile==='founder-2'`));
+ await B.eval(`${J}.app.announcer.setProfile('silver')`);await sleep(1000);ok('host and peer keep their own voices',await A.eval(`${J}.announcer().profile==='cave-6'`)&&await B.eval(`${J}.announcer().profile==='silver'`));
  for(const p of [A,B]){await ready(p);await p.eval(`${J}.app.announcer.history=[]`);}
  await A.eval(`(()=>{const a=${J}.app;a.fx.res={fill:57,mine:30,theirs:27,on:false,until:0,count:0};a.coop.fullSync();})()`);await until(()=>B.eval(`${J}.app.fx.res?.fill===57`),{label:'charged mirror'});await A.eval(`${J}.swap(1,2)`);
  await spoken(A,'team');await spoken(B,'team');await idle(A);await idle(B);

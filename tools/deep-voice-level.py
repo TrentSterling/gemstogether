@@ -24,13 +24,9 @@ def command(args):
     return json.JSONDecoder().raw_decode(result.stderr[start:])[0]
 
 
-def main():
+def normalize(folder):
     global OUT
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--round', choices=['deep', 'tone', 'casting', 'silver'], default='deep')
-    chosen = parser.parse_args().round
-    if chosen != 'deep':
-        OUT = OUT.parent / {'tone': 'tone-round4', 'casting': 'casting-round5', 'silver': 'silver-round6'}[chosen]
+    OUT = Path(folder)
     catalog = json.loads((OUT / 'catalog.json').read_text(encoding='utf-8'))
     (OUT / 'raw').mkdir(exist_ok=True)
     receipts = []
@@ -81,6 +77,14 @@ def main():
     (OUT / 'catalog.json').write_text(json.dumps(catalog, indent=2), encoding='utf-8')
     (OUT / 'level-results.json').write_text(json.dumps(receipts, indent=2), encoding='utf-8')
     print(len(receipts), 'loudness and duration checks passed; raw outputs retained.')
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--round', choices=['deep', 'tone', 'casting', 'silver'], default='deep')
+    chosen = parser.parse_args().round
+    folder = OUT.parent / {'deep': 'deep-round3', 'tone': 'tone-round4', 'casting': 'casting-round5', 'silver': 'silver-round6'}[chosen]
+    normalize(folder)
 
 
 if __name__ == '__main__':

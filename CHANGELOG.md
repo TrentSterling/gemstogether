@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.4 hosting patch 26 (2026-09-30) Silver master
+
+- Silver / arcade lift is the default announcer selected by Trent. Nineteen lines use the retained synthetic speaker, with a smooth greeting and expressive celebrations. The three approved audition performances are preserved; the new Silver clips have no final pitch, EQ, reverb or doubling effects.
+- The main Audio tab has a saved Announcer voice on/off switch. Turning it off immediately cancels active and queued speech while keeping music and gem sounds. Voice volume, previews and the earlier Warm founder/Cave choices remain available.
+- The new pack chooses Silver on its first load while preserving existing voice-off and volume preferences. Subsequent voice choices persist normally.
+- Exact compressed speech checks: 133/133. Real WebAudio, GPU controls, phone and private co-op: 161/161. Original browser gate: 22/22. This is a browser release for tront.xyz; no native package is part of the release.
+
 ## 3.3.3 local playtest patch 25 (2026-09-29) Aligned highlights
 
 - Move preview follows each rendered gem's silhouette, rotation, lift and scale, including the heart notch. High contrast and puzzle targets share the same contour; each gem draws one outline.

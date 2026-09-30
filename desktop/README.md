@@ -1,5 +1,7 @@
 # Gems Together desktop
 
+Retired experiment. Trent chose the browser game on tront.xyz; this wrapper is outside the project scope. The commands and receipts below are historical, and are not part of the 3.3.4 browser release.
+
 The wrapper runs the same standalone game through a secure local `gems://` origin.
 It keeps browser progression and saves in Electron's own persistent profile.
 Public co-op remains the default; network access is needed for co-op signalling.

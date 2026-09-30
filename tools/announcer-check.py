@@ -9,7 +9,7 @@ import soundfile as sf
 from faster_whisper import WhisperModel
 
 out = Path(__file__).resolve().parent/'out/announcer'
-parser=argparse.ArgumentParser();parser.add_argument('--line');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--line');parser.add_argument('--voice');args=parser.parse_args()
 cache = Path.home()/'.cache/huggingface/hub/models--Systran--faster-whisper-base/snapshots'
 model = WhisperModel(str(next(cache.iterdir())), device='cuda', compute_type='float16')
 normalize = lambda s: re.sub('[^a-z]', '', s.lower())
@@ -17,6 +17,8 @@ results = []
 prompt = 'Gems Together. Dawn Shallows. Tidepool. Ember Reef. Aurora Deep. Starfall. Prism Heart. Dazzling. Brilliant. Crown of Light. Prism Parade. Constellation. Resonance. Radiant Resonance. Prismatic Resonance. Supernova.'
 for clip in json.loads((out/'catalog.json').read_text(encoding='utf-8')):
     if args.line and clip['line']!=args.line:
+        continue
+    if args.voice and clip['voice']!=args.voice:
         continue
     audio, rate = sf.read(out/clip['mp3'], dtype='float32')
     segments, _ = model.transcribe(str(out/clip['mp3']), language='en', beam_size=5,
@@ -32,7 +34,7 @@ for clip in json.loads((out/'catalog.json').read_text(encoding='utf-8')):
     results.append(result)
     print(('PASS ' if result['pass'] else 'REVIEW ')+clip['mp3']+' / '+heard, flush=True)
 prior=out/'speech-results.json'
-if args.line and prior.exists():
+if (args.line or args.voice) and prior.exists():
     replaced={r['file'] for r in results}
     results=[r for r in json.loads(prior.read_text(encoding='utf-8')) if r['file'] not in replaced]+results
 prior.write_text(json.dumps(results, indent=2), encoding='utf-8')

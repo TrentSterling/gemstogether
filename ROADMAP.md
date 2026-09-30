@@ -2,6 +2,8 @@
 
 Every idea from the 2026-09-28 playtest thread on Discord, plus Tront's calls. Research backing: `research/TETRIS-EFFECT-DEEP-DIVE.md` (short pass; a deeper research handoff is coming from a separate run).
 
+Current scope (Trent, 09-30): ship the browser game on tront.xyz with the selected unprocessed Silver master announcer. MIDI is cancelled. Steam and Windows packaging are outside this project; earlier experiments are historical. Trent approved publication after selecting Silver / arcade lift.
+
 ## 0. Andre's feedback (the north star)
 
 Tront: "log andres feedback its basically our north star to impress him". Andre plays it, spots real bugs and has the taste call. Every item he raises goes here first.
@@ -12,7 +14,7 @@ Tront: "log andres feedback its basically our north star to impress him". Andre 
 | 09-28 02:36 | next: ambient music, and a background that animates like a journey | done (patches 7, 8, 14) |
 | 09-28 02:39 | add gamepad support | done (patch 9) |
 | 09-28 02:40 | hold-and-drag nearly gave him carpal tunnel | done (patch 21: tap hint, neighbour glow, tap-only option and gesture counts) |
-| 09-28 02:43 | stages and themes like Tetris Effect + meta progression + online co-op + a banger soundtrack = sells on Steam | progression added in patch 21; desktop and achievement preparation ready |
+| 09-28 02:43 | stages and themes like Tetris Effect + meta progression + online co-op + a banger soundtrack = sells on Steam | progression, stages and music delivered; Trent chose browser-only scope |
 | 09-28 02:43 | zen/endless should switch stage, background, theme and music every XX points | done (patch 8) |
 | 09-28 02:45 | some kind of fail state, "out of moves" | done as an option (patch 13) |
 | 09-28 02:46 | combos need to feel like "ooh yes I got a freaking 5x combo!" | done (patches 6, 15) |
@@ -34,7 +36,7 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 3. **More modes:** two-minute Timed with double Resonance scoring, 30 Moves, four deterministic puzzles and Daily. Budgets are authoritative and end after the current cascade; invalid swaps and cascade waves cost no extra moves.
 4. **Co-op team moments:** high-five burst, partner x5+ callouts in their colour and a distinct team fanfare. Contributions and challenge state mirror to joining players and survive host handoff.
 5. **Named chain payouts:** x7 CROWN OF LIGHT, x8 PRISM PARADE, x9+ CONSTELLATION. Session moments retain the five strongest chains and three biggest Resonances independently.
-6. **Steam preparation:** portable Electron Windows wrapper, 22 allowlisted milestone achievements, Xbox/PlayStation glyphs, controller menu navigation, resolution and fullscreen. Steam dashboard registration and live achievement activation still require the registered App ID/account.
+6. **Controller polish:** Xbox/PlayStation glyphs, controller menu navigation and fullscreen. The earlier desktop/Steam experiment is retired.
 
 ## Brainstorm delivered in patch 21
 
@@ -51,11 +53,10 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 
 ## Current follow-through
 
-- **Announcer:** added in patch 22 / 3.3.1. Trent selected Qwen's Warm founder and Cave-inspired clean, both lowered. Nineteen lines at three pitches per voice include “Welcome back to Gems Together!” Local voice/pitch/volume controls, previews, occasional celebrations and music ducking work in the single HTML and Windows app. Real browser gate 136/136, compressed speech-content check 114/114. OmniVoice's audition remains local.
+- **Announcer:** patch 26 / 3.3.4 makes Trent's selected Silver / arcade lift the default, with nineteen lines and no final pitch or tone effects. The three approved audition performances are retained. Main Audio has an independent saved Announcer voice switch; previews, volume and earlier voice options remain available. The exact compressed pack passes 133 speech checks; browser playback/UI/private co-op passes 161 checks. OmniVoice's audition remains local.
 - **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Patch 23 / 3.3.2 aligns scenery and chord changes on the soundtrack's next downbeat. Three phases add bass, arpeggios, scenery and beat response at a steady 88 BPM. Real audio-clock checks passed 30/30 across both GPU backends and private co-op, including a swap before travel and different local audio settings.
 - **Stage harmony and comfort:** patch 24 / 3.3.3 completes six unique progression pairs and stage keys, matching gem tones and stings, Resonance music filtering, beat-aligned landing sounds and an independent big-combo screen flash switch. Low shares a 350 ms interval across large flash events. Actual audio/GPU/private co-op gate: 121/121; matched music samples are at `tools/out/harmony/index.html`.
-- **Release verification:** final 3.3.3 native checks pass for the packaged executable and extracted ZIP, with matching browser/package/extracted HTML hashes. The guarded test launcher refuses restricted tokens before starting Electron. Publication still awaits explicit approval; Steam account setup and live achievement validation remain external.
-- **Steam account work:** create an App ID, register the 22 exact achievement API names, then verify activation and delivery with the real Steam client. Local wrapper smoke checks cover the GPU game, preload isolation, ID validation, resolution and fullscreen.
+- **Release verification:** browser 3.3.4 is the authorized release. Validate gameplay, both GPU backends, phone controls, private and isolated public co-op, stage travel, harmonies, aligned highlights and the final announcer before pushing; verify the live browser after Pages deploys. Native receipts describe retired experiments.
 
 ## Standing direction (Tront's calls, these override research)
 
@@ -109,18 +110,20 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 - **Gamepad support.** (André.)
 - **Less drag fatigue:** a long session of hold-and-drag nearly gave a player carpal tunnel (low mouse sensitivity). Make click-click swapping obvious, and consider a shorter drag threshold. (André.)
 - **Optional fail state:** "out of moves" ends the run, as a toggle. Default stays the reshuffle, for people who would rather the board just flip. (André, Tront.)
-- **Photosensitivity option** (aFoolsDuty: a sweet combo "probably gave someone an epileptic fit"). This is an OPTION, not a default toning-down. The default stays at full juice. Add Flash Intensity (Full default, Low, Off) that caps flash luminance and rate (three flashes per second or fewer), and a toggle for the x5 screen treatment, the way Tetris Effect has MIN, MID and MAX. Needed for Steam anyway.
+- **Photosensitivity option** (aFoolsDuty: a sweet combo "probably gave someone an epileptic fit"). This is an OPTION, not a default toning-down. The default stays at full juice. Add Flash Intensity (Full default, Low, Off) that caps flash luminance and rate (three flashes per second or fewer), and a toggle for the x5 screen treatment, the way Tetris Effect has MIN, MID and MAX.
 
 ## 6. Platform
 
-- **Steam** is the long-term target once stages, progression and music land.
+- **Browser on tront.xyz.** No Steam release or Windows packaging. Keep the single HTML deployment and public co-op default.
 
 ## Done
 
+- Patch 26 (3.3.4): selected natural Silver master announcer, nineteen lines, exact approved audition performances and a saved voice switch directly on Audio. Older voice choices and independent voice volume remain available.
+- Patch 25 (3.3.3 playtest): actual gem contours, one depth-tested physical socket bracket and a beat pulse in the existing cyan cabinet inlay. No detached HUD light bands.
 - Patch 24 (3.3.3): six distinct stage harmonies, musical gem and celebration tones, music-bus filtering during Resonance and the saved big-combo screen flash option. New-board audio resets and queued tones across a key change are verified; Full remains the default.
 - Patch 23 (3.3.2): stage travel and chord changes enter on a downbeat, three within-stage phases add musical layers and scenery, and the stage progress indicator shows thirds. Shared scoring and Resonance capacity advance immediately; the presentation uses each player's audio clock.
 - Patch 22 (3.3.1): embedded Qwen announcer, two selected synthetic identities at three lower pitches, returning-player greeting, stage/chain/team/payout cues, local controls and music ducking. Practice, Showcase and calm stay quiet.
-- Patch 21 (3.3.0): saved journey and treasury, input onboarding, shared modes, team moments, highlights, living gems, stage props and crossfades, photos, daily friends, spectator cheers, accessibility, ghost, music meters, calm preset, desktop/Steam preparation and local voice audition tools. MIDI cancelled.
+- Patch 21 (3.3.0): saved journey and treasury, input onboarding, shared modes, team moments, highlights, living gems, stage props and crossfades, photos, daily friends, spectator cheers, accessibility, ghost, music meters, calm preset and local voice audition tools. MIDI cancelled; desktop/Steam preparation subsequently retired.
 - Patch 6: combo ladder (callouts SPARKLING..TRANSCENDENT, chord stings, x5+ sky lasers, speed lines, strobe).
 - Patch 7: Resonance music (generative soundtrack that layers in with play).
 - Patch 8: the journey (six score-driven stages: sky grade, tempo, progressions, stage show, progress bar).

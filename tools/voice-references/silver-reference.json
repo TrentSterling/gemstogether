@@ -16,11 +16,13 @@
     "sourceSha256": "14b6d2a1766c70f11ba06e5793511165ee966d2afc329600576371a73150fbc6"
   },
   "selection": "Trent selected the round-five Silver master; smooth deep bass without rasp.",
-  "productionSelectionPending": true,
+  "productionSelectionPending": false,
   "measurements": {
     "medianHz": 117.45,
     "p10Hz": 66.87,
     "p90Hz": 153.82,
     "seconds": 13.2294
-  }
+  },
+  "productionSelection": "Trent selected Silver / arcade lift on 2026-09-30; original pitch and delivery, no final tone effects.",
+  "productionSeed": 42
 }

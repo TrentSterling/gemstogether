@@ -5,8 +5,10 @@
 Trent selected **Silver master** from round five: the bass he wanted without
 rasp. He wants variations with more celebratory energy, but a smooth, deep,
 calming "Welcome back". His specific tonal reference is **Bejeweled 2**.
-This supersedes the earlier baritone/Cave ranking below. Auditions still do
-not authorize replacing the embedded pack or publishing the game.
+This supersedes the earlier baritone/Cave ranking below. On 2026-09-30 he
+selected **Silver / arcade lift**, at its original pitch with no final tone
+effects, and explicitly authorized the remaining lines and publishing the
+browser game. Production generation and validation are in [ANNOUNCER.md](ANNOUNCER.md).
 
 The focused comparison is `tools/out/voices/silver-round6/index.html`:
 the exact liked Silver, three requested delivery directions and six DSP rows.

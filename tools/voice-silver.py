@@ -93,12 +93,13 @@ def freeze_reference():
     if not REFERENCE.exists():
         shutil.copyfile(source, REFERENCE)
     original = json.loads((SOURCE / 'silver-brilliant.json').read_text(encoding='utf-8'))
-    record = {'speaker': 'Silver master', 'file': REFERENCE.name, 'sha256': digest(REFERENCE),
+    previous = json.loads(REFERENCE.with_suffix('.json').read_text(encoding='utf-8')) if REFERENCE.with_suffix('.json').exists() else {}
+    record = {**previous, 'speaker': 'Silver master', 'file': REFERENCE.name, 'sha256': digest(REFERENCE),
               'synthetic': True, 'text': original['referenceText'], 'style': original['style'],
               'designSeed': original['designSeed'], 'designModelRevision': '5ecdb67327fd37bb2e042aab12ff7391903235d3',
               'baseModelRevision': original['modelRevision'], 'preparation': original['referencePreparation'],
               'selection': 'Trent selected the round-five Silver master; smooth deep bass without rasp.',
-              'productionSelectionPending': True, 'measurements': measure(*sf.read(REFERENCE))}
+              'productionSelectionPending': previous.get('productionSelectionPending', True), 'measurements': measure(*sf.read(REFERENCE))}
     REFERENCE.with_suffix('.json').write_text(json.dumps(record, indent=2), encoding='utf-8')
     return record
 

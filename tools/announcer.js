@@ -4,7 +4,7 @@ const ANNOUNCER_VISIT='gemstogether-announcer-visited-v1';
 class GemsAnnouncer {
  constructor(app){
   this.a=app;app.audio.announcer=this;this.ctx=null;this.cache=new Map();this.epoch=0;this.source=null;this.activeSources=new Set();this.loading=false;this.pending=null;this.last=-100;this.recent=new Map();this.history=[];this.stats={played:0,dropped:0,errors:0,peak:0};this.welcomed=false;
-  const p=app.prefs;p.announcer=p.announcer!==false;p.announcerProfile=Object.hasOwn(ANNOUNCER_PACK.profiles,p.announcerProfile)?p.announcerProfile:ANNOUNCER_PACK.defaultProfile;p.announcerVolume=Number.isFinite(+p.announcerVolume)?clamp(+p.announcerVolume,0,100):65;
+  const p=app.prefs,newPack=p.announcerPackVersion!==ANNOUNCER_PACK.version;p.announcer=p.announcer!==false;p.announcerProfile=!newPack&&Object.hasOwn(ANNOUNCER_PACK.profiles,p.announcerProfile)?p.announcerProfile:ANNOUNCER_PACK.defaultProfile;p.announcerVolume=Number.isFinite(+p.announcerVolume)?clamp(+p.announcerVolume,0,100):65;p.announcerPackVersion=ANNOUNCER_PACK.version;if(newPack)app.savePreferences();
   this.returning=!!readStorage(ANNOUNCER_VISIT,false)||!!app.expedition?.profile.gems;
   const input=document.createElement('input');input.id='announcer-volume';input.type='range';input.min='0';input.max='100';input.value=p.announcerVolume;input.hidden=true;input.oninput=()=>{p.announcerVolume=clamp(+input.value,0,100);this.level();if(!p.announcerVolume)this.stop();app.savePreferences();};document.body.append(input);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)this.stop();});window.addEventListener('pagehide',()=>this.stop());
@@ -84,9 +84,9 @@ CabinetUI.prototype.drawPanel=function(){
  y=this.paragraph('A little celebration for new worlds, big chains and Resonance. Choose a voice and hear it over your music.',x,y,w,13,UI_ART.dim)+18;
  this.toggle('announcer-on','Announcer',a.prefs.announcer,x,y,w);y+=62;this.slider('announcer-volume','Voice volume',a.prefs.announcerVolume,0,100,5,x,y,w,'%');y+=80;
  const chosen=ANNOUNCER_PACK.profiles[a.prefs.announcerProfile],gap=8,bw=(w-gap)/2;this.text('Voice',x,y,16,UI_ART.highlight);y+=32;
+ this.button('announcer-voice-silver','Silver master',x,y,w,46,a.prefs.announcerProfile==='silver');y+=58;
  for(const [i,id,name]of [[0,'founder','Warm founder'],[1,'cave','Cave-inspired clean']])this.button('announcer-voice-'+id,name,x+i*(bw+gap),y,bw,50,a.prefs.announcerProfile.startsWith(id+'-'));y+=73;
- this.text('Pitch depth',x,y,16,UI_ART.highlight);y+=32;const dw=(w-gap*2)/3;
- for(const [i,depth,label]of [[0,2,'Lower'],[1,4,'Deep'],[2,6,'Extra deep']])this.button('announcer-depth-'+depth,label,x+i*(dw+gap),y,dw,42,chosen.semitones===-depth);y+=65;
+ if(chosen.semitones<0){this.text('Pitch depth',x,y,16,UI_ART.highlight);y+=32;const dw=(w-gap*2)/3;for(const [i,depth,label]of [[0,2,'Lower'],[1,4,'Deep'],[2,6,'Extra deep']])this.button('announcer-depth-'+depth,label,x+i*(dw+gap),y,dw,42,chosen.semitones===-depth);y+=65;}else{this.text('Original pitch',x,y,13,UI_ART.dim);y+=35;}
  for(const [key,label]of [['welcome-back','Welcome back'],['dazzling','Big combo'],['team','Team Resonance']]){this.button('announcer-preview-'+key,'Hear: '+label,x,y,w,42);y+=53;}
  this.text(n.source?'Speaking...':!a.prefs.announcer?'Announcer off.':a.prefs.muted?'Sound is off.':!a.prefs.announcerVolume?'Voice volume is zero.':'Occasional celebrations; the music keeps playing.',x,y,12,UI_ART.dim,'left',w);y+=37;
  this.maxScroll=Math.max(0,y+this.scroll-m.body.y-m.body.h+12);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);if(this.maxScroll){const h=m.body.h,th=Math.max(26,h*h/(h+this.maxScroll));p.box(m.x+m.w-12,m.body.y,3,h,UI_ART.enamel,1);p.box(m.x+m.w-14,m.body.y+(h-th)*this.scroll/this.maxScroll,6,th,UI_ART.edge,2);}this.text('Esc to return / scroll for more',m.x+21,m.y+m.h-24,11,UI_ART.dim,'left',m.w-42);
@@ -96,8 +96,8 @@ CabinetUI.prototype.activate=function(id){
  const a=this.app,n=a.announcer;if(!n)return announcerActivate.call(this,id);
  if(id==='announcer-open'){a.openPanel('announcer');return;}if(id==='announcer-back'){a.openPanel('audio');return;}
  if(id==='announcer-on'){a.prefs.announcer=!a.prefs.announcer;if(!a.prefs.announcer)n.stop();a.savePreferences();return;}
- if(id.startsWith('announcer-voice-')){const voice=id.slice(16);n.setProfile(voice+'-'+(-ANNOUNCER_PACK.profiles[a.prefs.announcerProfile].semitones));return;}
- if(id.startsWith('announcer-depth-')){const voice=a.prefs.announcerProfile.split('-')[0];n.setProfile(voice+'-'+id.slice(16));return;}
+ if(id.startsWith('announcer-voice-')){const voice=id.slice(16),depth=-ANNOUNCER_PACK.profiles[a.prefs.announcerProfile].semitones||4;n.setProfile(voice==='silver'?'silver':voice+'-'+depth);return;}
+ if(id.startsWith('announcer-depth-')){const voice=a.prefs.announcerProfile.split('-')[0];if(voice!=='silver')n.setProfile(voice+'-'+id.slice(16));return;}
  if(id.startsWith('announcer-preview-')){if(a.prefs.muted){a.toast('Turn sound on to hear your announcer.');return;}if(!a.prefs.announcer){a.toast('Turn the announcer on to hear a sample.');return;}a.audio.start().then(()=>n.request(id.slice(18),{preview:true})).catch(()=>{});return;}
  return announcerActivate.call(this,id);
 };

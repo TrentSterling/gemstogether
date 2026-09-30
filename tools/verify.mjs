@@ -30,7 +30,7 @@ async function hits(page) { return (await page.eval(`${J}.ui()`)).hits || []; }
 let page = await boot(1280, 800, 9476);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
-  ok('version 3.3.3', d.version === '3.3.3', d.version);
+  ok('version 3.3.4', d.version === '3.3.4', d.version);
   ok('GPU backend', /WebGPU|WebGL/.test(d.backend), d.backend);
   ok('no runtime errors', d.errors.length === 0, JSON.stringify(d.errors).slice(0, 200));
   const s = await page.eval(`${J}.state()`);
