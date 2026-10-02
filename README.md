@@ -16,7 +16,7 @@ Silver crystal, the selected tuned stereo Qwen announcer, celebrates new worlds,
 
 Each world has its own musical key and chord progression. Gem tones and celebrations follow that key, while Resonance draws the music into a softer filter and opens it again for the payout. Journey > Comfort offers a separate big-combo screen flash toggle; Flashes Low limits large flash events to three per second.
 
-Built by Tront for Jennifer. Current version: 3.3.6.
+Built by Tront for Jennifer. Current version: 3.3.7.
 
 ## Tech
 

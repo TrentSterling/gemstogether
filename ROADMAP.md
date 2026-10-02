@@ -2,7 +2,7 @@
 
 Every idea from the 2026-09-28 playtest thread on Discord, plus Tront's calls. Research backing: `research/TETRIS-EFFECT-DEEP-DIVE.md` and `research/DEEP-RESEARCH-COMBO-SPECTACLE.md`.
 
-Current scope (Trent, 09-30): the browser game on tront.xyz with the selected Silver crystal announcer (Original 07 / Tuned stereo crystal). MIDI is cancelled. Steam and Windows packaging are outside this project; earlier experiments are historical. Current browser release: 3.3.6.
+Current scope (Trent, 09-30): the browser game on tront.xyz with the selected Silver crystal announcer (Original 07 / Tuned stereo crystal). MIDI is cancelled. Steam and Windows packaging are outside this project; earlier experiments are historical. Current browser release: 3.3.7.
 
 ## 0. Andre's feedback (the north star)
 
@@ -57,7 +57,9 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 - **Discoverability and phone controls:** patch 28 / 3.3.6 adds a direct Play button alongside Journey, and panel guidance follows touch, keyboard or controller input. The visual gate covers touch swaps, scrolling, challenge selection and rotation with mobile emulation on both renderers. Physical phone and USB-controller checks remain manual.
 - **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Patch 23 / 3.3.2 aligns scenery and chord changes on the soundtrack's next downbeat. Three phases add bass, arpeggios, scenery and beat response at a steady 88 BPM. Real audio-clock checks passed 30/30 across both GPU backends and private co-op, including a swap before travel and different local audio settings.
 - **Stage harmony and comfort:** patch 24 / 3.3.3 completes six unique progression pairs and stage keys, matching gem tones and stings, Resonance music filtering, beat-aligned landing sounds and an independent big-combo screen flash switch. Low shares a 350 ms interval across large flash events. Actual audio/GPU/private co-op gate: 121/121; matched music samples are at `tools/out/harmony/index.html`.
-- **Release verification:** browser 3.3.6 is the current release. Validate gameplay, both GPU backends, phone controls, private and isolated public co-op, stage travel, harmonies, aligned highlights and the final announcer before pushing; verify the live browser after Pages deploys. Native receipts describe retired experiments.
+- **HUD legibility:** patch 29 / 3.3.7 puts stage and Resonance on the opaque score plaque, with a matching compact phone backing. Labels stay readable over scenery and particles.
+- **Discovery reliability:** patch 30 / 3.3.7 restores three trackers for private and public discovery. The outage gate verifies real backup discovery and shared play with the first tracker unavailable.
+- **Release verification:** browser 3.3.7 is the current release. Validate gameplay, both GPU backends, phone controls, private and isolated public co-op, stage travel, harmonies, aligned highlights and the final announcer before pushing; verify the live browser after Pages deploys. Native receipts describe retired experiments.
 
 ## Standing direction (Tront's calls, these override research)
 
@@ -120,6 +122,7 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 ## Done
 
 - Patch 28 (3.3.6): direct Play access, responsive seven-button board rail, input-specific guidance across all panels and mobile touch/rotation coverage.
+- Patches 29-30 (3.3.7): opaque cabinet backing and inset stage/Resonance labels, including the compact phone strip; redundant co-op discovery with a controlled tracker-outage gate.
 - Patch 27 (3.3.5): selected Silver crystal announcer, nineteen exact approved stereo MP3s and frozen rebuild assets. Voice-off and volume preferences survive the upgrade.
 - Patch 26 (3.3.4): selected natural Silver master announcer, nineteen lines, exact approved audition performances and a saved voice switch directly on Audio. Older voice choices and independent voice volume remain available.
 - Patch 25 (3.3.3 playtest): actual gem contours, one depth-tested physical socket bracket and a beat pulse in the existing cyan cabinet inlay. No detached HUD light bands.

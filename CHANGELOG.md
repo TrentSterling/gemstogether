@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.7 hosting patches 29-30 (2026-10-02) Readable HUD and resilient discovery
+
+- The opaque score plaque now extends behind the stage name, phase progress and Resonance meter. Inset labels and a subtle divider keep the display readable over bright scenery, props and particles.
+- The compact phone layout gets a matching opaque brass-edged backing behind both rows.
+- Co-op uses three discovery trackers instead of depending on one. A controlled outage check covers private invites, shared challenge play, isolated public spectators and host migration; the single-tracker control cannot connect under the same outage.
+- Progression test failures now report connection state and recent network events.
+- Validation: gameplay 22/22; desktop/mobile UI 112/112; progression/private co-op 48/48; spectator/host migration 15/15; controlled tracker outage 9/9; stage transitions 16/16; audio-clock journey 30/30; harmonies 121/121; aligned highlights 21/21; announcer/settings/private co-op 163/163; selected-asset release audit 30/30. Firefox 157 / WebGL 2 renders cleanly and verifies stereo voice playback and immediate voice disable.
+
 ## 3.3.6 hosting patch 28 (2026-10-01) Play access and phone guidance
 
 - Play opens challenges and puzzles directly from the board; Journey retains progression and stage choices. The seven board controls fit one desktop row or two phone rows.

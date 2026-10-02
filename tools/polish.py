@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.6'")
+rep("version:'3.2.4'", "version:'3.3.7'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -546,6 +546,34 @@ rep("window.addEventListener('keydown',e=>{if(e.target?.id==='coop-code-input')r
 rep("this.text('Esc to return / scroll for more',", "this.text(this.panelHint(),", 4)
 rep("this.text('Esc to return',", "this.text(this.panelHint(),")
 rep("this.text('Scroll for more',", "this.text(this.panelHint(),")
+
+# Patch 29: scenery stays behind an opaque cabinet display for the stage and Resonance HUD.
+# plaqueAt retains the score section's height so challenge and onboarding offsets stay consistent.
+rep('this.plaque(sx,sy,sw,159);', 'this.plaque(sx,sy,sw,a.practice?159:257);')
+rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
+  this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+4,yy,11,col,'left',w,.12,true);this.text(info.name,x+4,yy+15,15,'#ffffff','left',w-8,.14,true);
+  p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);for(const n of [1,2])p.box(x+4+(w-8)*n/3,yy+39,2,5,'#071418',0,1);}""",
+    r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
+  p.line(x+10,y+h,x+w-10,y+h,1,UI_ART.brass,.3);
+  this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+10,yy,11,col,'left',w-20,.12,true);this.text(info.name,x+10,yy+15,15,'#ffffff','left',w-20,.14,true);
+  p.box(x+8,yy+37,w-16,9,'#071418',4,.95);p.box(x+10,yy+39,w-20,5,col,2,.22);if(f>0)p.box(x+10,yy+39,Math.max(5,(w-20)*f),5,col,2,1);for(const n of [1,2])p.box(x+10+(w-20)*n/3,yy+39,2,5,'#071418',0,1);}""")
+rep('this.stripAt=[x,yy,w];', 'this.stripAt=[x,yy,w];this.plaque(x-4,yy-8,w+8,52);')
+rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,cap=fx.resCap(),mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
+  const on=R&&R.on,glow=on?.6+.4*Math.sin(t*14):0;this.text(on?'RESONANCE!':'RESONANCE',x+4,yy,11,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w,.12,true);
+  p.box(x+2,yy+17,w-4,11,'#071418',4,.95);
+  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+4+(w-8)*f*k/6,yy+19,(w-8)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+2,yy+15,w-4,15,'#ffffff',5,.12*glow);}
+  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+4,yy+19,(w-8)*fm,7,mineCol,2,1);if(ft>0)p.box(x+4+(w-8)*fm,yy+19,(w-8)*ft,7,theirCol,2,1);
+   if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+2,yy+15,w-4,15,'#ffd98a',5,.18*pu);}}}""",
+    r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,cap=fx.resCap(),mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
+  const on=R&&R.on,glow=on?.6+.4*Math.sin(t*14):0;this.text(on?'RESONANCE!':'RESONANCE',x+10,yy,11,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w-20,.12,true);
+  p.box(x+8,yy+17,w-16,11,'#071418',4,.95);
+  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+10+(w-20)*f*k/6,yy+19,(w-20)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+8,yy+15,w-16,15,'#ffffff',5,.12*glow);}
+  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+10,yy+19,(w-20)*fm,7,mineCol,2,1);if(ft>0)p.box(x+10+(w-20)*fm,yy+19,(w-20)*ft,7,theirCol,2,1);
+   if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+8,yy+15,w-16,15,'#ffd98a',5,.18*pu);}}}""")
+
+# Patch 30: keep the pinned torrent strategy's three discovery trackers available.
+# A single tracker can stall peer discovery even while another tracker is reachable.
+rep('relayRedundancy:1', 'relayRedundancy:3', 2)
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

@@ -5,7 +5,7 @@ import {launch, sleep, until} from './cdp.mjs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const target = process.argv[2] || 'index.html';
-const expectedVersion = process.argv[3] || process.env.EXPECT_VERSION || '3.3.6';
+const expectedVersion = process.argv[3] || process.env.EXPECT_VERSION || '3.3.7';
 const base = /^https?:/.test(target) ? target : pathToFileURL(resolve(target)).href;
 const J = 'window.__jewel';
 let pass = 0, fail = 0;

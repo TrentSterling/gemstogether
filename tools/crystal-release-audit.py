@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'tools/out'
-VERSION=sys.argv[1] if len(sys.argv)>1 else '3.3.6'
+VERSION=sys.argv[1] if len(sys.argv)>1 else '3.3.7'
 pack_path=ROOT/'tools/announcer-pack.json'
 pack=json.loads(pack_path.read_text(encoding='utf-8'))
 html=(ROOT/'index.html').read_text(encoding='utf-8')

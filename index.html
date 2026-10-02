@@ -49,7 +49,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.6'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.7'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1327,7 +1327,7 @@ class CabinetUI {
   const tan=Math.tan(21*PI/180),aspect=w/h,framing=cabinetFraming(w,h),z=framing.distance;const stable=matMul(perspective(42*PI/180,aspect,.1,150),lookAt([0,.62,z],[0,0,0],[0,1,0]));const screen=pos=>project(pos,stable,w,h);
   const [left,top]=screen([-3.98,4.02,.15]),[right,bottom]=screen([3.98,-4.1,.15]);this.boardRect={x:left,y:top,w:right-left,h:bottom-top};const wide=framing.wide;this.wide=wide;
   if(wide){const nw=Math.min(350,(right-left)*.77),nh=h<460?34:43,ny=Math.max(5,top-nh-5);this.plaque(w/2-nw/2,ny,nw,nh);this.text(GAME_BRAND.wordmark,w/2,ny+9,h<460?18:23,UI_ART.highlight,'center',nw-34,.12,true);
-   const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
+   const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,a.practice?159:257);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
   }else{
    const nw=Math.min(w-28,350),titleY=Math.max(10,top-93);this.plaque(w/2-nw/2,titleY,nw,40);this.text(GAME_BRAND.wordmark,w/2,titleY+11,21,UI_ART.highlight,'center',nw-30,.12,true);
    const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
@@ -1860,7 +1860,7 @@ class CoopRoom {
    if(!window.RTCPeerConnection)throw Error('This browser does not provide WebRTC. Solo still works.');
    if(!crypto.subtle)throw Error('Co-op needs HTTPS or a local file in a secure browser context. Solo still works.');
    const mod=await this.loadLibrary();if(generation!==this.generation)return false;
-   const config={appId:COOP.appId,relayRedundancy:1};
+   const config={appId:COOP.appId,relayRedundancy:3};
    // Users can supply their own TURN configuration in an optional saved setting.
    // No credentials or paid service is required or embedded in this game.
    const turn=readStorage('gemstogether-turn-v3',null);if(Array.isArray(turn)&&turn.length>0&&turn.length<8){config.turnConfig=turn;config.rtcConfig={iceServers:turn,iceTransportPolicy:'relay'};}
@@ -2131,7 +2131,7 @@ class GlobalCoopRoom extends CoopRoom {
    if(!window.RTCPeerConnection||!crypto.subtle)throw Error('Public co-op needs WebRTC and a secure browser context. Solo still works.');
    if(navigator.onLine===false)throw Error('Offline. Your solo board is ready.');
    const mod=await this.loadLibrary();if(generation!==this.generation)return false;
-   const config={appId:COOP.appId,relayRedundancy:1};const turn=readStorage('gemstogether-turn-v3',null);
+   const config={appId:COOP.appId,relayRedundancy:3};const turn=readStorage('gemstogether-turn-v3',null);
    if(Array.isArray(turn)&&turn.length>0&&turn.length<8){config.turnConfig=turn;config.rtcConfig={iceServers:turn,iceTransportPolicy:'relay'};}
    const room=this.room=mod.joinRoom(config,this.testPublicRoom||PUBLIC_ROOM.id,detail=>{if(generation!==this.generation)return;this.error=detail?.error||'Public discovery unavailable';this.note('public-discovery-error',{message:this.error});});
    this.selfId=mod.selfId;this.joinAt=Date.now();this.members.set(this.selfId,{id:this.selfId,at:performance.now(),joined:this.joinAt});
@@ -2521,9 +2521,10 @@ const stageHex=info=>'#'+info.tint.map(v=>Math.round(clamp(v/170,.35,1)*255).toS
 CabinetUI.prototype.stageCallout=function(info){this.sc={...info,birth:this.app.time};};
 CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||fx.stage===undefined||a.panelOpen)return;const info=fx.stageInfo(),col=stageHex(info);p.opacity=1;
  if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+10,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);
-  this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+4,yy,11,col,'left',w,.12,true);this.text(info.name,x+4,yy+15,15,'#ffffff','left',w-8,.14,true);
-  p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);for(const n of [1,2])p.box(x+4+(w-8)*n/3,yy+39,2,5,'#071418',0,1);}
- else if(!a.practice){this.stripAt=null;const bt=this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight){const x=bt.x,w=bt.w,yy=bt.y+bt.h+12,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);this.stripAt=[x,yy,w];
+  p.line(x+10,y+h,x+w-10,y+h,1,UI_ART.brass,.3);
+  this.text('STAGE '+info.n+(info.loop?'  ENCORE':'')+'  '+((fx.visualPhase||0)+1)+'/3',x+10,yy,11,col,'left',w-20,.12,true);this.text(info.name,x+10,yy+15,15,'#ffffff','left',w-20,.14,true);
+  p.box(x+8,yy+37,w-16,9,'#071418',4,.95);p.box(x+10,yy+39,w-20,5,col,2,.22);if(f>0)p.box(x+10,yy+39,Math.max(5,(w-20)*f),5,col,2,1);for(const n of [1,2])p.box(x+10+(w-20)*n/3,yy+39,2,5,'#071418',0,1);}
+ else if(!a.practice){this.stripAt=null;const bt=this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight){const x=bt.x,w=bt.w,yy=bt.y+bt.h+12,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);this.stripAt=[x,yy,w];this.plaque(x-4,yy-8,w+8,52);
   this.text('STAGE '+info.n+'  '+info.name,x+4,yy,12,col,'left',w*.62,.12,true);p.box(x+w*.64,yy+4,w*.36-2,8,'#071418',4,.95);p.box(x+w*.64+2,yy+6,(w*.36-6),4,col,2,.22);if(f>0)p.box(x+w*.64+2,yy+6,Math.max(4,(w*.36-6)*f),4,col,2,1);for(const n of [1,2])p.box(x+w*.64+2+(w*.36-6)*n/3,yy+6,2,4,'#071418',0,1);}}
  const o=this.sc;if(!o)return;const age=a.time-o.birth,L=2.6;if(age<0)return;if(age>L){this.sc=null;return;}
  const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
@@ -2550,11 +2551,11 @@ CabinetUI.prototype.resCallout=function(label){this.rc={label,birth:this.app.tim
 CabinetUI.prototype.resPayout=function(count,team){this.rp={count,team,birth:this.app.time};};
 CabinetUI.prototype.drawRes=function(){const a=this.app,p=this.ink,fx=a.fx;if(!fx||a.panelOpen)return;const R=fx.res,co=a.coop,t=a.time;p.opacity=1;
  if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,cap=fx.resCap(),mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
-  const on=R&&R.on,glow=on?.6+.4*Math.sin(t*14):0;this.text(on?'RESONANCE!':'RESONANCE',x+4,yy,11,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w,.12,true);
-  p.box(x+2,yy+17,w-4,11,'#071418',4,.95);
-  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+4+(w-8)*f*k/6,yy+19,(w-8)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+2,yy+15,w-4,15,'#ffffff',5,.12*glow);}
-  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+4,yy+19,(w-8)*fm,7,mineCol,2,1);if(ft>0)p.box(x+4+(w-8)*fm,yy+19,(w-8)*ft,7,theirCol,2,1);
-   if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+2,yy+15,w-4,15,'#ffd98a',5,.18*pu);}}}
+  const on=R&&R.on,glow=on?.6+.4*Math.sin(t*14):0;this.text(on?'RESONANCE!':'RESONANCE',x+10,yy,11,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w-20,.12,true);
+  p.box(x+8,yy+17,w-16,11,'#071418',4,.95);
+  if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+10+(w-20)*f*k/6,yy+19,(w-20)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+8,yy+15,w-16,15,'#ffffff',5,.12*glow);}
+  else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+10,yy+19,(w-20)*fm,7,mineCol,2,1);if(ft>0)p.box(x+10+(w-20)*fm,yy+19,(w-20)*ft,7,theirCol,2,1);
+   if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+8,yy+15,w-16,15,'#ffd98a',5,.18*pu);}}}
  if(!this.plaqueAt&&this.stripAt&&!a.practice){const [x,y0,w]=this.stripAt,yy=y0+22,cap=fx.resCap(),on=R&&R.on,mineCol=co?.connected?(co.role==='host'?COOP_PALETTE.host:COOP_PALETTE.peer):'#ffd98a',theirCol=co?.connected?(co.role==='host'?COOP_PALETTE.peer:COOP_PALETTE.host):'#ffd98a';
   this.text(on?'RESONANCE!':'RESONANCE',x+4,yy,12,on?gemHex(((t*8)|0)%6):'#ffd98a','left',w*.62,.12,true);const bx=x+w*.64,bw2=w*.36-2;p.box(bx,yy+4,bw2,8,'#071418',4,.95);
   if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(bx+2+(bw2-4)*f*k/6,yy+6,(bw2-4)*f/6+1,4,gemHex((k+((t*10)|0))%6),2,.95);}
