@@ -43,6 +43,7 @@ class GemsExpedition {
   app.prefs.tapOnly=!!app.prefs.tapOnly;app.prefs.highContrast=!!app.prefs.highContrast;app.prefs.largeCursor=!!app.prefs.largeCursor;app.prefs.ghost=app.prefs.ghost!==false;app.prefs.comboTreatment=app.prefs.comboTreatment!==false;
   window.__jewel.expedition=()=>this.info();window.__jewel.challenge=(mode,options)=>this.start(mode,options);window.__jewel.cheer=()=>this.cheer();
   window.addEventListener('pagehide',()=>this.save());
+  window.addEventListener('pointerdown',event=>{app.lastInputDevice=event.pointerType==='touch'?'touch':'mouse';},true);
   window.addEventListener('keydown',event=>{if(event.key.startsWith('Arrow')||event.key===' '||event.key==='Enter')app.lastInputDevice='keyboard';},true);
   if(window.gemsDesktop)for(const id of this.profile.achievements)window.gemsDesktop.unlock(id).catch(()=>{});
  }
@@ -247,9 +248,9 @@ JewelApp.prototype.draw=function(){const e=this.expedition,p=e?.photo;if(!p)retu
 CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
  if(r.mode!=='zen'&&!a.practice){const label=r.mode==='timed'?Math.max(0,Math.ceil(120-r.elapsed))+' seconds':r.mode==='puzzle'?EXPEDITION_PUZZLES[r.puzzle].name:r.mode==='daily'?'DAILY '+r.day:'30-MOVE CHALLENGE',detail=r.mode==='timed'?'Resonance scores double':Math.max(0,r.limit-a.board.moves)+' moves left',gs=e.ghostScore(),d=a.board.score-gs,hasGhost=r.mode==='timed'&&a.prefs.ghost&&e.profile.bests.timed;
-  if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+116;this.text(label,x+3,yy,13,UI_ART.highlight,'left',w-6,.12,true);this.text(detail,x+3,yy+24,11,UI_ART.dim,'left',w-6);if(hasGhost){this.text('Ghost '+gs+' / '+(d>=0?'+':'')+d,x+3,yy+48,11,UI_ART.aqua,'left',w-6);const f=clamp(gs/Math.max(1,e.profile.bests.timed.score),0,1);p.line(x+3,yy+68,x+w-3,yy+68,2,UI_ART.brass,.4);p.box(x+3+(w-6)*f-2,yy+65,4,6,UI_ART.aqua,1,.6);}}
+  if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,compact=a.cssHeight<460,yy=y+h+(compact?100:116);this.text(label,x+3,yy,13,UI_ART.highlight,'left',w-6,.12,true);this.text(compact&&hasGhost?'Ghost '+gs+' / '+(d>=0?'+':'')+d:detail,x+3,yy+24,11,UI_ART.dim,'left',w-6);if(hasGhost&&!compact){this.text('Ghost '+gs+' / '+(d>=0?'+':'')+d,x+3,yy+48,11,UI_ART.aqua,'left',w-6);const f=clamp(gs/Math.max(1,e.profile.bests.timed.score),0,1);p.line(x+3,yy+68,x+w-3,yy+68,2,UI_ART.brass,.4);p.box(x+3+(w-6)*f-2,yy+65,4,6,UI_ART.aqua,1,.6);}}
   else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+9;this.text(label+' / '+(hasGhost?'ghost '+gs:detail),cx,y,11,UI_ART.highlight,'center',bw-8,.12,true);}}
- if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+118;this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
+ if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+(a.cssHeight<460?100:118);if(a.cssHeight<460){this.text('Tap a gem, then its',x+4,yy,11,UI_ART.highlight,'left',w-8);this.text('neighbour to swap.',x+4,yy+21,11,UI_ART.highlight,'left',w-8);this.hit('exp-dismiss',x,yy,w,42,'button',null,'Dismiss first-run hint');}else{this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
  const ann=e.announcement;if(ann){const age=a.time-ann.at;if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox(),al=Math.min(1,age*10)*clamp((ann.duration-age)/.4,0,1);p.opacity=al;this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);p.opacity=1;}}
 };
 // Weld the rendered mesh once. Split shared edges at facet midpoints so the
@@ -293,12 +294,17 @@ const expeditionDrawHUD=CabinetUI.prototype.drawHUD;
 CabinetUI.prototype.drawHUD=function(){if(this.app.expedition?.photo)return;expeditionDrawHUD.call(this);this.expeditionHUD();};
 const expeditionDrawCursor=CabinetUI.prototype.drawCursor;
 CabinetUI.prototype.drawCursor=function(){this.expeditionDecor();return expeditionDrawCursor.call(this);};
-CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open','Co-op Room']];const cols=w>=600?6:4,width=Math.min(w-24,w>=600?780:528),bw=(width-gap*(cols-1))/cols,x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
- items.forEach(([id,label],i)=>{if(w<600&&i===5)this.button(id,n?.publicRoom?'Public / '+Math.max(1,n.playerCount)+' players':'Co-op Room',x+width*.35+gap,y+50,width*.65-gap,38,!!n?.connected);else if(w<600&&i===4)this.button(id,label,x,y+50,width*.35,38);else this.button(id,label,x+(i%cols)*(bw+gap),y+Math.floor(i/cols)*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:false);});return y;};
+CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['play','Play'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open',w<600&&n?.publicRoom?'Public / '+Math.max(1,n.playerCount):'Co-op Room']];const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
+ items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
+
+CabinetUI.prototype.panelHint=function(){const a=this.app,device=a.lastInputDevice||(matchMedia('(pointer:coarse)').matches?'touch':'mouse');
+ if(device==='touch')return 'Tap '+(this.tab==='announcer'?'Audio':'Back')+(this.maxScroll?' / swipe for more':' to return');
+ if(device==='pad')return (/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Circle':'B')+' to return'+(this.maxScroll?' / triggers to scroll':'');
+ return 'Esc to return'+(this.maxScroll?' / scroll for more':'');};
 
 CabinetUI.prototype.expeditionPanel=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(this.tab==='photo'){this.photoPanel();return;}
- const m=this.panelLayout();this.panelRect=m;p.box(0,0,a.cssWidth,a.cssHeight,UI_ART.ink,0,.78);this.plaque(m.x,m.y,m.w,m.h,true);this.text('Your journey',m.x+21,m.y+21,23,UI_ART.highlight,'left',m.w-133,.12,true);this.button('close','Back',m.x+m.w-94,m.y+12,76,37);
+ const m=this.panelLayout();this.panelRect=m;p.box(0,0,a.cssWidth,a.cssHeight,UI_ART.ink,0,.78);this.plaque(m.x,m.y,m.w,m.h,true);this.text(this.tab==='play'?'Play together':'Your journey',m.x+21,m.y+21,23,UI_ART.highlight,'left',m.w-133,.12,true);this.button('close','Back',m.x+m.w-94,m.y+12,76,37);
  const tabs=[['journey','Journey'],['play','Play'],['moments','Moments'],['comfort','Comfort'],['music-toys','Music']],cols=a.cssWidth<500?3:5,tw=(m.w-32-4*(cols-1))/cols;
  tabs.forEach(([id,label],i)=>this.button('exp-tab-'+id,label,m.x+16+(i%cols)*(tw+4),m.y+59+Math.floor(i/cols)*41,tw,34,this.tab===id));
  p.clip(m.body);const x=m.body.x+6,y0=m.body.y+13-this.scroll,w=m.body.w-19;let y=y0;
@@ -334,7 +340,7 @@ const expeditionPanelOriginal=CabinetUI.prototype.drawPanel;
 CabinetUI.prototype.drawPanel=function(){if(['journey','play','moments','comfort','music-toys','photo'].includes(this.tab)&&this.app.expedition)return this.expeditionPanel();return expeditionPanelOriginal.call(this);};
 const expeditionActivate=CabinetUI.prototype.activate;
 CabinetUI.prototype.activate=function(id){const a=this.app,e=a.expedition;if(!e)return expeditionActivate.call(this,id);
- if(id==='journey'){a.openPanel('journey');return;}if(id==='exp-dismiss'){e.dismissTour();return;}
+ if(id==='play'||id==='journey'){a.openPanel(id);return;}if(id==='exp-dismiss'){e.dismissTour();return;}
  if(id.startsWith('exp-tab-')){this.tab=id.slice(8);this.scroll=0;return;}if(id.startsWith('exp-stage-')){const k=Number(id.slice(10));if(e.profile.visited.includes(k)){e.selectedStage=k;e.start('zen',{stage:k});}return;}
  if(id.startsWith('exp-mode-')){e.start(id.slice(9));return;}if(id.startsWith('exp-puzzle-')){e.selectedPuzzle=Number(id.slice(11));e.start('puzzle',{puzzle:e.selectedPuzzle});return;}
  if(id.startsWith('exp-pref-')){const key=id.slice(9);if(['tapOnly','highContrast','largeCursor','comboTreatment','ghost'].includes(key)){a.prefs[key]=!a.prefs[key];a.savePreferences();}return;}

@@ -15,7 +15,7 @@
 #scene:focus {outline:none}
 #accessibility-status{position:fixed;left:-10000px;width:1px;height:1px;overflow:hidden}
 #coop-code-input{position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0;font-size:16px;}
-</style></head><body>
+</style><style>@media(max-height:640px){#trontAbout.tront-about{top:12px;bottom:auto;left:auto;right:12px;}}</style></head><body>
 <div id="accessibility-status" role="status" aria-live="polite"></div><canvas tabindex="0" id="scene" aria-label="Interactive 3D match-three jewel board. Use the mouse or touch to swap adjacent jewels. Keyboard: arrow keys and Space."></canvas><div id="shade"></div>
 <div id="hud">
  <header id="brand"><svg class="sigil" width="42" height="48" viewBox="0 0 42 48" fill="none" aria-hidden="true"><path d="M21 2L37 15 32 33 21 46 10 33 5 15 21 2ZM5 15H37L21 46 5 15ZM21 2L14 15 21 33 28 15 21 2ZM10 33H32" stroke="currentColor" stroke-width=".8"/></svg><h1>Gems Together</h1></header>
@@ -49,7 +49,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.5'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.6'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1327,17 +1327,17 @@ class CabinetUI {
   const tan=Math.tan(21*PI/180),aspect=w/h,framing=cabinetFraming(w,h),z=framing.distance;const stable=matMul(perspective(42*PI/180,aspect,.1,150),lookAt([0,.62,z],[0,0,0],[0,1,0]));const screen=pos=>project(pos,stable,w,h);
   const [left,top]=screen([-3.98,4.02,.15]),[right,bottom]=screen([3.98,-4.1,.15]);this.boardRect={x:left,y:top,w:right-left,h:bottom-top};const wide=framing.wide;this.wide=wide;
   if(wide){const nw=Math.min(350,(right-left)*.77),nh=h<460?34:43,ny=Math.max(5,top-nh-5);this.plaque(w/2-nw/2,ny,nw,nh);this.text(GAME_BRAND.wordmark,w/2,ny+9,h<460?18:23,UI_ART.highlight,'center',nw-34,.12,true);
-   const sw=Math.min(208,left-54),sx=left-sw-25,sy=top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
+   const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
   }else{
    const nw=Math.min(w-28,350),titleY=Math.max(10,top-93);this.plaque(w/2-nw/2,titleY,nw,40);this.text(GAME_BRAND.wordmark,w/2,titleY+11,21,UI_ART.highlight,'center',nw-30,.12,true);
    const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
   }
   const gap=7,railW=Math.min(w-24,528),bw=(railW-gap*3)/4,rx=(w-railW)/2,ry=Math.min(h-57,bottom+28);if(a.aaCompare){const cw=(railW-gap*2)/3;this.button('aa-on','AA on',rx,ry,cw,42,!a.aaCompareBypass);this.button('aa-off','AA off',rx+cw+gap,ry,cw,42,a.aaCompareBypass);this.button('aa-done','Done',rx+2*(cw+gap),ry,cw,42);this.text('Frozen frame / '+(a.aaCompareBypass?'AA off':({off:'Off',fxaa:'FXAA',msaa:'4x MSAA',hybrid:'MSAA + FXAA'})[a.effectiveAA]),w/2,Math.min(h-17,ry+55),11,UI_ART.aqua,'center',w-24);}else{this.coopRail(bottom);this.coopBadge();}
-  if(w>=600&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0&&!a.practice&&!a.coop?.code){this.text('Tap a gem, then its neighbour',w/2,Math.min(h-17,ry+55),11,UI_ART.dim,'center',w-28);}
+  if(w>=600&&h>=460&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0&&!a.practice&&!a.coop?.code){this.text('Tap a gem, then its neighbour',w/2,Math.min(h-17,ry+55),11,UI_ART.dim,'center',w-28);}
   if(this.comboEase(a)){const sy=wide?top+(bottom-top)*.31:Math.max(8,top-126),cx=(wide?Math.min(w-91,right+111):w/2)+this.cE.dx;this.ink.opacity=this.cE.al;
     if(wide){this.plaque(cx-77,sy,154,116,true);this.text((a.coop?.connected?'Co-op x':'x')+this.lastCascade,cx,sy+20-39*(this.cE.s-1)*.5,39*this.cE.s,UI_ART.highlight,'center',130,.14,true);this.text(a.coop?.connected?'TEAM CASCADE':this.lastCascade>=6?'Brilliant':this.lastCascade>=4?'Radiant':'Cascade',cx,sy+82,14,UI_ART.aqua,'center',132);}this.ink.opacity=1;
   }
-  const tnow=performance.now();if(this.toastUntil+260>tnow&&!a.panelOpen){const tI=smooth(clamp((2800-(this.toastUntil-tnow))/180)),tO=smooth(clamp((this.toastUntil+260-tnow)/260));this.ink.opacity=tI*tO;const text=this.fitLine(this.toastMessage,w-58,13),tw=Math.min(w-22,this.measure(text,13)+32);let ty=(wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque((w-tw)/2,ty,tw,32);this.text(text,w/2,ty+9,13,UI_ART.highlight,'center',tw-20);this.ink.opacity=1;}
+  const tnow=performance.now();if(this.toastUntil+260>tnow&&!a.panelOpen){const tI=smooth(clamp((2800-(this.toastUntil-tnow))/180)),tO=smooth(clamp((this.toastUntil+260-tnow)/260));this.ink.opacity=tI*tO;const compactToast=wide&&h<460,text=this.fitLine(this.toastMessage,compactToast?Math.max(80,w-right-56):w-58,13),tw=Math.min(w-22,this.measure(text,13)+32),tx=compactToast?w-tw-12:(w-tw)/2;let ty=(compactToast?Math.max(60,top+(bottom-top)*.28):wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque(tx,ty,tw,32);this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);this.ink.opacity=1;}
  }
  trackCursor(e,down=null){
   const m=this.mouse,c=this.app.canvas;
@@ -1404,7 +1404,7 @@ class CabinetUI {
   }else{
    let yy=y;this.text(GAME_BRAND.name+' '+GAME_BRAND.version,x,yy,22,UI_ART.highlight,'left',w,.12);yy+=43;
    yy=this.paragraph('Swap neighbouring gems. Match three or more. A match of four makes a blast gem. Five in a line makes a prism.',x,yy,w,14)+13;
-   yy=this.paragraph('Match a blast to clear a 3 x 3 area. Swap a prism with any gem to clear that colour. Endless has no timer or lives; Journey also has challenges.',x,yy,w,14)+13;
+   yy=this.paragraph('Match a blast to clear a 3 x 3 area. Swap a prism with any gem to clear that colour. Endless has no timer or lives; Play has challenges and puzzles.',x,yy,w,14)+13;
    yy=this.paragraph('H: hint. D: showcase. M: sound. F: fullscreen. Arrows and Space: play. Tab: focus controls. Esc: back.',x,yy,w,14)+15;
    this.lineDivider(x,yy,w);yy+=23;yy=this.paragraph('Built by Tront for Jennifer.',x,yy,w,12,UI_ART.dim)+11;
    yy=this.paragraph("This cabinet lives on tront.xyz alongside Trent's other browser games, prototypes, and weird little experiments.",x,yy,w,12,UI_ART.dim)+11;
@@ -1412,8 +1412,8 @@ class CabinetUI {
    yy=this.paragraph('Music is optional. Load your own track in Audio; the file stays on your device.',x,yy,w,12,UI_ART.dim);end=yy+20;
   }
   this.maxScroll=Math.max(0,end+this.scroll-m.body.y-m.body.h+7);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);
-  if(this.maxScroll>0){const track=m.body.h,thumb=Math.max(30,track*track/(track+this.maxScroll)),yy=m.body.y+(track-thumb)*this.scroll/this.maxScroll;p.box(m.x+m.w-13,m.body.y,3,track,'#142b36',1);p.box(m.x+m.w-14,yy,5,thumb,UI_ART.edge,2);this.text('Scroll for more',m.x+21,m.y+m.h-24,11,UI_ART.dim);}
-  else this.text('Esc to return',m.x+21,m.y+m.h-24,11,UI_ART.dim);
+  if(this.maxScroll>0){const track=m.body.h,thumb=Math.max(30,track*track/(track+this.maxScroll)),yy=m.body.y+(track-thumb)*this.scroll/this.maxScroll;p.box(m.x+m.w-13,m.body.y,3,track,'#142b36',1);p.box(m.x+m.w-14,yy,5,thumb,UI_ART.edge,2);this.text(this.panelHint(),m.x+21,m.y+m.h-24,11,UI_ART.dim);}
+  else this.text(this.panelHint(),m.x+21,m.y+m.h-24,11,UI_ART.dim);
  }
  find(x,y){for(let i=this.hits.length-1;i>=0;i--){const b=this.hits[i];if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h)return b;}return null;}
  setSlider(hit,x,relative=0){const a=this.app,m=hit.meta;let value=relative?this.value(hit.id)+relative*m.step:m.min+clamp((x-m.x)/m.w,0,1)*(m.max-m.min);value=clamp(Math.round(value/m.step)*m.step,m.min,m.max);const input=$(hit.id);input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));}
@@ -1439,7 +1439,7 @@ class CabinetUI {
   window.addEventListener('blur',()=>this.cancelInteraction());
   document.addEventListener('visibilitychange',()=>{if(document.hidden)this.cancelInteraction();});
   c.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();return;}if(a.panelOpen){stop(e);this.scroll=clamp(this.scroll+e.deltaY,0,this.maxScroll);}},{capture:true,passive:false});
-  window.addEventListener('keydown',e=>{if(e.target?.id==='coop-code-input')return;if(e.key==='Escape'){this.focus=null;return;}if(e.key==='Tab'){stop(e);let ix=this.hits.findIndex(h=>h.id===this.focus);ix=(ix+(e.shiftKey?-1:1)+this.hits.length)%this.hits.length;this.focus=this.hits[ix]?.id;return;}const hit=this.hits.find(h=>h.id===this.focus);if(hit&&['Enter',' ','ArrowLeft','ArrowRight'].includes(e.key)){stop(e);if(hit.kind==='slider'){const dir=e.key==='ArrowLeft'?-1:1;this.setSlider(hit,0,dir);}else if(e.key===' '||e.key==='Enter')this.activate(hit.id);return;}if(a.panelOpen&&['ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key)){stop(e);this.scroll=clamp(this.scroll+(e.key.endsWith('Down')?1:-1)*(e.key.startsWith('Page')?160:35),0,this.maxScroll);}},true);
+  window.addEventListener('keydown',e=>{a.lastInputDevice='keyboard';if(e.target?.id==='coop-code-input')return;if(e.key==='Escape'){this.focus=null;return;}if(e.key==='Tab'){stop(e);let ix=this.hits.findIndex(h=>h.id===this.focus);ix=(ix+(e.shiftKey?-1:1)+this.hits.length)%this.hits.length;this.focus=this.hits[ix]?.id;return;}const hit=this.hits.find(h=>h.id===this.focus);if(hit&&['Enter',' ','ArrowLeft','ArrowRight'].includes(e.key)){stop(e);if(hit.kind==='slider'){const dir=e.key==='ArrowLeft'?-1:1;this.setSlider(hit,0,dir);}else if(e.key===' '||e.key==='Enter')this.activate(hit.id);return;}if(a.panelOpen&&['ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key)){stop(e);this.scroll=clamp(this.scroll+(e.key.endsWith('Down')?1:-1)*(e.key.startsWith('Page')?160:35),0,this.maxScroll);}},true);
  }
  draw(){const a=this.app,p=this.ink;p.begin(a.cssWidth,a.cssHeight);this.hits=[];
   this.floats=this.floats.filter(f=>a.time-f.birth<(f.life||1.1));for(const f of this.floats){const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos,a.vp,a.cssWidth,a.cssHeight),alpha=Math.min(age*9,1)*clamp(((f.life||1.1)-age)*3,0,1);p.opacity=alpha;this.text(f.text,x,y-36*(1-Math.exp(-age*2.5)),(f.size||(f.special?22:24))*(1+.5*Math.exp(-age*13)),f.col||(f.special?UI_ART.aqua:UI_ART.highlight),'center',Math.min(f.size?900:300,a.cssWidth-40),.12,true);}p.opacity=1;
@@ -2373,7 +2373,7 @@ CabinetUI.prototype.coopPanel=function(){
  y=this.paragraph('Two players, one shared score. The creator resolves swaps. Keep the host tab open. Some restrictive networks need TURN.',x,y,w,12,UI_ART.muted)+12;
  this.maxScroll=Math.max(0,y+this.scroll-body.y-body.h+8);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);
  if(this.maxScroll>0){const height=body.h,thumb=Math.max(26,height*height/(height+this.maxScroll)),yy=body.y+(height-thumb)*this.scroll/this.maxScroll;p.box(m.x+m.w-12,body.y,3,height,UI_ART.enamel,1);p.box(m.x+m.w-14,yy,6,thumb,UI_ART.edge,2);}
- this.text('Esc to return / scroll for more',m.x+22,m.y+m.h-23,11,UI_ART.dim,'left',m.w-42);
+ this.text(this.panelHint(),m.x+22,m.y+m.h-23,11,UI_ART.dim,'left',m.w-42);
 };
 CabinetUI.prototype.coopRail=function(bottom){
  const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7;let ry;
@@ -2624,7 +2624,7 @@ CabinetUI.prototype.coopPanel=function(){
  y=this.paragraph(n.publicRoom?'Eight active players share one board; extra visitors spectate. The next connected player takes over if the host leaves. The world lives in participating browsers, not on a game server.':'Private rooms support two players. Play Solo avoids automatic public joining until you choose Join Public Board or open the plain link again.',x,y,w,12,UI_ART.muted)+12;
  this.maxScroll=Math.max(0,y+this.scroll-body.y-body.h+8);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);
  if(this.maxScroll>0){const thumb=Math.max(26,body.h*body.h/(body.h+this.maxScroll)),yy=body.y+(body.h-thumb)*this.scroll/this.maxScroll;p.box(m.x+m.w-12,body.y,3,body.h,UI_ART.enamel,1);p.box(m.x+m.w-14,yy,6,thumb,UI_ART.edge,2);}
- this.text('Esc to return / scroll for more',m.x+22,m.y+m.h-23,11,UI_ART.dim,'left',m.w-42);
+ this.text(this.panelHint(),m.x+22,m.y+m.h-23,11,UI_ART.dim,'left',m.w-42);
 };
 const oldGlobalActivate=CabinetUI.prototype.activate;
 CabinetUI.prototype.activate=function(id){if(id==='coop-public'){this.app.audio.start().catch(()=>{});this.app.coop.joinPublic();return;}return oldGlobalActivate.call(this,id);};
@@ -2675,6 +2675,7 @@ class GemsExpedition {
   app.prefs.tapOnly=!!app.prefs.tapOnly;app.prefs.highContrast=!!app.prefs.highContrast;app.prefs.largeCursor=!!app.prefs.largeCursor;app.prefs.ghost=app.prefs.ghost!==false;app.prefs.comboTreatment=app.prefs.comboTreatment!==false;
   window.__jewel.expedition=()=>this.info();window.__jewel.challenge=(mode,options)=>this.start(mode,options);window.__jewel.cheer=()=>this.cheer();
   window.addEventListener('pagehide',()=>this.save());
+  window.addEventListener('pointerdown',event=>{app.lastInputDevice=event.pointerType==='touch'?'touch':'mouse';},true);
   window.addEventListener('keydown',event=>{if(event.key.startsWith('Arrow')||event.key===' '||event.key==='Enter')app.lastInputDevice='keyboard';},true);
   if(window.gemsDesktop)for(const id of this.profile.achievements)window.gemsDesktop.unlock(id).catch(()=>{});
  }
@@ -2879,9 +2880,9 @@ JewelApp.prototype.draw=function(){const e=this.expedition,p=e?.photo;if(!p)retu
 CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
  if(r.mode!=='zen'&&!a.practice){const label=r.mode==='timed'?Math.max(0,Math.ceil(120-r.elapsed))+' seconds':r.mode==='puzzle'?EXPEDITION_PUZZLES[r.puzzle].name:r.mode==='daily'?'DAILY '+r.day:'30-MOVE CHALLENGE',detail=r.mode==='timed'?'Resonance scores double':Math.max(0,r.limit-a.board.moves)+' moves left',gs=e.ghostScore(),d=a.board.score-gs,hasGhost=r.mode==='timed'&&a.prefs.ghost&&e.profile.bests.timed;
-  if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+116;this.text(label,x+3,yy,13,UI_ART.highlight,'left',w-6,.12,true);this.text(detail,x+3,yy+24,11,UI_ART.dim,'left',w-6);if(hasGhost){this.text('Ghost '+gs+' / '+(d>=0?'+':'')+d,x+3,yy+48,11,UI_ART.aqua,'left',w-6);const f=clamp(gs/Math.max(1,e.profile.bests.timed.score),0,1);p.line(x+3,yy+68,x+w-3,yy+68,2,UI_ART.brass,.4);p.box(x+3+(w-6)*f-2,yy+65,4,6,UI_ART.aqua,1,.6);}}
+  if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,compact=a.cssHeight<460,yy=y+h+(compact?100:116);this.text(label,x+3,yy,13,UI_ART.highlight,'left',w-6,.12,true);this.text(compact&&hasGhost?'Ghost '+gs+' / '+(d>=0?'+':'')+d:detail,x+3,yy+24,11,UI_ART.dim,'left',w-6);if(hasGhost&&!compact){this.text('Ghost '+gs+' / '+(d>=0?'+':'')+d,x+3,yy+48,11,UI_ART.aqua,'left',w-6);const f=clamp(gs/Math.max(1,e.profile.bests.timed.score),0,1);p.line(x+3,yy+68,x+w-3,yy+68,2,UI_ART.brass,.4);p.box(x+3+(w-6)*f-2,yy+65,4,6,UI_ART.aqua,1,.6);}}
   else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+9;this.text(label+' / '+(hasGhost?'ghost '+gs:detail),cx,y,11,UI_ART.highlight,'center',bw-8,.12,true);}}
- if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+118;this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
+ if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+(a.cssHeight<460?100:118);if(a.cssHeight<460){this.text('Tap a gem, then its',x+4,yy,11,UI_ART.highlight,'left',w-8);this.text('neighbour to swap.',x+4,yy+21,11,UI_ART.highlight,'left',w-8);this.hit('exp-dismiss',x,yy,w,42,'button',null,'Dismiss first-run hint');}else{this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
  const ann=e.announcement;if(ann){const age=a.time-ann.at;if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox(),al=Math.min(1,age*10)*clamp((ann.duration-age)/.4,0,1);p.opacity=al;this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);p.opacity=1;}}
 };
 // Weld the rendered mesh once. Split shared edges at facet midpoints so the
@@ -2925,12 +2926,17 @@ const expeditionDrawHUD=CabinetUI.prototype.drawHUD;
 CabinetUI.prototype.drawHUD=function(){if(this.app.expedition?.photo)return;expeditionDrawHUD.call(this);this.expeditionHUD();};
 const expeditionDrawCursor=CabinetUI.prototype.drawCursor;
 CabinetUI.prototype.drawCursor=function(){this.expeditionDecor();return expeditionDrawCursor.call(this);};
-CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open','Co-op Room']];const cols=w>=600?6:4,width=Math.min(w-24,w>=600?780:528),bw=(width-gap*(cols-1))/cols,x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
- items.forEach(([id,label],i)=>{if(w<600&&i===5)this.button(id,n?.publicRoom?'Public / '+Math.max(1,n.playerCount)+' players':'Co-op Room',x+width*.35+gap,y+50,width*.65-gap,38,!!n?.connected);else if(w<600&&i===4)this.button(id,label,x,y+50,width*.35,38);else this.button(id,label,x+(i%cols)*(bw+gap),y+Math.floor(i/cols)*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:false);});return y;};
+CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['play','Play'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open',w<600&&n?.publicRoom?'Public / '+Math.max(1,n.playerCount):'Co-op Room']];const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
+ items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
+
+CabinetUI.prototype.panelHint=function(){const a=this.app,device=a.lastInputDevice||(matchMedia('(pointer:coarse)').matches?'touch':'mouse');
+ if(device==='touch')return 'Tap '+(this.tab==='announcer'?'Audio':'Back')+(this.maxScroll?' / swipe for more':' to return');
+ if(device==='pad')return (/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Circle':'B')+' to return'+(this.maxScroll?' / triggers to scroll':'');
+ return 'Esc to return'+(this.maxScroll?' / scroll for more':'');};
 
 CabinetUI.prototype.expeditionPanel=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(this.tab==='photo'){this.photoPanel();return;}
- const m=this.panelLayout();this.panelRect=m;p.box(0,0,a.cssWidth,a.cssHeight,UI_ART.ink,0,.78);this.plaque(m.x,m.y,m.w,m.h,true);this.text('Your journey',m.x+21,m.y+21,23,UI_ART.highlight,'left',m.w-133,.12,true);this.button('close','Back',m.x+m.w-94,m.y+12,76,37);
+ const m=this.panelLayout();this.panelRect=m;p.box(0,0,a.cssWidth,a.cssHeight,UI_ART.ink,0,.78);this.plaque(m.x,m.y,m.w,m.h,true);this.text(this.tab==='play'?'Play together':'Your journey',m.x+21,m.y+21,23,UI_ART.highlight,'left',m.w-133,.12,true);this.button('close','Back',m.x+m.w-94,m.y+12,76,37);
  const tabs=[['journey','Journey'],['play','Play'],['moments','Moments'],['comfort','Comfort'],['music-toys','Music']],cols=a.cssWidth<500?3:5,tw=(m.w-32-4*(cols-1))/cols;
  tabs.forEach(([id,label],i)=>this.button('exp-tab-'+id,label,m.x+16+(i%cols)*(tw+4),m.y+59+Math.floor(i/cols)*41,tw,34,this.tab===id));
  p.clip(m.body);const x=m.body.x+6,y0=m.body.y+13-this.scroll,w=m.body.w-19;let y=y0;
@@ -2958,7 +2964,7 @@ CabinetUI.prototype.expeditionPanel=function(){
   title('The music follows you');para('One steady 88 BPM. Earned layers hold, then step down gently. Your own loaded track takes priority.');
   const names=['Pad','Bass','Arpeggio','Drums','Lead'];names.forEach((name,i)=>{const level=a.music.lv[i]||0;this.text(name,x,y,15,level>.3?UI_ART.highlight:UI_ART.dim);this.text(Math.round(level*100)+'%',x+w,y,13,UI_ART.aqua,'right');y+=29;p.box(x,y,w,12,UI_ART.enamel,4);p.box(x,y,w*clamp(level,0,1),12,level>.3?'#8ff7ff':UI_ART.brass,4);y+=43;});para(a.audio.loadedTrack?'Playing your local track. The generative soundtrack is waiting.':a.audio.started&&!a.audio.muted?'The soundtrack is playing.':'Turn sound on to hear the layers.');row('sound',a.prefs.muted?'Sound on':'Sound off');row('exp-audio','Audio settings');
  }
- this.maxScroll=Math.max(0,y+this.scroll-m.body.y-m.body.h+12);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);if(this.maxScroll){const h=m.body.h,th=Math.max(26,h*h/(h+this.maxScroll));p.box(m.x+m.w-12,m.body.y,3,h,UI_ART.enamel,1);p.box(m.x+m.w-14,m.body.y+(h-th)*this.scroll/this.maxScroll,6,th,UI_ART.edge,2);}this.text('Esc to return / scroll for more',m.x+21,m.y+m.h-24,11,UI_ART.dim,'left',m.w-42);
+ this.maxScroll=Math.max(0,y+this.scroll-m.body.y-m.body.h+12);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);if(this.maxScroll){const h=m.body.h,th=Math.max(26,h*h/(h+this.maxScroll));p.box(m.x+m.w-12,m.body.y,3,h,UI_ART.enamel,1);p.box(m.x+m.w-14,m.body.y+(h-th)*this.scroll/this.maxScroll,6,th,UI_ART.edge,2);}this.text(this.panelHint(),m.x+21,m.y+m.h-24,11,UI_ART.dim,'left',m.w-42);
 };
 CabinetUI.prototype.padLegend=function(x,y,w){const g=this.app.padState?.id||'',ps=/dualsense|dualshock|playstation|054c/i.test(g),p=this.ink;const labels=ps?['Select','Back','Hint','Point']:['A select','B back','X hint','Y point'];for(let i=0;i<4;i++){const cx=x+(i+.5)*w/4,cy=y+12;if(ps){if(i===0){p.line(cx-7,cy-7,cx+7,cy+7,2,UI_ART.aqua);p.line(cx-7,cy+7,cx+7,cy-7,2,UI_ART.aqua);}if(i===1){const pts=[];for(let k=0;k<=20;k++){const a=k/20*TAU;pts.push(cx+Math.cos(a)*8,cy+Math.sin(a)*8);}p.poly(pts,2,'#f486ee');}if(i===2)p.poly([cx-7,cy-7,cx+7,cy-7,cx+7,cy+7,cx-7,cy+7,cx-7,cy-7],2,'#b9a4ff');if(i===3)p.poly([cx,cy-8,cx+8,cy+7,cx-8,cy+7,cx,cy-8],2,'#8addb5');}else this.text('ABXY'[i],cx,cy-8,18,UI_ART.aqua,'center',20);this.text(labels[i],cx,y+36,10,UI_ART.dim,'center',w/4-6);}};
 CabinetUI.prototype.photoPanel=function(){const a=this.app,e=a.expedition,p=e.photo;if(!p)return;this.text(p.stage,a.cssWidth/2,18,21,UI_ART.highlight,'center',a.cssWidth-24,.12,true);this.text('Score '+p.score.toLocaleString()+' / Gems Together by Tront',a.cssWidth/2,49,12,UI_ART.text,'center',a.cssWidth-24);if(p.exporting)return;const w=Math.min(680,a.cssWidth-24),x=(a.cssWidth-w)/2,y=a.cssHeight-116,bw=(w-21)/4;[['exp-photo-left','Orbit left'],['exp-photo-right','Orbit right'],['exp-photo-save',e.saving?'Saving...':'Save PNG'],['close','Back']].forEach(([id,label],i)=>this.button(id,label,x+i*(bw+7),y,bw,40));this.text('Your view is frozen. The shared board continues.',a.cssWidth/2,y+56,11,UI_ART.dim,'center',a.cssWidth-24);};
@@ -2966,7 +2972,7 @@ const expeditionPanelOriginal=CabinetUI.prototype.drawPanel;
 CabinetUI.prototype.drawPanel=function(){if(['journey','play','moments','comfort','music-toys','photo'].includes(this.tab)&&this.app.expedition)return this.expeditionPanel();return expeditionPanelOriginal.call(this);};
 const expeditionActivate=CabinetUI.prototype.activate;
 CabinetUI.prototype.activate=function(id){const a=this.app,e=a.expedition;if(!e)return expeditionActivate.call(this,id);
- if(id==='journey'){a.openPanel('journey');return;}if(id==='exp-dismiss'){e.dismissTour();return;}
+ if(id==='play'||id==='journey'){a.openPanel(id);return;}if(id==='exp-dismiss'){e.dismissTour();return;}
  if(id.startsWith('exp-tab-')){this.tab=id.slice(8);this.scroll=0;return;}if(id.startsWith('exp-stage-')){const k=Number(id.slice(10));if(e.profile.visited.includes(k)){e.selectedStage=k;e.start('zen',{stage:k});}return;}
  if(id.startsWith('exp-mode-')){e.start(id.slice(9));return;}if(id.startsWith('exp-puzzle-')){e.selectedPuzzle=Number(id.slice(11));e.start('puzzle',{puzzle:e.selectedPuzzle});return;}
  if(id.startsWith('exp-pref-')){const key=id.slice(9);if(['tapOnly','highContrast','largeCursor','comboTreatment','ghost'].includes(key)){a.prefs[key]=!a.prefs[key];a.savePreferences();}return;}
@@ -3081,7 +3087,7 @@ CabinetUI.prototype.drawPanel=function(){
  if(chosen.semitones<0){this.text('Pitch depth',x,y,16,UI_ART.highlight);y+=32;const dw=(w-gap*2)/3;for(const [i,depth,label]of [[0,2,'Lower'],[1,4,'Deep'],[2,6,'Extra deep']])this.button('announcer-depth-'+depth,label,x+i*(dw+gap),y,dw,42,chosen.semitones===-depth);y+=65;}else{this.text(chosen.pitchLabel||'Original pitch',x,y,13,UI_ART.dim);y+=35;}
  for(const [key,label]of [['welcome-back','Welcome back'],['dazzling','Big combo'],['team','Team Resonance']]){this.button('announcer-preview-'+key,'Hear: '+label,x,y,w,42);y+=53;}
  this.text(n.source?'Speaking...':!a.prefs.announcer?'Announcer off.':a.prefs.muted?'Sound is off.':!a.prefs.announcerVolume?'Voice volume is zero.':'Occasional celebrations; the music keeps playing.',x,y,12,UI_ART.dim,'left',w);y+=37;
- this.maxScroll=Math.max(0,y+this.scroll-m.body.y-m.body.h+12);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);if(this.maxScroll){const h=m.body.h,th=Math.max(26,h*h/(h+this.maxScroll));p.box(m.x+m.w-12,m.body.y,3,h,UI_ART.enamel,1);p.box(m.x+m.w-14,m.body.y+(h-th)*this.scroll/this.maxScroll,6,th,UI_ART.edge,2);}this.text('Esc to return / scroll for more',m.x+21,m.y+m.h-24,11,UI_ART.dim,'left',m.w-42);
+ this.maxScroll=Math.max(0,y+this.scroll-m.body.y-m.body.h+12);this.scroll=clamp(this.scroll,0,this.maxScroll);p.clip(null);if(this.maxScroll){const h=m.body.h,th=Math.max(26,h*h/(h+this.maxScroll));p.box(m.x+m.w-12,m.body.y,3,h,UI_ART.enamel,1);p.box(m.x+m.w-14,m.body.y+(h-th)*this.scroll/this.maxScroll,6,th,UI_ART.edge,2);}this.text(this.panelHint(),m.x+21,m.y+m.h-24,11,UI_ART.dim,'left',m.w-42);
 };
 const announcerActivate=CabinetUI.prototype.activate;
 CabinetUI.prototype.activate=function(id){

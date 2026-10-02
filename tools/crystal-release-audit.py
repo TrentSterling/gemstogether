@@ -4,11 +4,13 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'tools/out'
+VERSION=sys.argv[1] if len(sys.argv)>1 else '3.3.6'
 pack_path=ROOT/'tools/announcer-pack.json'
 pack=json.loads(pack_path.read_text(encoding='utf-8'))
 html=(ROOT/'index.html').read_text(encoding='utf-8')
@@ -23,7 +25,7 @@ def check(name,value):
 
 embedded=json.loads(re.search(r'const ANNOUNCER_PACK=(.*);\nconst ANNOUNCER_VISIT=',html).group(1))
 check('final HTML embeds exact selected pack',embedded==pack)
-check('3.3.5 browser version and pack upgrade',"version:'3.3.5'" in html and pack['version']==3)
+check(VERSION+' browser version and pack upgrade',("version:'"+VERSION+"'") in html and pack['version']==3)
 check('Silver crystal default and complete nineteen-line selection',pack['defaultProfile']=='silver'
       and pack['profiles']['silver']['name']=='Silver crystal'
       and set(pack['profiles']['silver']['clips'])==set(manifest['clips']) and len(manifest['clips'])==19)
@@ -56,20 +58,21 @@ check('all 133 current compressed speech checks pass',len(speech)==133 and all(c
       c['mp3Sha256']==digest(OUT/'announcer'/c['file']) for c in speech))
 runtime=json.loads((OUT/'announcer/runtime-results.json').read_text())
 check('current audio, settings and private co-op gate',runtime['pass']==163 and runtime['fail']==0)
-log_bytes=(OUT/'announcer/crystal-game.log').read_bytes()
+game_log=OUT/'release'/('game-'+VERSION+'.log') if VERSION!='3.3.5' else OUT/'announcer/crystal-game.log'
+log_bytes=game_log.read_bytes()
 game=log_bytes.decode('utf-16' if log_bytes.startswith((b'\xff\xfe',b'\xfe\xff')) else 'utf-8-sig')
-check('current 3.3.5 browser release gate','PASS version 3.3.5' in game and '22 passed, 0 failed' in game)
+check('current '+VERSION+' browser release gate',('PASS version '+VERSION) in game and '22 passed, 0 failed' in game)
 firefox=json.loads((OUT/'highlights/firefox-results.json').read_text())
 check('Firefox selected stereo voice and voice-off control',firefox['pass'] and firefox['voice']['channels']==2
       and firefox['voice']['name']=='Silver crystal' and firefox['voice']['disabled'])
 check('original source drop unchanged',not subprocess.check_output(['git','diff','--name-only','d412882','--',
       'versions/gemstogether-v3.2.4.html'],cwd=ROOT).strip())
-result=dict(version='3.3.5',createdUtc=datetime.now(timezone.utc).isoformat(),
+result=dict(version=VERSION,createdUtc=datetime.now(timezone.utc).isoformat(),
     htmlSha256=digest(ROOT/'index.html'),packSha256=digest(pack_path),selection='Original 07 / Tuned stereo crystal',
     passed=sum(c['passed'] for c in checks),failed=sum(not c['passed'] for c in checks),checks=checks,levels=levels,
     receipts={name:digest(OUT/name) for name in ['announcer/runtime-results.json','announcer/speech-results.json',
-        'announcer/crystal-game.log','highlights/firefox-results.json']})
-(OUT/'release/crystal-3.3.5.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        str(game_log.relative_to(OUT)).replace('\\','/'),'highlights/firefox-results.json']})
+(OUT/('release/crystal-'+VERSION+'.json')).write_text(json.dumps(result,indent=2),encoding='utf-8')
 (OUT/'announcer/crystal-level-results.json').write_text(json.dumps(levels,indent=2),encoding='utf-8')
 print(result['passed'],'passed;',result['failed'],'failed',flush=True)
 raise SystemExit(1 if result['failed'] else 0)

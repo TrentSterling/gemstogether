@@ -71,17 +71,18 @@ Direction, never break these:
 - Ground every light to real geometry. The cyan rail inlay is centered at +-4.07, z .107 with .14 mesh depth; socket brackets sit at local +- .392, z .077. Corner gems are (+-4.10, +-4.10) at z .30 top / .40 bottom, crown [0, 4.98, .05], plinth front z .32. Project actual mesh vertices and transforms for gem outlines.
 - Intensity in the music comes from layering (latched), never from tempo; one steady 88 BPM.
 
-Patch code lives in `tools/polish.py` (rep() pairs, patches 1-27), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser version is 3.3.5. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
+Patch code lives in `tools/polish.py` (rep() pairs, patches 1-28), `tools/resonance.js` (FX, stages, Resonance, the combo ladder), `tools/music.js` (ResonanceMusic), `tools/expedition.js` (3.3 progression, challenges, comfort, photos, social moments and stage transitions) and `tools/announcer.js` (local voice presentation). Rebuild: `python tools/polish.py`; the exact 3.2.4 drop remains untouched. Browser version is 3.3.6. Patch 28 adds direct board access to Play, input-specific panel hints and mobile touch/rotation coverage. The Qwen pack is `tools/announcer-pack.json`; retained synthetic references are in `tools/voice-references/`. See `tools/ANNOUNCER.md` for generation, filenames and the listening page.
 
 Patch 23 aligns stage entrances and progression changes on the local soundtrack bar and adds three phases per stage. `fx.stage` remains score-derived for shared Resonance capacity; `fx.visualStage`, `visualPhase` and `stageTravel` are local presentation. Never delay the board or sync these local clocks. A loaded track or muted music uses an immediate fade. `__jewel.fx()` exposes entrance timestamps for verification.
 
 Patch 24 finishes distinct harmonies for all six stages. `music.key(at)` follows the harmony audible at a scheduled time, including pending travel; it is relative to the existing shared Gem tones key. Only pitched buffers transpose. Pads fade at a key change; new boards reset the local music scheduler and earned layers. Music routes through `audio.resonanceFilter`, then the announcer's ducker, then the compressor. Voice and SFX bypass that filter. `comboTreatment` is a local preference, true unless explicitly false; Low's large-flash interval is shared across match, Resonance and combo effects. The listening comparison is `tools/out/harmony/index.html`.
 
 Test and receipts tools:
+Run the timing-sensitive audio gates without concurrent GPU/audio harnesses. Competing workloads can interrupt the real clock and invalidate a downbeat timing measurement.
 - `tools/verify.mjs` (22 checks, also the live URL)
 - `tools/expedition-audit.mjs` (48 progression/challenge/photo/private co-op checks)
 - `tools/expedition-network.mjs` (15 team, spectator and host migration checks; random isolated public room)
-- `tools/expedition-visual.mjs` (68 desktop/phone, WebGPU/WebGL, controller, keyboard and PNG checks)
+- `tools/expedition-visual.mjs` (112 desktop/mobile, WebGPU/WebGL, real browser touch events at 2x density, scrolling, rotation, compact HUD/overlay bounds, controller, keyboard and PNG checks; physical devices remain manual)
 - `tools/expedition-stage.mjs` (16 checks for both backend fades, input during travel, reduced motion and Starfall shooting stars)
 - `tools/journey-audit.mjs` (30 real audio-clock/phase checks on both backends, plus private co-op with different local clocks)
 - `tools/harmony-audit.mjs` (121 actual tone, spectrum, comfort, offline audio and private co-op checks); `tools/harmony-listen.mjs` renders the before/after listening page

@@ -6,7 +6,7 @@ import {join} from 'node:path';
 
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
-export async function launch({port, width = 1280, height = 800, headless = true} = {}) {
+export async function launch({port, width = 1280, height = 800, headless = true, mobile = false, deviceScaleFactor = 1} = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'sd-chrome-'));
   const args = [
     headless ? '--headless=new' : '', `--remote-debugging-port=${port}`, `--user-data-dir=${dir}`,
@@ -38,7 +38,8 @@ export async function launch({port, width = 1280, height = 800, headless = true}
   });
   const call = (method, params) => send(method, params, sessionId);
   await call('Page.enable'); await call('Runtime.enable'); await call('Log.enable');
-  await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false});
+  await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor, mobile});
+  if (mobile) await call('Emulation.setTouchEmulationEnabled', {enabled: true, maxTouchPoints: 1});
   const page = {
     logs, proc, dir, call, browser: send,
     goto: url => call('Page.navigate', {url}),

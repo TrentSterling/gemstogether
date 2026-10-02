@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.3.6 hosting patch 28 (2026-10-01) Play access and phone guidance
+
+- Play opens challenges and puzzles directly from the board; Journey retains progression and stage choices. The seven board controls fit one desktop row or two phone rows.
+- All panel footers follow the latest input. Touch names Back or Audio and explains swiping; keyboard keeps Esc and scrolling; controller names B or Circle and explains trigger scrolling.
+- On screens 640 pixels tall or shorter, the About link moves to the top corner so it cannot cover game controls. Compact portrait and landscape overlap checks cover both renderers.
+- Short landscape layouts place score, stage, Resonance and challenge information above the button rail, with a compact first-run hint and side notices. Timed best-run ghosts retain their score comparison.
+- Phone verification now uses mobile emulation at 2x density, browser touch taps and swipes, challenge selection and portrait/landscape rotation on WebGPU and WebGL. Physical phone and USB-controller playtests remain manual.
+- README, roadmap and art direction now describe the selected Silver crystal voice and current browser release.
+- Validation: gameplay 22/22; UI/touch 112/112 across both renderers; progression/private co-op 48/48; spectator/host migration 15/15; stage transitions 16/16; audio-clock journey 30/30; stage harmonies 121/121; aligned highlights 21/21; audio/settings/private co-op 163/163; selected-asset release audit 30/30. Firefox 157 / WebGL 2 renders cleanly and verifies stereo voice playback and immediate voice disable.
+
 ## 3.3.5 hosting patch 27 (2026-09-30) Silver crystal
 
 - Silver crystal is the selected default: exact Original 07 / Tuned stereo crystal from the voice auditions. All nineteen performances retain the approved compressed bytes, with low pitch correction, darker vowels, short stereo layers and a small bloom.

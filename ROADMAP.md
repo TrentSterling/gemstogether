@@ -1,8 +1,8 @@
 # Roadmap
 
-Every idea from the 2026-09-28 playtest thread on Discord, plus Tront's calls. Research backing: `research/TETRIS-EFFECT-DEEP-DIVE.md` (short pass; a deeper research handoff is coming from a separate run).
+Every idea from the 2026-09-28 playtest thread on Discord, plus Tront's calls. Research backing: `research/TETRIS-EFFECT-DEEP-DIVE.md` and `research/DEEP-RESEARCH-COMBO-SPECTACLE.md`.
 
-Current scope (Trent, 09-30): ship the browser game on tront.xyz with the selected unprocessed Silver master announcer. MIDI is cancelled. Steam and Windows packaging are outside this project; earlier experiments are historical. Trent approved publication after selecting Silver / arcade lift.
+Current scope (Trent, 09-30): the browser game on tront.xyz with the selected Silver crystal announcer (Original 07 / Tuned stereo crystal). MIDI is cancelled. Steam and Windows packaging are outside this project; earlier experiments are historical. Current browser release: 3.3.6.
 
 ## 0. Andre's feedback (the north star)
 
@@ -53,10 +53,11 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 
 ## Current follow-through
 
-- **Announcer:** patch 26 / 3.3.4 makes Trent's selected Silver / arcade lift the default, with nineteen lines and no final pitch or tone effects. The three approved audition performances are retained. Main Audio has an independent saved Announcer voice switch; previews, volume and earlier voice options remain available. The exact compressed pack passes 133 speech checks; browser playback/UI/private co-op passes 161 checks. OmniVoice's audition remains local.
+- **Announcer:** patch 27 / 3.3.5 makes Trent's selected Original 07 / Tuned stereo crystal the default, named Silver crystal. All nineteen selected MP3s retain their exact approved bytes and stereo layers. Main Audio has an independent saved Announcer voice switch; previews, volume and earlier voice options remain available. The release's compressed pack passed 133 speech checks; browser playback/UI/private co-op passed 163 checks. OmniVoice's audition remains local.
+- **Discoverability and phone controls:** patch 28 / 3.3.6 adds a direct Play button alongside Journey, and panel guidance follows touch, keyboard or controller input. The visual gate covers touch swaps, scrolling, challenge selection and rotation with mobile emulation on both renderers. Physical phone and USB-controller checks remain manual.
 - **Transitions:** sky, background light and 3D stage props blend over 3.2 seconds without pausing play. Patch 23 / 3.3.2 aligns scenery and chord changes on the soundtrack's next downbeat. Three phases add bass, arpeggios, scenery and beat response at a steady 88 BPM. Real audio-clock checks passed 30/30 across both GPU backends and private co-op, including a swap before travel and different local audio settings.
 - **Stage harmony and comfort:** patch 24 / 3.3.3 completes six unique progression pairs and stage keys, matching gem tones and stings, Resonance music filtering, beat-aligned landing sounds and an independent big-combo screen flash switch. Low shares a 350 ms interval across large flash events. Actual audio/GPU/private co-op gate: 121/121; matched music samples are at `tools/out/harmony/index.html`.
-- **Release verification:** browser 3.3.4 is the authorized release. Validate gameplay, both GPU backends, phone controls, private and isolated public co-op, stage travel, harmonies, aligned highlights and the final announcer before pushing; verify the live browser after Pages deploys. Native receipts describe retired experiments.
+- **Release verification:** browser 3.3.6 is the current release. Validate gameplay, both GPU backends, phone controls, private and isolated public co-op, stage travel, harmonies, aligned highlights and the final announcer before pushing; verify the live browser after Pages deploys. Native receipts describe retired experiments.
 
 ## Standing direction (Tront's calls, these override research)
 
@@ -65,7 +66,7 @@ Trent authorized every priority except MIDI, plus the brainstorm below. Source: 
 - **Endless/zen is the heart.** It is Jennifer's favourite mode. Progression, stages and fail states sit on top as options, never replacements.
 - **No meme callouts in the game.** Milestones stay huge, but the text is plain (5K, 10K...). (André: the "it's over 9000" reference had to go.)
 - **Co-op first.** Every feature has to work, and feel good, for everyone in the room, not just solo. Test the co-op path, not `#solo=1` only.
-- **Art bible + direction doc next:** codify palette, particle language, the tier ladder, motion rules, audio rules and comfort rules in one place (ART-BIBLE.md), fed by the deep research handoff.
+- **Art bible:** palette, particle language, the tier ladder, motion, audio and comfort rules are codified in ART-BIBLE.md, including the deep research handoff and selected Silver crystal voice.
 
 ## 1. Combos that feel like COMBOS (top priority)
 
@@ -118,6 +119,8 @@ The escalation ladder (every tier keeps everything below it and adds a new KIND 
 
 ## Done
 
+- Patch 28 (3.3.6): direct Play access, responsive seven-button board rail, input-specific guidance across all panels and mobile touch/rotation coverage.
+- Patch 27 (3.3.5): selected Silver crystal announcer, nineteen exact approved stereo MP3s and frozen rebuild assets. Voice-off and volume preferences survive the upgrade.
 - Patch 26 (3.3.4): selected natural Silver master announcer, nineteen lines, exact approved audition performances and a saved voice switch directly on Audio. Older voice choices and independent voice volume remain available.
 - Patch 25 (3.3.3 playtest): actual gem contours, one depth-tested physical socket bracket and a beat pulse in the existing cyan cabinet inlay. No detached HUD light bands.
 - Patch 24 (3.3.3): six distinct stage harmonies, musical gem and celebration tones, music-bus filtering during Resonance and the saved big-combo screen flash option. New-board audio resets and queued tones across a key change are verified; Full remains the default.

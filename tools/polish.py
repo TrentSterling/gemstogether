@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.5'")
+rep("version:'3.2.4'", "version:'3.3.6'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -478,7 +478,7 @@ rep("x.slot=i<PUBLIC_ROOM.maxPlayers?i+1:0;", "x.slot=i<(this.testPublicLimit||P
 rep("this.lineDivider(x,yy+365,w);this.button('fullscreen','Fullscreen',x,yy+386,w,42);this.button('new-board','New board',x,yy+442,w,42);end=yy+513;", "this.lineDivider(x,yy+365,w);this.button('exp-comfort','Input and comfort',x,yy+386,w,42);this.button('fullscreen','Fullscreen',x,yy+439,w,42);this.button('new-board','New board',x,yy+495,w,42);end=yy+566;")
 rep("end=y+365;", "this.button('exp-music','Live music layers',x,y+361,w,42);end=y+424;")
 rep("this.selected=-1;this.trySwap(this.keyboardCell,to);", "this.selected=-1;this.expedition?.input('pad');this.trySwap(this.keyboardCell,to);")
-rep("Swap a prism with any gem to clear that colour. No timer or lives.", "Swap a prism with any gem to clear that colour. Endless has no timer or lives; Journey also has challenges.")
+rep("Swap a prism with any gem to clear that colour. No timer or lives.", "Swap a prism with any gem to clear that colour. Endless has no timer or lives; Play has challenges and puzzles.")
 
 # Patch 22: selected local voices embedded for browser play.
 pack_path = ROOT / 'tools' / 'announcer-pack.json'
@@ -532,6 +532,20 @@ rep("col=base*(1.4+juice*2.2+energy*3.0)*wave;", """col=base*(1.4+juice*2.2+ener
     float blue=frame.y-red*65536.0-green*256.0;
     col+=vec3(red,green,blue)/255.0*frame.x*4.5;
    }""")
+
+# Patch 28: every panel follows the most recent touch, keyboard or controller input.
+rep('</head>', '<style>@media(max-height:640px){#trontAbout.tront-about{top:12px;bottom:auto;left:auto;right:12px;}}</style></head>')
+rep('sy=top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);',
+    'sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,159);')
+rep('if(w>=600&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0',
+    'if(w>=600&&h>=460&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0')
+rep("const text=this.fitLine(this.toastMessage,w-58,13),tw=Math.min(w-22,this.measure(text,13)+32);let ty=(wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque((w-tw)/2,ty,tw,32);this.text(text,w/2,ty+9,13,UI_ART.highlight,'center',tw-20);",
+    "const compactToast=wide&&h<460,text=this.fitLine(this.toastMessage,compactToast?Math.max(80,w-right-56):w-58,13),tw=Math.min(w-22,this.measure(text,13)+32),tx=compactToast?w-tw-12:(w-tw)/2;let ty=(compactToast?Math.max(60,top+(bottom-top)*.28):wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque(tx,ty,tw,32);this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);")
+rep("window.addEventListener('keydown',e=>{if(e.target?.id==='coop-code-input')return;",
+    "window.addEventListener('keydown',e=>{a.lastInputDevice='keyboard';if(e.target?.id==='coop-code-input')return;")
+rep("this.text('Esc to return / scroll for more',", "this.text(this.panelHint(),", 4)
+rep("this.text('Esc to return',", "this.text(this.panelHint(),")
+rep("this.text('Scroll for more',", "this.text(this.panelHint(),")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

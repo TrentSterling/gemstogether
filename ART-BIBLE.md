@@ -1,6 +1,6 @@
 # Gems Together: art bible and direction
 
-The rules every patch follows. Tront's calls override research. Living document: the deep Tetris Effect / Lumines research handoff will add to it; `research/TETRIS-EFFECT-DEEP-DIVE.md` is the short pass.
+The rules every patch follows. Tront's calls override research. The deep Tetris Effect / Lumines handoff is recorded in `research/DEEP-RESEARCH-COMBO-SPECTACLE.md`; `research/TETRIS-EFFECT-DEEP-DIVE.md` is the short pass.
 
 ## North star
 
@@ -76,12 +76,13 @@ The soundtrack stays at 88 BPM. Stages change chords, colour and scenery on the 
 - Resonance filters the music bus from 2.2 kHz toward 4.2 kHz as clears bank, then restores 20 kHz at payout. Loaded tracks use the same filter. Gem effects and narration have their own route.
 - A player's own loaded track always wins over the soundtrack.
 - Loading a track fades the old synth bus and pads; removing it starts the current stage's harmony again. All eight Gem tones choices retain pitch across six stages. Team phrases shift by a whole octave when needed to keep their top notes in range.
-- Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. The selected synthetic Qwen identities are Warm founder and Cave-inspired clean, lowered by 2, 4 or 6 semitones. Warm founder / -4 is the default. Ordinary matches keep their musical sounds; speech ducks the music, respects mute and has a cooldown and repeat guard. Voice choice and volume stay local; Jennifer's calm preset disables speech. OmniVoice remains a local audition.
+- Announcer direction: warm and playful, short stage welcomes and earned combo/team moments. Silver crystal is the default, using the exact nineteen approved Original 07 / Tuned stereo crystal MP3s, with low pitch correction, darker vowels, short stereo layers and a small bloom. Normal rebuilds install the frozen selected bytes without synthesis or re-encoding. Warm founder and Cave-inspired clean remain optional at three pitch depths. Ordinary matches keep their musical sounds; speech ducks the music, respects mute and has a cooldown and repeat guard. Voice choice and volume stay local; Jennifer's calm preset disables speech. OmniVoice remains a local audition.
 
 ## Comfort (options, never defaults)
 
 - Reduced motion: no camera punch, no strobe, the swirl freezes, flashes soften (already honoured).
 - Flash Intensity has Full (default), Low and Off. Low shares a 350 ms interval across large flash events and eases their light envelope. Big combo screen flash is independently selectable in Journey > Comfort, on by default. Speed lines, lasers and audio remain available with that flash disabled. Tap-only swapping, high contrast outlines, a larger cursor and Jennifer's calm preset are local choices.
+- Play opens challenge selection directly from the board; Journey retains progression and unlocked stage choices. Board controls remain reachable on phone and desktop. Panel guidance follows the most recent input: touch uses Back/Audio and swipes, keyboard uses Esc and scrolling, controller uses its return button and triggers.
 
 ## Receipts standard
 

@@ -1,10 +1,11 @@
 // Release gate: real GPU Chrome, solo boot (#solo=1 so the harness never joins the public room),
 // real pointer drag swap, About pill clear of the GPU buttons, phone viewport, Settings panel.
-//   node tools/verify.mjs [file-or-url]      (also run against https://tront.xyz/gemstogether/)
+//   node tools/verify.mjs [file-or-url] [expected-version]  (also run against https://tront.xyz/gemstogether/)
 import {launch, sleep, until} from './cdp.mjs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const target = process.argv[2] || 'index.html';
+const expectedVersion = process.argv[3] || process.env.EXPECT_VERSION || '3.3.6';
 const base = /^https?:/.test(target) ? target : pathToFileURL(resolve(target)).href;
 const J = 'window.__jewel';
 let pass = 0, fail = 0;
@@ -30,7 +31,7 @@ async function hits(page) { return (await page.eval(`${J}.ui()`)).hits || []; }
 let page = await boot(1280, 800, 9476);
 try {
   const d = await page.eval(`${J}.diagnostics()`);
-  ok('version 3.3.5', d.version === '3.3.5', d.version);
+  ok('version ' + expectedVersion, d.version === expectedVersion, d.version);
   ok('GPU backend', /WebGPU|WebGL/.test(d.backend), d.backend);
   ok('no runtime errors', d.errors.length === 0, JSON.stringify(d.errors).slice(0, 200));
   const s = await page.eval(`${J}.state()`);
