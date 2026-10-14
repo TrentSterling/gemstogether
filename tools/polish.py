@@ -579,4 +579,16 @@ left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l a
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')
 print(f'wrote {DST} ({len(orig)} -> {len(html)} bytes)')
-subprocess.run([sys.executable, 'C:/trontstack/seo/about.py', 'gemstogether'], check=True)
+# Keep the approved About integration reproducible without an external checkout.
+import re
+html = DST.read_text(encoding='utf-8')
+fragment = (ROOT / 'tools' / 'about-fragment.html').read_text(encoding='utf-8').strip()
+html = re.sub(r'<!-- tront-about:start -->.*?<!-- tront-about:end -->', '', html, flags=re.S)
+html = html.replace('</body>', fragment + '\n</body>')
+head = '<link rel="stylesheet" href="tront-about-discovery.css">\n<link rel="stylesheet" href="tront-about-shell.css">\n<script src="tront-about-shell.js"></script>\n'
+html = html.replace('<head>', '<head>\n' + head, 1)
+DST.write_text(html, encoding='utf-8', newline='\n')
+
+# Mark the animated game surface for the shared preview resource policy.
+html = html.replace('id="scene"', 'id="scene" data-tront-discovery-game-surface', 1)
+DST.write_text(html, encoding='utf-8', newline='\n')

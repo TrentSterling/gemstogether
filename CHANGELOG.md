@@ -1,3 +1,8 @@
+## 2026-10-14: About discovery
+
+- Consolidate the existing About copy and links with the approved game discovery component.
+- Keep the panel collapsed during play; isolate its keyboard, pointer and touch input, preserve fullscreen, and return pointer lock only through the original game control.
+
 # Changelog
 
 ## 3.3.7 hosting patches 29-30 (2026-10-02) Readable HUD and resilient discovery
