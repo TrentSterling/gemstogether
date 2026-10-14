@@ -588,3 +588,7 @@ html = html.replace('</body>', fragment + '\n</body>')
 head = '<link rel="stylesheet" href="tront-about-discovery.css">\n<link rel="stylesheet" href="tront-about-shell.css">\n<script src="tront-about-shell.js"></script>\n'
 html = html.replace('<head>', '<head>\n' + head, 1)
 DST.write_text(html, encoding='utf-8', newline='\n')
+
+# Mark the animated game surface for the shared preview resource policy.
+html = html.replace('id="scene"', 'id="scene" data-tront-discovery-game-surface', 1)
+DST.write_text(html, encoding='utf-8', newline='\n')

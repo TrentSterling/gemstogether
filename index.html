@@ -20,7 +20,7 @@
 #accessibility-status{position:fixed;left:-10000px;width:1px;height:1px;overflow:hidden}
 #coop-code-input{position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0;font-size:16px;}
 </style><style>@media(max-height:640px){#trontAbout.tront-about{top:12px;bottom:auto;left:auto;right:12px;}}</style></head><body>
-<div id="accessibility-status" role="status" aria-live="polite"></div><canvas tabindex="0" id="scene" aria-label="Interactive 3D match-three jewel board. Use the mouse or touch to swap adjacent jewels. Keyboard: arrow keys and Space."></canvas><div id="shade"></div>
+<div id="accessibility-status" role="status" aria-live="polite"></div><canvas tabindex="0" id="scene" data-tront-discovery-game-surface aria-label="Interactive 3D match-three jewel board. Use the mouse or touch to swap adjacent jewels. Keyboard: arrow keys and Space."></canvas><div id="shade"></div>
 <div id="hud">
  <header id="brand"><svg class="sigil" width="42" height="48" viewBox="0 0 42 48" fill="none" aria-hidden="true"><path d="M21 2L37 15 32 33 21 46 10 33 5 15 21 2ZM5 15H37L21 46 5 15ZM21 2L14 15 21 33 28 15 21 2ZM10 33H32" stroke="currentColor" stroke-width=".8"/></svg><h1>Gems Together</h1></header>
  <div id="scores"><label>SCORE</label><div id="score">0</div><div id="best-block"><label>BEST</label><div id="best">0</div></div><div id="score-rule"></div><div id="moves">0 moves</div></div>
@@ -3134,7 +3134,6 @@ $('retry-gl').onclick=()=>{const u=new URL(location.href);u.searchParams.set('we
         </div>
         <h3 class="tront-discovery__games-title">Games</h3>
         <div class="tront-discovery__grid" data-tront-discovery-cards></div>
-        <p class="tront-discovery__status" data-tront-discovery-status role="status" aria-live="polite"></p>
         <noscript><p class="tront-discovery__hub"><a href="/craftmine/">CraftMine</a> &middot; <a href="/smear/">SMEAR</a> &middot; <a href="/games/">More games and tools</a></p></noscript>
     </section>
 </details>
