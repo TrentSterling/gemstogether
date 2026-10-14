@@ -19,7 +19,7 @@ async function waitForGame(page) {
     terrainlab:()=>window.__surfaceWorld && document.getElementById('loading').hidden,
     tunnelrat:()=>window.TR?.ready,
     vibecraft:()=>document.querySelector('canvas') && /FPS:/.test(document.getElementById('info').textContent),
-    vibespace:()=>!!document.querySelector('#debug-panel input'),
+    vibespace:()=>typeof document.getElementById('toggle-debug').onclick==='function',
     vibemaze:()=>document.getElementById('gameScreen').textContent!=='Loading...'
   };
   await page.waitForFunction(ready[repository],{},{timeout:90000});
@@ -117,16 +117,24 @@ const server = http.createServer((req,res)=>{
         };
       });
       const page = await context.newPage(); const mp4=[]; const errors=[];
+      page.setDefaultTimeout(60000);
       page.on('request',r=>{if(/\.mp4(?:\?|$)/.test(r.url()))mp4.push(r.url());});
       page.on('pageerror',e=>errors.push(e.message));
-      await page.goto(base+(repository==='gemstogether'?'#solo=1':''),{waitUntil:'domcontentloaded',timeout:90000});
+      const gameUrl=new URL(base);
+      if(repository==='gemstogether'){
+        gameUrl.hash='solo=1';
+        // The normal WebGPU path is covered by the local 22-check release gate.
+        // Hosted CI has software graphics; exercise the shipped WebGL fallback.
+        if(process.env.CI)gameUrl.searchParams.set('webgl','');
+      }
+      await page.goto(gameUrl.href,{waitUntil:'domcontentloaded',timeout:90000});
       await page.waitForFunction(()=>!!window.TrontAboutDiscovery);
       await waitForGame(page);
       await page.waitForTimeout(500);
       assert.equal(await page.locator('[data-tront-discovery-game]').count(),0,'cards must wait for open');
       assert.equal(mp4.length,0,'no eager MP4');
       const summary=page.locator('#trontAbout > summary');
-      await page.screenshot({path:path.join(output,`${repository}-${mode}-initial.png`),timeout:10000});
+      await page.screenshot({path:path.join(output,`${repository}-${mode}-initial.png`),timeout:60000});
       console.log(repository,mode,'initial',await summary.boundingBox());
       if(mode==='touch')console.log('viewport',await page.evaluate(()=>({w:innerWidth,h:innerHeight,cw:document.documentElement.clientWidth,ch:document.documentElement.clientHeight,vw:visualViewport.width,vh:visualViewport.height,scale:visualViewport.scale})));
       if(mode==='touch') await summary.tap(); else await summary.click();
