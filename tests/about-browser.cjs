@@ -109,6 +109,12 @@ const server = http.createServer((req,res)=>{
         }
       });
       if(mode==='save-data')await context.addInitScript(()=>Object.defineProperty(navigator,'connection',{value:{saveData:true},configurable:true}));
+      if(repository==='gemstogether'&&process.env.CI)await context.addInitScript(()=>{
+        // Exercise the shipped render-scale/AA preferences on the software GPU.
+        // Default-quality WebGPU and the 22-check game gate run on local hardware.
+        // All real input, layout, media, fullscreen and audio assertions remain.
+        localStorage.setItem('gemstogether-settings-v1',JSON.stringify({quality:0.5,aaMode:'off',particles:false}));
+      });
       if(repository==='vibespace'&&mode==='desktop')await context.addInitScript(()=>{
         const lock=Element.prototype.requestPointerLock;
         Element.prototype.requestPointerLock=function(options){
