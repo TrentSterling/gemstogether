@@ -5,3 +5,6 @@ __pycache__/
 desktop/node_modules/
 desktop/dist/
 desktop/.stage/
+
+node_modules/
+tests/about-evidence/
