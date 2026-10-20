@@ -1,10 +1,13 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.8**, round A01 (2026-10-20). `drawHintSwap` in
-`tools/expedition.js` renders a static local swap arrow for existing hints.
-Run `tools/hint-audit.mjs` and `tools/hint-coop-audit.mjs` for its regression
-checks. Timestamped round notes live in `rounds/`; media stays in `tools/out/`
-and the Library evidence bundle. The detailed 3.3.7 handoff below is historical.
+Current gauntlet release: **3.3.9**, round A02 (2026-10-20). Result screens now
+compare timed, 30-move and daily scores with the player's existing local best.
+`tools/result-audit.mjs` covers record states and short-screen layout;
+`tools/result-coop-audit.mjs` verifies different host/peer personal records.
+A01's static hint swap arrow remains covered by `tools/hint-audit.mjs` and
+`tools/hint-coop-audit.mjs`. Timestamped round notes live in `rounds/`; media
+stays in ignored `tools/out/` and local evidence bundles. Library delivery is
+recorded separately. The detailed 3.3.7 handoff below is historical.
 
 Co-op match-three (one HTML file, own GPU renderer: WebGPU with WebGL2 fallback, Trystero/WebRTC co-op). Live at https://tront.xyz/gemstogether/ (public repo `TrentSterling/gemstogether`, Pages from `main` root, https enforced). ChatGPT writes the drops; this repo hosts them. Built by Tront for Jennifer.
 

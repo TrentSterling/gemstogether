@@ -61,7 +61,7 @@ class GemsExpedition {
   const stage=Number(options.stage??this.selectedStage),puzzle=Number(options.puzzle??this.selectedPuzzle);
   if(!Number.isInteger(stage)||stage<0||stage>5||mode==='zen'&&!this.profile.visited.includes(stage))return false;
   if(!Number.isInteger(puzzle)||puzzle<0||puzzle>=EXPEDITION_PUZZLES.length)return false;
-  this.run=this.makeRun(mode,{stage,puzzle});this.lastClock=performance.now();this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=0;this.a.fx.stage=undefined;this.a.gameOver=null;if(this.a.ui){this.a.ui.sc=null;this.a.ui.rc=null;this.a.ui.rp=null;this.a.ui.co=null;this.a.ui.burst=null;}
+  this.run=this.makeRun(mode,{stage,puzzle});this.resultRecord=null;this.lastClock=performance.now();this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=0;this.a.fx.stage=undefined;this.a.gameOver=null;if(this.a.ui){this.a.ui.sc=null;this.a.ui.rc=null;this.a.ui.rp=null;this.a.ui.co=null;this.a.ui.burst=null;}
   const seed=mode==='daily'?expeditionSeed(this.run.day):mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].seed:options.seed??Date.now();
   this.starting=true;try{this.a.newBoard(seed);}finally{this.starting=false;}
   if(mode==='puzzle'&&EXPEDITION_PUZZLES[puzzle].goal==='targets'){
@@ -71,7 +71,7 @@ class GemsExpedition {
   if(this.a.coop?.hosting){this.a.coop.revision++;this.a.coop.publish('reset',{state:this.a.coop.snapshot()});}
   this.a.closePanel();this.a.toast(mode==='zen'?'Endless: '+FX_STAGES[stage].name:mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].description:mode==='daily'?'Daily board: '+this.run.day:'Challenge: '+EXPEDITION_MODES[mode]);return true;
  }
- resetForBoard(fixture){if(this.starting)return;this.run=this.makeRun('zen');this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.stage=undefined;this.forgeFocus=null;}
+ resetForBoard(fixture){if(this.starting)return;this.run=this.makeRun('zen');this.resultRecord=null;this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.stage=undefined;this.forgeFocus=null;}
  acceptSwap(){const r=this.run;if(!this.active)return true;if(r.finished)return false;if(r.mode==='timed'&&r.elapsed>=r.limit)return false;return !['moves','daily','puzzle'].includes(r.mode)||this.a.board.moves<r.limit;}
  tick(dt){
   this.connectSocial();const a=this.a,r=this.run,now=performance.now(),elapsed=a.debugManual?dt:Math.max(0,(now-this.lastClock)/1000);this.lastClock=now;
@@ -110,11 +110,24 @@ class GemsExpedition {
   if(r.mode==='timed'){if(r.samples.at(-1)?.[0]===120)r.samples[r.samples.length-1]=[120,r.score];else r.samples.push([120,r.score]);}this.commitResult();this.a.fx.fanfare();this.a.rumble?.(.9,.6,380);if(a.coop?.hosting)a.coop.publish('settings');
  }
  commitResult(){const r=this.run;if(!r.finished||this.committed===r.id||!this.active)return;this.committed=r.id;
+  // Capture the local comparison before saving a new best. Never put it in the
+  // shared run/snapshot: co-op partners can have different personal records.
+  if(['timed','moves','daily'].includes(r.mode)){
+   const prior=r.mode==='daily'?(this.profile.daily?.day===r.day?this.profile.daily:null):this.profile.bests[r.mode];
+   this.resultRecord={id:r.id,mode:r.mode,score:r.score,previous:prior?.score??null};
+  }else this.resultRecord=null;
   if(r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'){if(!this.profile.puzzles.includes(r.puzzle))this.profile.puzzles.push(r.puzzle);this.unlock('PUZZLE_CLEAR');}
   if(r.mode==='timed')this.unlock('TIMED_CLEAR');
   if(r.mode==='daily'){const old=this.profile.daily;if(!old||old.day!==r.day||r.score>old.score)this.profile.daily={day:r.day,score:r.score,moves:r.moves};this.unlock('DAILY_CLEAR');this.shareDaily();}
   if(['timed','moves','daily'].includes(r.mode)&&(!this.profile.bests[r.mode]||r.score>this.profile.bests[r.mode].score))this.profile.bests[r.mode]={score:r.score,samples:r.samples.slice(-121)};
   this.save();
+ }
+ resultComparison(){
+  const q=this.resultRecord,r=this.run;if(!q||q.id!==r.id||!r.finished||!this.active)return null;
+  const daily=q.mode==='daily',best=Math.max(q.score,q.previous??0),delta=q.previous===null?null:q.score-q.previous;
+  const title=delta===null?(daily?'FIRST DAILY SCORE':'FIRST SCORE SAVED'):delta>0?(daily?'NEW DAILY BEST':'NEW PERSONAL BEST'):delta===0?(daily?'DAILY BEST TIED':'PERSONAL BEST TIED'):(-delta).toLocaleString()+(daily?' TO DAILY BEST':' TO YOUR BEST');
+  const label=daily?'Best for this daily board':q.mode==='timed'?'Two-minute best':'30-move best';
+  return {title,detail:label+': '+best.toLocaleString(),record:delta===null||delta>0};
  }
  ghostScore(){const samples=this.profile.bests.timed?.samples||[],t=this.run.elapsed;let score=0;for(const x of samples){if(x[0]>t)break;score=x[1];}return score;}
  announce(label,col='#ffd98a',duration=2){this.announcement={label,col,at:this.a.time,duration};}
@@ -135,7 +148,7 @@ class GemsExpedition {
  restore(raw){
   if(!raw||!Object.hasOwn(EXPEDITION_MODES,raw.mode)||typeof raw.id!=='string'||raw.id.length>32||!Number.isInteger(raw.stageStart)||raw.stageStart<0||raw.stageStart>5||!Number.isFinite(raw.elapsed)||raw.elapsed<0||!Number.isInteger(raw.puzzle)||raw.puzzle<0||raw.puzzle>=EXPEDITION_PUZZLES.length)return;
   const fresh=this.run.id!==raw.id;this.run={...this.makeRun(raw.mode,{stage:raw.stageStart,puzzle:raw.puzzle}),...expeditionClone(raw),targets:(raw.targets||[]).slice(0,64),forged:(raw.forged||[]).slice(0,64),samples:(raw.samples||[]).slice(-121)};
-  if(fresh){this.highlights=[];this.current={chain:0,gems:0,points:0};this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=this.a.board.score;this.a.fx.stage=undefined;this.a.gameOver=null;}
+  if(fresh){this.resultRecord=null;this.highlights=[];this.current={chain:0,gems:0,points:0};this.lastClear.clear();this.a.fx.res=null;this.a.fx.resScore=this.a.board.score;this.a.fx.stage=undefined;this.a.gameOver=null;}
   if(this.run.finished){this.a.gameOver={score:this.run.score,stage:this.a.fx.stageInfo(),birth:this.a.time,best:false};this.commitResult();}
  }
  info(){return {version:'3.3.2',run:this.summary(),profile:expeditionClone(this.profile),highlights:expeditionClone(this.highlights),ornaments:EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length,tutorial:this.tourVisible,photo:!!this.photo,dailyFriends:[...this.dailyFriends.values()],props:this.props.active||0,ghostScore:this.ghostScore()};}
@@ -372,7 +385,19 @@ JewelApp.prototype.closePanel=function(){if(this.expedition?.photo){this.expedit
 const expeditionFullscreen=JewelApp.prototype.fullscreen;
 JewelApp.prototype.fullscreen=function(){if(window.gemsDesktop)return window.gemsDesktop.fullscreen().catch(err=>this.toast(err.message));return expeditionFullscreen.call(this);};
 const expeditionGameOver=CabinetUI.prototype.drawGameOver;
-CabinetUI.prototype.drawGameOver=function(){const a=this.app,e=a.expedition,r=e?.run;if(!r?.finished)return expeditionGameOver.call(this);if(a.panelOpen)return;const p=this.ink,{cx,cy,bw}=this.boardBox(),W=bw*.91,H=Math.min(440,Math.max(330,bw*.84)),x=cx-W/2,y=cy-H/2;p.box(x-8,y-8,W+16,H+16,UI_ART.ink,10,.96);this.plaque(x,y,W,H,true);this.text(r.reason,cx,y+25,Math.min(27,bw*.067),UI_ART.highlight,'center',W-24,.12,true);this.text((r.score||0).toLocaleString(),cx,y+76,Math.min(60,bw*.14),UI_ART.text,'center',W-24,.13,true);this.text(r.moves+' moves / '+r.cleared+' gems',cx,y+147,13,UI_ART.dim,'center',W-24);if(e.highlights[0])this.text(e.highlights[0].name+(e.highlights[0].chain?' x'+e.highlights[0].chain:''),cx,y+180,13,'#8ff7ff','center',W-24);const bx=x+18,ww=W-36,by=y+H-113;this.button(r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'exp-next-puzzle':'again',r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'Next puzzle':'Play again',bx,by,ww,42);this.button('exp-endless','Return to endless',bx,by+52,ww,42);};
+CabinetUI.prototype.drawGameOver=function(){
+ const a=this.app,e=a.expedition,r=e?.run;if(!r?.finished)return expeditionGameOver.call(this);if(a.panelOpen)return;
+ const comparison=e.resultComparison(),p=this.ink,{cx,cy,bw}=this.boardBox(),W=Math.max(bw*.91,Math.min(320,a.cssWidth-24)),
+  H=Math.min(440,Math.max(comparison?380:330,bw*.84),a.cssHeight-24),x=cx-W/2,y=clamp(cy-H/2,12,Math.max(12,a.cssHeight-H-12)),
+  // Keep the result, highlight and comparison above full-size replay buttons on short screens.
+  scale=Math.min(1,(H-(comparison?183:125))/197);
+ p.box(x-8,y-8,W+16,H+16,UI_ART.ink,10,.96);this.plaque(x,y,W,H,true);
+ this.text(r.reason,cx,y+25*scale,Math.min(27,W*.08)*scale,UI_ART.highlight,'center',W-24,.12,true);
+ this.text((r.score||0).toLocaleString(),cx,y+76*scale,Math.min(60,W*.18)*scale,UI_ART.text,'center',W-24,.13,true);
+ this.text(r.moves+' moves / '+r.cleared+' gems',cx,y+147*scale,Math.max(11,13*scale),UI_ART.dim,'center',W-24);
+ if(e.highlights[0])this.text(e.highlights[0].name+(e.highlights[0].chain?' x'+e.highlights[0].chain:''),cx,y+180*scale,Math.max(11,13*scale),'#8ff7ff','center',W-24);
+ if(comparison){const ry=y+H-171,col=comparison.record?'#ffe27a':'#a6fff0';p.box(x+18,ry,W-36,44,'#123b42',5,.95);p.line(x+26,ry,x+W-26,ry,1,col,.7);this.text(comparison.title,cx,ry+6,Math.min(14,Math.max(11,bw*.034)),col,'center',W-48,.08,true);this.text(comparison.detail,cx,ry+25,11,UI_ART.text,'center',W-48);}
+const bx=x+18,ww=W-36,by=y+H-113;this.button(r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'exp-next-puzzle':'again',r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'Next puzzle':'Play again',bx,by,ww,42);this.button('exp-endless','Return to endless',bx,by+52,ww,42);};
 const expeditionPollPad=JewelApp.prototype.pollPad;
 JewelApp.prototype.pollPad=function(){const g=Array.from(navigator.getGamepads?.()||[]).find(p=>p?.connected);if(g&&(g.buttons.some(b=>b.pressed)||g.axes.some(v=>Math.abs(v)>.55)))this.lastInputDevice='pad';if(!this.panelOpen)return expeditionPollPad.call(this);if(!g)return;const S=this.menuPad||(this.menuPad={buttons:[],next:0}),now=performance.now(),bt=i=>!!g.buttons[i]?.pressed,down=i=>bt(i)&&!S.buttons[i],ui=this.ui;this.padState=this.padState||{};this.padState.id=g.id;
  if(down(1)||down(9)){this.closePanel();S.buttons=g.buttons.map(b=>b.pressed);return;}let dir=bt(12)||g.axes[1]<-.55?-1:bt(13)||g.axes[1]>.55?1:0;
