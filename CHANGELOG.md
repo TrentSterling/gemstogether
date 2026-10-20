@@ -1,3 +1,10 @@
+## 3.3.9 / Gauntlet A02 (2026-10-20) A target for the next run
+
+- Timed, 30-move and daily result screens show the first saved score, a new best, a tied best or the points needed to reach the player's record.
+- Daily comparisons use the same daily board; co-op partners each see their own existing local record.
+- A static gold or mint plaque keeps the score and best cascade visible above the existing replay actions, including short landscape screens.
+- No save migration, scoring, challenge-budget, network or selected-audio changes. See `rounds/2026-10-20-A02.md` and the release receipt for independent review, tests and matched visual evidence.
+
 ## 3.3.8 / Gauntlet A01 (2026-10-20) Clearer swap hints
 
 - Hint now draws a high-contrast double arrow between the suggested gems, making the intended swap explicit alongside the existing socket brackets.
