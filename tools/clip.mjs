@@ -1,7 +1,7 @@
 // Frame-stepped clips for before/after receipts. Manual clock (game + performance.now), so every build
 // renders the same moments at an exact 30 fps no matter how slow capture is. Solo only (#solo=1).
 //   node tools/clip.mjs <file|url> <label> [scene=cascade] [seconds=6]
-//   scenes: cascade (the drop's deterministic nine-wave fixture), swap (an illegal swap), showcase
+//   scenes: hint (request hint, then tap the suggested swap), cascade, swap, showcase
 // -> tools/out/clips/<label>-<scene>/NNN.png, <label>-<scene>.mp4, <label>-<scene>.gif
 import {launch, until} from './cdp.mjs';
 import {resolve} from 'node:path';
@@ -17,7 +17,7 @@ mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
 const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H});
 const log = [];
-let tour = false, padScript = null, padMove = null, autoplay = false;
+let tour = false, padScript = null, padMove = null, autoplay = false, hintPair = null;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
@@ -27,7 +27,13 @@ try {
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
   if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
   const step = n => page.eval(`(()=>{for(let i=0;i<${n};i++){window.__fake+=1000/60;${J}.advance(1/60);}return 1})()`);
-  if (scene === 'cascade') {
+  if (scene === 'hint') {
+    await page.eval(`${J}.app.newBoard(1);${J}.app.expedition.dismissTour()`);
+    await step(120);
+    await page.call('Input.dispatchKeyEvent', {type:'keyDown',key:'h',code:'KeyH'});
+    await page.call('Input.dispatchKeyEvent', {type:'keyUp',key:'h',code:'KeyH'});
+    hintPair = await page.eval(`${J}.app.hintCells.map(i=>${J}.project(i))`);
+  } else if (scene === 'cascade') {
     await page.eval(`${J}.fixture('cascade')`);
   } else if (scene === 'swap') {
     await step(30);
@@ -74,6 +80,10 @@ try {
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if (hintPair && (f === 40 || f === 44)) {
+      const [x,y] = hintPair[f === 40 ? 0 : 1];
+      await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);
+    }
     if (padScript) for (const [pf, pb, pv] of padScript) if (pf === f) await page.eval(`(()=>{const b=window.__pad.buttons[${pb}];b.pressed=${pv};b.value=${pv ? 1 : 0};})()`);
     if (autoplay) await page.eval(`(()=>{const a=${J}.app;if(a.phase==='idle'){const m=a.board.legalMoves();if(m.length){const p=m[(a.board.moves*7)%m.length];${J}.swap(p[0],p[1]);}}})()`);
     if (tour && f % 60 === 10) await page.eval(`(()=>{const a=${J}.app,k=${Math.floor(f / 60) + 1},s=5000*k*(k+1)/2+10;a.board.score=s;a.displayScore=s;})()`);
