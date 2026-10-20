@@ -575,6 +575,15 @@ rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,
 # A single tracker can stall peer discovery even while another tracker is reachable.
 rep('relayRedundancy:1', 'relayRedundancy:3', 2)
 
+# Patch 31: Tront Party. ?party=CODE (from tront.xyz/party/) joins the crew's own room with no code
+# to type. It reuses the public-board machinery (elected host, up to 8 players, host migration)
+# under a room id only the crew shares. The hook also loads the party overlay (back to party).
+rep('</head>', (ROOT / 'tools' / 'tront-party-hook.html').read_text(encoding='utf-8') + '</head>')
+rep(""" async autoJoin(){
+  const hash=new URLSearchParams(location.hash.slice(1));""", """ async autoJoin(){
+  const hash=new URLSearchParams(location.hash.slice(1));
+  if(window.TRONT_PARTY){this.testPublicRoom='v31-party-'+window.TRONT_PARTY.code;return this.joinPublic(false);}""")
+
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
 DST.write_text(html, encoding='utf-8', newline='\n')

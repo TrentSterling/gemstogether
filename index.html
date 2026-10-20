@@ -19,7 +19,15 @@
 #scene:focus {outline:none}
 #accessibility-status{position:fixed;left:-10000px;width:1px;height:1px;overflow:hidden}
 #coop-code-input{position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0;font-size:16px;}
-</style><style>@media(max-height:640px){#trontAbout.tront-about{top:12px;bottom:auto;left:auto;right:12px;}}</style></head><body>
+</style><style>@media(max-height:640px){#trontAbout.tront-about{top:12px;bottom:auto;left:auto;right:12px;}}</style><script>
+// Tront Party hook: ?party=CODE puts this game in the crew's room (no code to type), and loads
+// the party overlay (roster pill + back-to-party) from the party page this tab came from.
+(function(){var q=new URLSearchParams(location.search),c=(q.get('party')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!/^[A-Z0-9]{5}$/.test(c))return;
+window.TRONT_PARTY={code:c,name:(q.get('name')||'').replace(/[<>]/g,'').slice(0,20)};
+var h;try{h=new URL(q.get('ret')||'../party/',location.href);if(!/^https?:$/.test(h.protocol)||(h.origin!==location.origin&&['tront.xyz','www.tront.xyz','trentsterling.github.io'].indexOf(h.hostname)<0)||!/\/party\/(index\.html)?$/.test(h.pathname))throw 0}catch(e){h=new URL('../party/',location.href)}
+var s=document.createElement('script');s.src=new URL('tront-party.js',h).href;s.onload=function(){window.TRONT_PARTY.party=TrontParty.attachGame({gameId:'gemstogether'})};document.head.appendChild(s)})();
+</script>
+</head><body>
 <div id="accessibility-status" role="status" aria-live="polite"></div><canvas tabindex="0" id="scene" data-tront-discovery-game-surface aria-label="Interactive 3D match-three jewel board. Use the mouse or touch to swap adjacent jewels. Keyboard: arrow keys and Space."></canvas><div id="shade"></div>
 <div id="hud">
  <header id="brand"><svg class="sigil" width="42" height="48" viewBox="0 0 42 48" fill="none" aria-hidden="true"><path d="M21 2L37 15 32 33 21 46 10 33 5 15 21 2ZM5 15H37L21 46 5 15ZM21 2L14 15 21 33 28 15 21 2ZM10 33H32" stroke="currentColor" stroke-width=".8"/></svg><h1>Gems Together</h1></header>
@@ -2107,6 +2115,7 @@ class GlobalCoopRoom extends CoopRoom {
  }
  async autoJoin(){
   const hash=new URLSearchParams(location.hash.slice(1));
+  if(window.TRONT_PARTY){this.testPublicRoom='v31-party-'+window.TRONT_PARTY.code;return this.joinPublic(false);}
   if(hash.get('solo')==='1'){this.status='Solo mode';return false;}
   if(netCode(location.hash.slice(1)))return super.autoJoin();
   return this.joinPublic(true);
