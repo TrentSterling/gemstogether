@@ -7,7 +7,8 @@ permissions:
   contents: read
 jobs:
   about-browser-checks:
-    runs-on: ubuntu-latest
+    # Keep the runner compatible with the pinned Playwright browser dependencies.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
