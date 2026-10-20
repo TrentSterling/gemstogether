@@ -1,3 +1,10 @@
+## 3.3.10 / Gauntlet A03 (2026-10-20) Readable final seconds
+
+- Timed challenges show a clock and remaining-time bar on a dark backing, with a static amber FINAL label for the last ten seconds.
+- TIME UP and Finishing cascade explain the interval before the existing final accepted turn settles and the result appears.
+- Personal ghost comparisons, reduced-motion behavior and compact phone layouts remain available. No clock, scoring, save, network or audio changes.
+- See `rounds/2026-10-20-A03.md` and the release receipt for independent review, tests and matched visual evidence.
+
 ## 3.3.9 / Gauntlet A02 (2026-10-20) A target for the next run
 
 - Timed, 30-move and daily result screens show the first saved score, a new best, a tied best or the points needed to reach the player's record.

@@ -1,6 +1,10 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.9**, round A02 (2026-10-20). Result screens now
+Current gauntlet release: **3.3.10**, round A03 (2026-10-20). Timed challenges
+now have a backed clock, remaining-time bar, static final-ten-seconds label and
+an explanation while the last accepted cascade settles. `tools/timer-audit.mjs`
+and `tools/timer-coop-audit.mjs` cover layout, expiry and shared clock behavior.
+A02 result screens
 compare timed, 30-move and daily scores with the player's existing local best.
 `tools/result-audit.mjs` covers record states and short-screen layout;
 `tools/result-coop-audit.mjs` verifies different host/peer personal records.
