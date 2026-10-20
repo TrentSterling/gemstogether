@@ -1,3 +1,10 @@
+## 3.3.8 / Gauntlet A01 (2026-10-20) Clearer swap hints
+
+- Hint now draws a high-contrast double arrow between the suggested gems, making the intended swap explicit alongside the existing socket brackets.
+- The cue follows the projected board on desktop and rotated phones, stays static with reduced motion, and clears during swaps, panels, photos and completed runs.
+- Local presentation only: scoring, hint selection, saves, challenge budgets, co-op packets and the selected announcer are unchanged.
+- Validation: focused hint checks 52/52, gameplay 22/22, progression/save/private co-op 48/48, mobile/controller/keyboard visuals 112/112, About contracts 3/3. See `rounds/2026-10-20-A01.md` and the release evidence for screenshots, clip and live verification.
+
 ## 2026-10-14: About discovery
 
 - Consolidate the existing About copy and links with the approved game discovery component.

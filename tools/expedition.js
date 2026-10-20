@@ -293,7 +293,24 @@ CabinetUI.prototype.expeditionDecor=function(){
 const expeditionDrawHUD=CabinetUI.prototype.drawHUD;
 CabinetUI.prototype.drawHUD=function(){if(this.app.expedition?.photo)return;expeditionDrawHUD.call(this);this.expeditionHUD();};
 const expeditionDrawCursor=CabinetUI.prototype.drawCursor;
-CabinetUI.prototype.drawCursor=function(){this.expeditionDecor();return expeditionDrawCursor.call(this);};
+// Hint brackets identify the gems; a short double arrow explains the swap.
+// Project board positions every frame so the cue follows either renderer and phone rotation.
+CabinetUI.prototype.drawHintSwap=function(){
+ const a=this.app,c=a.hintCells;
+ if(a.phase!=='idle'||a.panelOpen||a.auto||a.oneShot||a.gameOver||a.expedition?.photo||a.expedition?.run.finished||c.length!==2||a.time>a.hintUntil)return;
+ const [i,j]=c;
+ if(!Number.isInteger(i)||!Number.isInteger(j)||i<0||j<0||i>=64||j>=64||!a.board.cells[i]||!a.board.cells[j]||Math.abs(i%8-j%8)+Math.abs((i/8|0)-(j/8|0))!==1)return;
+ const u=project(cellXY(i),a.vp,a.cssWidth,a.cssHeight),v=project(cellXY(j),a.vp,a.cssWidth,a.cssHeight);
+ const dx=v[0]-u[0],dy=v[1]-u[1],d=Math.hypot(dx,dy);if(!Number.isFinite(d)||d<1)return;
+ const x=(u[0]+v[0])/2,y=(u[1]+v[1])/2,nx=dx/d,ny=dy/d,half=Math.min(23,d*.28),wing=Math.min(6,d*.09),p=this.ink;
+ const start=[x-nx*half,y-ny*half],end=[x+nx*half,y+ny*half];
+ const lines=[[...start,...end]];
+ for(const sign of [-1,1]){const tip=sign<0?start:end;for(const side of [-1,1])lines.push([tip[0],tip[1],tip[0]-sign*nx*wing-ny*wing*side,tip[1]-sign*ny*wing+nx*wing*side]);}
+ // Constant contrast, no flashes or movement, including with Motion/Flashes off.
+ for(const line of lines)p.line(...line,7,'#061d26',1);
+ for(const line of lines)p.line(...line,3,'#a6fff0',1);
+};
+CabinetUI.prototype.drawCursor=function(){this.expeditionDecor();this.drawHintSwap();return expeditionDrawCursor.call(this);};
 CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['play','Play'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open',w<600&&n?.publicRoom?'Public / '+Math.max(1,n.playerCount):'Co-op Room']];const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
  items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
 
