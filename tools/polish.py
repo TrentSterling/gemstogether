@@ -574,6 +574,9 @@ rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,
 # Patch 30: keep the pinned torrent strategy's three discovery trackers available.
 # A single tracker can stall peer discovery even while another tracker is reachable.
 rep('relayRedundancy:1', 'relayRedundancy:3', 2)
+# Patch 31: name the trackers that currently answer (2026-10-20 check from PC 1: webtorrent.dev and openwebtorrent.com
+# open; btorrent.xyz and files.fm refuse). Re-check before relying on this list.
+rep('relayRedundancy:3', "relayUrls:['wss://tracker.webtorrent.dev','wss://tracker.openwebtorrent.com'],relayRedundancy:2", 2)
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)
