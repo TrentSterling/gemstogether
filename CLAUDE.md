@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.13**, round A06 (2026-10-21). Controller result
+Current gauntlet release: **3.3.14**, round A07 (2026-10-21). Moves and daily
+challenges have a backed remaining-budget card and gauge, a static final-five
+cue, FINAL MOVE and LAST CASCADE text. `moveBudgetHUD` only reads existing shared
+state. `tools/move-budget-audit.mjs` covers layouts, real input, boundaries and
+purity; `tools/move-budget-coop-audit.mjs` covers private host/peer authority.
+The `move-budget` scene in `tools/clip.mjs` reaches the final moves through real
+pointer swaps before capturing a deterministic comparison.
+
+Gauntlet release **3.3.13**, round A06 (2026-10-21). Controller result
 navigation uses the existing result actions, showing A/Cross on the focused
 button. Neutral-entry and replay-release guards prevent held inputs skipping
 results or selecting a new-board gem. `tools/result-pad-audit.mjs` and

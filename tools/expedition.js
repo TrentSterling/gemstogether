@@ -266,9 +266,28 @@ ResonanceFX.prototype.frame=function(){const a=this.a;if(a.expedition?.photo)ret
 const expeditionDraw=JewelApp.prototype.draw;
 JewelApp.prototype.draw=function(){const e=this.expedition,p=e?.photo;if(!p)return expeditionDraw.call(this);const original={actors:this.actors,time:this.time,board:this.board,shake:this.shake,punch:this.punch};try{this.actors=p.actors;this.time=p.time;this.board={...this.board,...p.board,rng:this.board.rng,legalMoves:()=>[]};this.shake=0;this.punch=0;p.exporting=p.wantCapture||e.saving;expeditionDraw.call(this);if(p.wantCapture)e.capturePhoto();}finally{Object.assign(this,original);}};
 
+// The move budget is gameplay information, so keep it legible over every stage.
+// Read shared state only: cascades still cost no extra moves and finish normally.
+CabinetUI.prototype.moveBudgetHUD=function(){
+ const a=this.app,r=a.expedition.run,p=this.ink,left=Math.max(0,r.limit-a.board.moves),resolving=left===0&&!r.finished,
+  label=resolving?'LAST CASCADE':left===1?'FINAL MOVE':left+' MOVES LEFT',
+  detail=resolving?'Finishing cascade':r.mode==='daily'?'DAILY '+r.day:'30-MOVE CHALLENGE',
+  tone=left<=5&&!r.finished?'#ffd36b':'#a6fff0';
+ let x,y,w,h,strip=false;
+ if(this.plaqueAt){const [px,py,pw,ph]=this.plaqueAt;x=px;w=pw;y=py+ph+(a.cssHeight<460?95:111);h=44;
+  if(y+h>a.cssHeight-65){x=a.cssWidth-px-pw;y=this.boardRect.y+7;}
+ }else if(a.cssHeight<460&&a.cssWidth>a.cssHeight){x=12;y=this.boardRect.y+7;w=Math.max(80,this.boardRect.x-24);h=44;
+ }else{const {cx,bw}=this.boardBox();w=Math.max(bw,Math.min(320,a.cssWidth-24));x=cx-w/2;y=this.boardRect.y+this.boardRect.h+6;h=22;strip=true;}
+ p.box(x,y,w,h,'#12343c',5,1);
+ if(strip)this.text(label+' / '+detail,x+w/2,y+3,11,tone,'center',w-8,.12,true);
+ else{this.text(label,x+4,y+5,16,tone,'left',w-8,.12,true);this.text(detail,x+4,y+29,11,UI_ART.dim,'left',w-8);}
+ const gy=y+(strip?17:23),fill=(w-8)*clamp(left/Math.max(1,r.limit),0,1);
+ p.box(x+4,gy,w-8,3,'#31535d',1,1);if(fill>0)p.box(x+4,gy,fill,3,tone,1,1);
+};
 CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
- if(r.mode!=='zen'&&!a.practice){
+ if((r.mode==='moves'||r.mode==='daily')&&!a.practice)this.moveBudgetHUD();
+ else if(r.mode!=='zen'&&!a.practice){
   // Read the shared clock without advancing it. Urgency stays static for all comfort settings.
   const timed=r.mode==='timed',puzzle=r.mode==='puzzle',seconds=Math.max(0,Math.ceil(120-r.elapsed)),urgent=timed&&seconds<=10&&!r.finished,
    clock=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'),

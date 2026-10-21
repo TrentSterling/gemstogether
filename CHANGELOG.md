@@ -1,3 +1,10 @@
+## 3.3.14 / Gauntlet A07 (2026-10-21) Make every move count
+
+- The 30-move and daily challenges put the remaining budget first, with a solid backing and remaining-moves bar that stays readable over the stage scenery.
+- The final five moves use a static amber cue; FINAL MOVE names the last turn. LAST CASCADE explains why the last accepted turn is still scoring before the result appears.
+- Short landscape layouts give the budget its own side card. Daily dates, comfort settings, controls, saves, co-op authority, scoring and audio remain intact.
+- See `rounds/2026-10-21-A07.md` and the release receipts for self-play, matched captures, independent review and regression evidence.
+
 ## 3.3.13 / Gauntlet A06 (2026-10-21) Replay from the controller
 
 - Result buttons now respond to D-pad or vertical stick selection and A/Cross activation, including puzzle progression, challenge replay and optional solo out-of-moves replay.
