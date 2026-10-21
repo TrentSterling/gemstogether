@@ -1,3 +1,9 @@
+## 3.3.27 / Gauntlet A20 (2026-10-21) Learn keyboard play as you use it
+
+- The existing first-run hint follows keyboard input and teaches arrows, selection and neighbouring swaps; roomy instructions include Space and Enter.
+- Readable cards and compact hints avoid the board and controls. Accessible instructions announce once and yield to notices and focused controls.
+- Comfort's existing reminder is now Show control hint. Mouse, touch and controller hints, saves, modes, scoring and co-op are unchanged. See `rounds/2026-10-21-A20.md` for tests and retained failures.
+
 ## 3.3.26 / Gauntlet A19 (2026-10-21) Know what your special gem does
 
 - Selecting a blast gem explains its 3 x 3 match effect; selecting a prism explains the colour-clearing swap.
