@@ -1,6 +1,15 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.23**, round A16 (2026-10-21).
+Current gauntlet release: **3.3.25**, round A18 (2026-10-21).
+The Play picker shows each player's saved targets before starting a challenge.
+`GemsExpedition.playRecord(mode,day)` is independent of the current run and reads
+only local completed records. Capture today's UTC day once per menu draw; daily
+records must match that day, and zero is a valid best. Keep wrapped record lines,
+existing descriptions, hit IDs/order and once-per-focus-entry announcements.
+`play-record-audit.mjs` and `play-record-coop.mjs` cover real input, compact menus,
+locality, purity and original host authority. Saves and transport are unchanged.
+
+Gauntlet release: **3.3.23**, round A16 (2026-10-21).
 `tools/ornament-notice.js` detects new lifetime-gem tiers around recordClear.
 Keep its queue transient and local, outside saves, runs and shared summaries.
 Dispatch and display share suppression, including impending completion: the

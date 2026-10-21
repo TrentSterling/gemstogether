@@ -1,3 +1,10 @@
+## 3.3.25 / Gauntlet A18 (2026-10-21) Pick your next personal target
+
+- Play shows your saved timed and 30-move best beside each challenge, and today's daily best beside today's board.
+- First runs have a clear invitation to set a best; a recorded zero remains a real score. Each co-op player sees their own targets.
+- Record lines wrap on compact screens and are announced on focus entry. Existing descriptions, puzzle access, scrolling, controls and host authority remain available.
+- No save, scoring, challenge, network, audio or renderer changes. See `rounds/2026-10-21-A18.md` and timestamped evidence for review, tests and retained failed receipts.
+
 ## 3.3.24 / Gauntlet A17 (2026-10-21) Keep playing when a private connection stalls
 
 - Play Solo immediately keeps your board and returns control, even when a private connection cannot finish sending or closing.
