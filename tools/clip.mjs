@@ -1,7 +1,7 @@
 // Frame-stepped clips for before/after receipts. Manual clock (game + performance.now), so every build
 // renders the same moments at an exact 30 fps no matter how slow capture is. Solo only (#solo=1).
 //   node tools/clip.mjs <file|url> <label> [scene=cascade] [seconds=6]
-//   scenes: puzzle (persistent goal, then solve), hint, landscape (bottom-row touch), cascade, swap, showcase
+//   scenes: result-pad (controller replay), puzzle (persistent goal, then solve), hint, landscape, cascade, swap, showcase
 // -> tools/out/clips/<label>-<scene>/NNN.png, <label>-<scene>.mp4, <label>-<scene>.gif
 import {launch, until} from './cdp.mjs';
 import {resolve} from 'node:path';
@@ -27,7 +27,14 @@ try {
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
   if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
   const step = n => page.eval(`(()=>{for(let i=0;i<${n};i++){window.__fake+=1000/60;${J}.advance(1/60);}return 1})()`);
-  if (scene === 'puzzle') {
+  if (scene === 'result-pad') {
+    await page.eval(`${J}.challenge('puzzle',{puzzle:0})`);await step(120);
+    for(const cell of [1,2]){const [x,y]=await page.eval(`${J}.project(${cell})`);await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);await step(6);}
+    await step(180);
+    await page.eval(`(()=>{window.__rumbles=[];window.__pad={id:'Scripted standard gamepad',index:0,connected:true,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0}))};navigator.getGamepads=()=>[__pad];${J}.app.lastInputDevice='pad';${J}.app.ui.toastUntil=0;})()`);await step(2);
+    await page.eval(`${J}.app.ui.toastUntil=0`);await step(1);
+    padScript=[[15,13,true],[18,13,false],[30,12,true],[33,12,false],[60,0,true],[64,0,false]];
+  } else if (scene === 'puzzle') {
     await page.eval(`${J}.challenge('puzzle',{puzzle:1})`);await step(360);
   } else if (scene === 'hint') {
     await page.eval(`${J}.app.newBoard(1);${J}.app.expedition.dismissTour()`);
@@ -108,7 +115,7 @@ try {
   const d = await page.eval(`${J}.diagnostics()`);
   const pad = padScript ? await page.eval(`({rumbles:window.__rumbles.length,strongest:Math.max(0,...window.__rumbles.map(r=>r.strongMagnitude)),moves:${J}.app.board.moves,score:${J}.app.board.score,cursor:${J}.app.keyboardCell,point:${J}.points().local,hint:${J}.app.hintCells.length})`) : null;
   if (pad) console.log('pad', JSON.stringify({...pad, move: padMove}));
-  writeFileSync(`${dir}/log.json`, JSON.stringify({log, pad, errors: d.errors, maxCascade: await page.eval(`${J}.app.maxCascadeSeen`)}));
+  writeFileSync(`${dir}/log.json`, JSON.stringify({log, pad, errors: d.errors, maxCascade: await page.eval(`${J}.app.maxCascadeSeen`),result:scene==='result-pad'?await page.eval(`${J}.expedition().run`):undefined}));
   console.log(name, 'frames', frames, 'maxCascade', await page.eval(`${J}.app.maxCascadeSeen`), 'errors', JSON.stringify(d.errors));
 } finally { page.kill(); }
 const ff = process.env.FFMPEG || 'ffmpeg';

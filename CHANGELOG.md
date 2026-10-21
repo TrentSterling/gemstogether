@@ -1,3 +1,10 @@
+## 3.3.13 / Gauntlet A06 (2026-10-21) Replay from the controller
+
+- Result buttons now respond to D-pad or vertical stick selection and A/Cross activation, including puzzle progression, challenge replay and optional solo out-of-moves replay.
+- The focused result button displays its controller action. Held input cannot skip a result or select a gem as the next board starts.
+- Existing mouse, touch, keyboard, settings access and host-only challenge controls remain available. Save data, scoring and audio are unchanged.
+- See `rounds/2026-10-21-A06.md` and the release evidence for the reproduced defect, matched captures, independent review and regression receipts.
+
 ## 3.3.12 / Gauntlet A05 (2026-10-21) Keep the puzzle goal in sight
 
 - Puzzle boards retain an explicit goal after the opening message fades: clear the marked gems, forge a blast gem or prism, or reach a five-wave chain.

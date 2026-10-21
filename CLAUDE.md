@@ -1,6 +1,13 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.12**, round A05 (2026-10-21). Puzzle HUDs keep
+Current gauntlet release: **3.3.13**, round A06 (2026-10-21). Controller result
+navigation uses the existing result actions, showing A/Cross on the focused
+button. Neutral-entry and replay-release guards prevent held inputs skipping
+results or selecting a new-board gem. `tools/result-pad-audit.mjs` and
+`tools/result-pad-coop.mjs` cover modes, input transitions and host authority.
+The `result-pad` scene in `tools/clip.mjs` captures matching controller replays.
+
+Gauntlet release **3.3.12**, round A05 (2026-10-21). Puzzle HUDs keep
 explicit objectives visible after the opening toast, showing remaining marked
 gems, forged specials and best chain progress from existing shared state.
 `tools/puzzle-audit.mjs` covers both renderers and real mouse/touch puzzle
