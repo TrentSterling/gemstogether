@@ -1,6 +1,12 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.10**, round A03 (2026-10-20). Timed challenges
+Current gauntlet release: **3.3.11**, round A04 (started 2026-10-20). Compact
+landscape at 540px+ wide and 320-359px high places utility buttons beside the
+board and play controls below it. Stage, Resonance and co-op status have clear
+side space. A closed About entry hides while a game panel is open and restores
+after the closing input event. `tools/landscape-audit.mjs` and
+`tools/landscape-coop-audit.mjs` cover touch, layout, panel exits and private co-op.
+A03 timed challenges
 now have a backed clock, remaining-time bar, static final-ten-seconds label and
 an explanation while the last accepted cascade settles. `tools/timer-audit.mjs`
 and `tools/timer-coop-audit.mjs` cover layout, expiry and shared clock behavior.

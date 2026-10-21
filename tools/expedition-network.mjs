@@ -13,7 +13,8 @@ const hash=p=>p.eval(`${J}.net().hash`);
 const synced=()=>until(async()=>await hash(A)===await hash(B)&&await B.eval(`${J}.app.coop.synced&&${J}.app.phase==='idle'`),{timeout:30000,every:60,label:'matching boards'});
 const move=async(p,pair)=>{const n=await p.eval(`${J}.state().moves`);pair=pair||await p.eval(`${J}.state().legalMoves[0]`);await p.eval(`${J}.swap(${pair[0]},${pair[1]})`);await until(()=>p.eval(`${J}.state().moves>${n}`),{timeout:8000,every:40,label:'swap'});await idle(A);await synced();};
 try{
- A=await launch({port:9930});B=await launch({port:9931});
+ const compact=process.env.COMPACT_LANDSCAPE==='1';
+ A=await launch({port:9930,...(compact?{width:600,height:320,mobile:true,deviceScaleFactor:2}:{})});B=await launch({port:9931,...(compact?{width:568,height:320,mobile:true,deviceScaleFactor:2}:{})});
  for(const p of [A,B]){await p.goto(base+'#solo=1');await until(()=>p.eval(`!!${J}?.ready`),{timeout:60000,label:'GPU boot'});await idle(p);await p.eval(`${J}.app.audio.start()`);}
  await A.eval(`${J}.app.ui.activate('coop-host')`);const code=await until(()=>A.eval(`${J}.net().code`),{timeout:30000,label:'private code'});await B.eval(`${J}.app.coop.join(${JSON.stringify(code)})`);
  await until(async()=>await A.eval(`${J}.net().connected`)&&await B.eval(`${J}.net().connected&&${J}.app.coop.synced`),{timeout:60000,every:300,label:'private connection'});await synced();

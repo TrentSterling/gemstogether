@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.10'")
+rep("version:'3.2.4'", "version:'3.3.11'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -574,6 +574,16 @@ rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,
 # Patch 30: keep the pinned torrent strategy's three discovery trackers available.
 # A single tracker can stall peer discovery even while another tracker is reachable.
 rep('relayRedundancy:1', 'relayRedundancy:3', 2)
+
+# A04: the tall sidebar cannot fit beside the board in short landscape.
+# Camera, projected input and stable HUD all read this same framing decision.
+rep('wide=left>180;', 'wide=left>180&&!(h>=320&&h<360&&w>=540);')
+# Keep stage and Resonance in the free left column, below the timed card.
+rep("const bt=this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight)",
+    "const compact=a.cssHeight>=320&&a.cssHeight<360&&a.cssWidth>=540,bt=compact?{x:16,y:this.boardRect.y+26,w:Math.max(80,this.boardRect.x-36),h:40}:this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight)")
+# The closed About pill must not cover a game's modal Back control. An already
+# open disclosure retains its own focus and dismissal behavior.
+rep('</head>', '<style>body.gems-panel-open #trontAbout:not([open]){visibility:hidden;}</style></head>')
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

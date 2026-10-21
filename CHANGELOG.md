@@ -1,3 +1,10 @@
+## 3.3.11 / Gauntlet A04 (started 2026-10-20) Reach the lower gems
+
+- Compact landscape controls clear the bottom gem row, with four play controls below and three utility controls beside the board.
+- Stage, Resonance, the timed card and compact co-op status retain clear space; all seven controls remain available at full touch height.
+- Game panels keep Back reachable by hiding the closed About entry, then restore it after the closing input event. Existing open About disclosures keep their behavior.
+- No save, scoring, challenge, audio or network changes. See `rounds/2026-10-20-A04.md` and the release receipt for independent review, tests and matched captures.
+
 ## 3.3.10 / Gauntlet A03 (2026-10-20) Readable final seconds
 
 - Timed challenges show a clock and remaining-time bar on a dark backing, with a static amber FINAL label for the last ten seconds.
