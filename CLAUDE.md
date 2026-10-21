@@ -1,6 +1,13 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.16**, round A09 (2026-10-21). Controller
+Current gauntlet release: **3.3.17**, round A10 (2026-10-21). Short portrait
+screens use `tools/portrait-framing.js` to reserve challenge and control space.
+It returns immutable values cached by viewport width and height, shared by camera,
+HUD and rail placement. Recover rail spacing before zooming; preserve the legacy
+camera when there is no deficit or a tiny window would exceed the far plane.
+`tools/portrait-layout-audit.mjs` covers modes, touch, rotation and state purity.
+
+Gauntlet release **3.3.16**, round A09 (2026-10-21). Controller
 arrival uses `tools/controller-guide.js`, full device-appropriate text and a
 six-second toast kind. It reads HUD and About geometry without altering input
 or state. Normal notices retain their previous lifetime and rendering.

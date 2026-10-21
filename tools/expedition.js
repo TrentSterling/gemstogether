@@ -386,8 +386,8 @@ CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssW
    right=this.boardRect.x+this.boardRect.w,ux=Math.max(right+12,w/2+163),uw=w-ux-12,uy=Math.max(60,Math.min(this.boardRect.y+8,y-144));
   items.forEach(([id,label],i)=>this.button(id,label,i<4?x+i*(bw+gap):ux,i<4?y:uy+(i-4)*48,i<4?bw:uw,40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false));return y;
  }
- const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
- items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
+ const framing=cabinetFraming(w,h),cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-framing.railReserve,bottom+framing.railGap);
+ items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*framing.railPitch,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
 const expeditionCoopBadge=CabinetUI.prototype.coopBadge;
 CabinetUI.prototype.coopBadge=function(){const a=this.app,n=a.coop;
  if(a.cssHeight>=320&&a.cssHeight<360&&a.cssWidth>=540){

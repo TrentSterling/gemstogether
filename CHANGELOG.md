@@ -1,3 +1,9 @@
+## 3.3.17 / Gauntlet A10 (2026-10-21) Room to play on short phones
+
+- Short portrait screens give challenge status and controls separate space, keeping move counts, time and puzzle goals above fully readable buttons.
+- All seven controls keep their full touch height. The layout first tightens spare rail spacing, then adjusts the board only as much as needed; roomy phones and landscape retain their existing framing.
+- Camera, HUD and picking share one cached framing result. Saves, modes, co-op, controls, comfort settings and selected audio remain intact. See `rounds/2026-10-21-A10.md` and the release evidence.
+
 ## 3.3.16 / Gauntlet A09 (2026-10-21) Know your controller
 
 - Connecting a controller shows complete select, hold-direction swap, hint and point instructions for six seconds, including Cross, Square and Triangle names for PlayStation devices.

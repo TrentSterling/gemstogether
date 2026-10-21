@@ -1,0 +1,470 @@
+{
+  "at": "2026-10-21T05:54:29.189Z",
+  "events": [
+    {
+      "mode": "zen",
+      "at": "2026-10-21T05:54:26.841Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "board": {
+        "x": 32.194450318258546,
+        "y": 111.124860111219,
+        "w": 253.959150292888,
+        "h": 258.91757611092004
+      },
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "zen",
+      "playButtonOpens": true
+    },
+    {
+      "mode": "moves",
+      "at": "2026-10-21T05:54:27.423Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "board": {
+        "x": 32.194450318258546,
+        "y": 111.124860111219,
+        "w": 253.959150292888,
+        "h": 258.91757611092004
+      },
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "moves",
+      "playButtonOpens": true
+    },
+    {
+      "mode": "daily",
+      "at": "2026-10-21T05:54:28.015Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "board": {
+        "x": 32.194450318258546,
+        "y": 111.124860111219,
+        "w": 253.959150292888,
+        "h": 258.91757611092004
+      },
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "daily",
+      "playButtonOpens": true
+    },
+    {
+      "mode": "timed",
+      "at": "2026-10-21T05:54:28.596Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "board": {
+        "x": 32.194450318258546,
+        "y": 111.124860111219,
+        "w": 253.959150292888,
+        "h": 258.91757611092004
+      },
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "timed",
+      "playButtonOpens": true
+    },
+    {
+      "mode": "puzzle",
+      "at": "2026-10-21T05:54:28.784Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 0,
+      "moves": 0,
+      "board": {
+        "x": 32.194450318258546,
+        "y": 111.124860111219,
+        "w": 253.959150292888,
+        "h": 258.91757611092004
+      },
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 375,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 425,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "puzzle",
+      "playButtonOpens": true
+    }
+  ]
+}
