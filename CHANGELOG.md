@@ -1,3 +1,10 @@
+## 3.3.12 / Gauntlet A05 (2026-10-21) Keep the puzzle goal in sight
+
+- Puzzle boards retain an explicit goal after the opening message fades: clear the marked gems, forge a blast gem or prism, or reach a five-wave chain.
+- Marked gems remaining, successful forges and best chain progress read the existing shared run state, alongside the remaining move budget.
+- A dark backing keeps the objective readable on desktop and phones, with a side card in short landscape views.
+- Scoring, puzzle solutions, saves, co-op authority, controls and selected audio remain unchanged. See `rounds/2026-10-21-A05.md` and the release receipts.
+
 ## 3.3.11 / Gauntlet A04 (started 2026-10-20) Reach the lower gems
 
 - Compact landscape controls clear the bottom gem row, with four play controls below and three utility controls beside the board.

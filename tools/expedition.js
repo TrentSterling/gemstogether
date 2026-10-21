@@ -105,6 +105,14 @@ class GemsExpedition {
  addHighlight(entry){const all=[...this.highlights,entry],chains=all.filter(x=>!x.resonance).sort((a,b)=>b.chain-a.chain||b.points-a.points),resonances=all.filter(x=>x.resonance).sort((a,b)=>b.gems-a.gems);this.highlights=[...chains.slice(0,5),...resonances.slice(0,3)];}
  resonance(count,team){if(!this.active)return;this.addHighlight({name:count>=90?'SUPERNOVA':count>=60?'PRISMATIC RESONANCE':'RADIANT RESONANCE',chain:0,gems:count,points:0,at:Math.round(this.run.elapsed),resonance:true});this.unlock('RESONANCE');if(count>=90)this.unlock('SUPERNOVA');if(team)this.unlock('TEAM_RESONANCE');}
  puzzleWon(){const p=EXPEDITION_PUZZLES[this.run.puzzle];return p.goal==='targets'?!this.run.targets.length:p.goal==='blast'?this.run.forged.includes(1):p.goal==='prism'?this.run.forged.includes(2):this.run.bestChain>=5;}
+ puzzleObjective(){
+  const r=this.run;if(r.mode!=='puzzle')return null;
+  const goal=EXPEDITION_PUZZLES[r.puzzle].goal;
+  if(goal==='targets')return 'Clear marked gems: '+r.targets.length+' left';
+  if(goal==='blast')return r.forged.includes(1)?'Blast gem forged':'Forge a blast gem';
+  if(goal==='prism')return r.forged.includes(2)?'Prism forged':'Forge a prism';
+  return 'Best chain: '+r.bestChain+' / 5';
+ }
  finish(reason){
   const a=this.a,r=this.run;if(r.finished)return;r.finished=true;r.reason=reason;r.score=a.board.score;r.moves=a.board.moves;a.selected=-1;a.grab=-1;a.down=null;a.gameOver={score:r.score,stage:a.fx.stageInfo(),birth:a.time,best:false};
   if(r.mode==='timed'){if(r.samples.at(-1)?.[0]===120)r.samples[r.samples.length-1]=[120,r.score];else r.samples.push([120,r.score]);}this.commitResult();this.a.fx.fanfare();this.a.rumble?.(.9,.6,380);if(a.coop?.hosting)a.coop.publish('settings');
@@ -262,23 +270,26 @@ CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
  if(r.mode!=='zen'&&!a.practice){
   // Read the shared clock without advancing it. Urgency stays static for all comfort settings.
-  const timed=r.mode==='timed',seconds=Math.max(0,Math.ceil(120-r.elapsed)),urgent=timed&&seconds<=10&&!r.finished,
+  const timed=r.mode==='timed',puzzle=r.mode==='puzzle',seconds=Math.max(0,Math.ceil(120-r.elapsed)),urgent=timed&&seconds<=10&&!r.finished,
    clock=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'),
-   label=timed?(seconds===0?'TIME UP':(urgent?'FINAL ':'TIME ')+clock):r.mode==='puzzle'?EXPEDITION_PUZZLES[r.puzzle].name:r.mode==='daily'?'DAILY '+r.day:'30-MOVE CHALLENGE',
-   resolving=timed&&seconds===0&&!r.finished,detail=timed?(resolving?'Finishing cascade':'Resonance scores double'):Math.max(0,r.limit-a.board.moves)+' moves left',
+   label=timed?(seconds===0?'TIME UP':(urgent?'FINAL ':'TIME ')+clock):puzzle?e.puzzleObjective():r.mode==='daily'?'DAILY '+r.day:'30-MOVE CHALLENGE',
+   movesLeft=Math.max(0,r.limit-a.board.moves),resolving=timed&&seconds===0&&!r.finished,detail=timed?(resolving?'Finishing cascade':'Resonance scores double'):movesLeft+(movesLeft===1?' move left':' moves left'),
    gs=e.ghostScore(),d=a.board.score-gs,hasGhost=timed&&a.prefs.ghost&&e.profile.bests.timed,tone=timed?(urgent?'#ffd36b':'#a6fff0'):UI_ART.highlight,
    gauge=(x,y,width)=>{p.box(x,y,width,3,'#31535d',1,1);const fill=width*clamp((120-r.elapsed)/120,0,1);if(fill>0)p.box(x,y,fill,3,tone,1,1);};
-  if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,compact=a.cssHeight<460,yy=y+h+(compact?100:116);
-   if(timed){p.box(x,yy-5,w,compact?40:44,'#08232e',5,1);gauge(x+4,yy+18,w-8);}
+  if(this.plaqueAt){let [x,y,w,h]=this.plaqueAt;const compact=a.cssHeight<460;let yy=y+h+(compact?100:116);
+   // A short, wide window can fit the score sidebar but not another card below it.
+   // Mirror the puzzle card into the free right margin, keeping the board and rail clear.
+   if(puzzle&&yy+39>a.cssHeight-65){x=a.cssWidth-x-w;yy=this.boardRect.y+12;}
+   if(timed||puzzle){p.box(x,yy-5,w,compact?40:44,puzzle?'#123b42':'#08232e',5,1);if(timed)gauge(x+4,yy+18,w-8);}
    this.text(label,x+3,yy,timed?16:13,tone,'left',w-6,.12,true);
    this.text(compact&&hasGhost&&!resolving?'Ghost '+gs+' / '+(d>=0?'+':'')+d:detail,x+3,yy+(timed&&compact?22:24),11,UI_ART.dim,'left',w-6);
    if(hasGhost&&!compact){this.text('Ghost '+gs+' / '+(d>=0?'+':'')+d,x+3,yy+48,11,UI_ART.aqua,'left',w-6);const f=clamp(gs/Math.max(1,e.profile.bests.timed.score),0,1);p.line(x+3,yy+68,x+w-3,yy+68,2,UI_ART.brass,.4);p.box(x+3+(w-6)*f-2,yy+65,4,6,UI_ART.aqua,1,.6);}}
-  else{const {cx,bw}=this.boardBox(),side=timed&&a.cssHeight<460&&w>a.cssHeight;
+  else{const {cx,bw}=this.boardBox(),side=(timed||puzzle)&&a.cssHeight<460&&w>a.cssHeight;
    if(side){const x=12,y=this.boardRect.y+12,tw=Math.max(80,this.boardRect.x-24);
-    p.box(x,y-5,tw,44,'#08232e',5,1);gauge(x+4,y+18,tw-8);
-    this.text(label,x+4,y,16,tone,'left',tw-8,.12,true);this.text(hasGhost&&!resolving?'Ghost '+gs:detail,x+4,y+24,11,UI_ART.dim,'left',tw-8);
-   }else{const y=this.boardRect.y+this.boardRect.h+9,tw=timed?Math.max(bw,Math.min(320,w-24)):bw;
-    if(timed){p.box(cx-tw/2,y-3,tw,22,'#08232e',3,1);gauge(cx-tw/2+4,y+14,tw-8);}
+    p.box(x,y-5,tw,44,puzzle?'#123b42':'#08232e',5,1);if(timed)gauge(x+4,y+18,tw-8);
+    this.text(label,x+4,y,timed?16:13,tone,'left',tw-8,.12,true);this.text(hasGhost&&!resolving?'Ghost '+gs:detail,x+4,y+24,11,UI_ART.dim,'left',tw-8);
+   }else{const y=this.boardRect.y+this.boardRect.h+9,tw=timed||puzzle?Math.max(bw,Math.min(320,w-24)):bw;
+    if(timed||puzzle){p.box(cx-tw/2,y-3,tw,22,puzzle?'#123b42':'#08232e',3,1);if(timed)gauge(cx-tw/2+4,y+14,tw-8);}
     this.text(label+' / '+(hasGhost&&!resolving?'ghost '+gs:detail),cx,y,11,tone,'center',tw-8,.12,true);}}}
  if(e.tourVisible&&a.board.moves===0&&r.mode==='zen'&&!a.practice&&!a.gameOver){if(this.plaqueAt){const [x,y,w,h]=this.plaqueAt,yy=y+h+(a.cssHeight<460?100:118);if(a.cssHeight<460){this.text('Tap a gem, then its',x+4,yy,11,UI_ART.highlight,'left',w-8);this.text('neighbour to swap.',x+4,yy+21,11,UI_ART.highlight,'left',w-8);this.hit('exp-dismiss',x,yy,w,42,'button',null,'Dismiss first-run hint');}else{this.plaque(x,yy-10,w,125,true);const end=this.paragraph('Tap a gem, then its neighbour.',x+8,yy,w-16,13,UI_ART.highlight);this.text('Drag and controller also work.',x+8,end+4,10,UI_ART.dim,'left',w-16);this.button('exp-dismiss','Got it',x+7,end+28,w-14,32);}}else{const {cx,bw}=this.boardBox(),y=this.boardRect.y+this.boardRect.h+8;this.text('Tap a gem, then its neighbour',cx,y,11,UI_ART.highlight,'center',bw-8);this.hit('exp-dismiss',cx-bw/2,y-3,bw,20,'button',null,'Dismiss first-run hint');}}
  const ann=e.announcement;if(ann){const age=a.time-ann.at;if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox(),al=Math.min(1,age*10)*clamp((ann.duration-age)/.4,0,1);p.opacity=al;this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);p.opacity=1;}}

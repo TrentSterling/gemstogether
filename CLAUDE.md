@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.11**, round A04 (started 2026-10-20). Compact
+Current gauntlet release: **3.3.12**, round A05 (2026-10-21). Puzzle HUDs keep
+explicit objectives visible after the opening toast, showing remaining marked
+gems, forged specials and best chain progress from existing shared state.
+`tools/puzzle-audit.mjs` covers both renderers and real mouse/touch puzzle
+solutions; `tools/puzzle-coop-audit.mjs` covers host/peer objectives. The `puzzle`
+scene in `tools/clip.mjs` captures a matching deterministic solution.
+Earlier round handoffs follow.
+
+Gauntlet release **3.3.11**, round A04 (started 2026-10-20). Compact
 landscape at 540px+ wide and 320-359px high places utility buttons beside the
 board and play controls below it. Stage, Resonance and co-op status have clear
 side space. A closed About entry hides while a game panel is open and restores
