@@ -1,7 +1,7 @@
 // Frame-stepped clips for before/after receipts. Manual clock (game + performance.now), so every build
 // renders the same moments at an exact 30 fps no matter how slow capture is. Solo only (#solo=1).
 //   node tools/clip.mjs <file|url> <label> [scene=cascade] [seconds=6]
-//   scenes: hint (request hint, then tap the suggested swap), landscape (bottom-row touch), cascade, swap, showcase
+//   scenes: puzzle (persistent goal, then solve), hint, landscape (bottom-row touch), cascade, swap, showcase
 // -> tools/out/clips/<label>-<scene>/NNN.png, <label>-<scene>.mp4, <label>-<scene>.gif
 import {launch, until} from './cdp.mjs';
 import {resolve} from 'node:path';
@@ -27,7 +27,9 @@ try {
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
   if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
   const step = n => page.eval(`(()=>{for(let i=0;i<${n};i++){window.__fake+=1000/60;${J}.advance(1/60);}return 1})()`);
-  if (scene === 'hint') {
+  if (scene === 'puzzle') {
+    await page.eval(`${J}.challenge('puzzle',{puzzle:1})`);await step(360);
+  } else if (scene === 'hint') {
     await page.eval(`${J}.app.newBoard(1);${J}.app.expedition.dismissTour()`);
     await step(120);
     await page.call('Input.dispatchKeyEvent', {type:'keyDown',key:'h',code:'KeyH'});
@@ -82,6 +84,10 @@ try {
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if(scene==='puzzle'&&(f===30||f===40)){
+      const [x,y]=await page.eval(`${J}.project(${f===30?28:36})`);
+      await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);
+    }
     if(scene==='landscape'&&(f===30||f===40)){
       const [x,y]=await page.eval(`${J}.project(${f===30?60:61})`);
       await page.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
