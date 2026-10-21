@@ -1,0 +1,28 @@
+// Isolated private room: special selection stays local; actual peer swap stays shared.
+import {launch,until,sleep} from './cdp.mjs';import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+const target=process.argv[2]||'index.html',label=process.argv[3]||'local',base=/^https?:/.test(target)?target:pathToFileURL(resolve(target)).href,out='tools/out/special-guide';mkdirSync(out,{recursive:true});let A,B,stage='boot';const checks=[],events=[];
+const ok=(name,pass)=>{checks.push({name,pass:!!pass});console.log(`${pass?'PASS':'FAIL'} ${name}`);};
+const boot=async(p,hash)=>{await p.call('Page.addScriptToEvaluateOnNewDocument',{source:readFileSync(new URL('./connection-observer.js',import.meta.url),'utf8')});await p.goto(base+hash);await until(()=>p.eval('window.__jewel?.ready&&__jewel.state().phase==="idle"'),{timeout:60000});};
+const hit=async(p,id)=>{await until(()=>p.eval(`__jewel.ui().hits.some(h=>h.id===${JSON.stringify(id)})`),{timeout:5000,label:id});const h=await p.eval(`__jewel.ui().hits.find(h=>h.id===${JSON.stringify(id)})`);await p.mouse('mousePressed',h.x+h.w/2,h.y+h.h/2);await p.mouse('mouseReleased',h.x+h.w/2,h.y+h.h/2);};
+const tap=async(p,cell,touch=false)=>{const[x,y]=await p.eval(`__jewel.project(${cell})`);if(touch){await p.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});await p.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await p.mouse('mousePressed',x,y);await p.mouse('mouseReleased',x,y);}};
+const observe=async p=>p.eval('({net:__jewel.net(),phase:__jewel.state().phase,selected:__jewel.app.selected,focus:__jewel.app.ui.focus,panel:__jewel.app.panelOpen,loading:__jewel.app.coop.loading,synced:__jewel.app.coop.synced,tip:__jewel.app.ui.specialGuideLayout?.()?.text,probe:__connectionProbe.summary(),events:__connectionProbe.events,errors:__jewel.diagnostics().errors})');
+try{
+ A=await launch({port:9891,width:1280,height:800});B=await launch({port:9892,width:390,height:844,mobile:true});await boot(A,'#solo=1');await hit(A,'coop-open');await hit(A,'coop-host');const code=await until(()=>A.eval('__jewel.net().code'));await boot(B,'#room='+code);
+ stage='initial private connection';await until(async()=>await A.eval('__jewel.net().connected')&&await B.eval('__jewel.net().connected&&__jewel.app.coop.synced'),{timeout:60000});ok('private host and peer connected',await A.eval('!__jewel.net().publicRoom')&&await B.eval('!__jewel.net().publicRoom'));
+ stage='host starts deterministic endless';await A.eval('__jewel.challenge("zen",{seed:13})');await B.eval('__jewel.app.closePanel()');await until(async()=>await A.eval('__jewel.state().phase==="idle"')&&await B.eval('__jewel.state().phase==="idle"')&&await A.eval('__jewel.net().hash')===await B.eval('__jewel.net().hash'));
+ const run=await A.eval('__jewel.expedition().run.id');ok('peer cannot replace shared run',await B.eval('__jewel.challenge("moves")')===false&&await A.eval('__jewel.expedition().run.id')===run);
+ stage='actual host forge';for(const cell of[53,61])await tap(A,cell);await until(async()=>await A.eval('__jewel.state().moves===1&&__jewel.state().phase==="idle"')&&await B.eval('__jewel.state().moves===1&&__jewel.state().phase==="idle"'));
+ const cell=await B.eval('__jewel.state().cells.findIndex(c=>c?.special===2)');ok('actual forge mirrored',cell>=0&&await A.eval('__jewel.net().hash')===await B.eval('__jewel.net().hash'));await sleep(3500);
+ const saved=await B.eval('localStorage.getItem("gemstogether-expedition-v1")'),rev=await A.eval('__jewel.net().revision');
+ stage='actual peer selection';await tap(B,cell,true);await until(()=>B.eval('!!__jewel.app.ui.specialGuideLayout()'),{timeout:12000,label:'local selection guide'});
+ ok('peer sees selected prism rule',await B.eval('__jewel.app.ui.specialGuideLayout().text==="Prism: swap with a neighbour to clear its colour."'));
+ ok('selection guide stays local',await A.eval('__jewel.app.selected===-1&&__jewel.app.ui.specialGuideLayout()===null'));
+ ok('selection preserves board and save',await A.eval('__jewel.net().revision')===rev&&await B.eval('__jewel.state().moves===1')&&await B.eval('localStorage.getItem("gemstogether-expedition-v1")')===saved);
+ await B.shot(`${out}/${label}-peer-selected.png`);events.push({stage,at:new Date().toISOString(),host:await observe(A),peer:await observe(B)});
+ stage='actual peer prism swap';await tap(B,cell%8<7?cell+1:cell-1,true);await until(async()=>await A.eval('__jewel.state().moves===2&&__jewel.state().phase==="idle"')&&await B.eval('__jewel.state().moves===2&&__jewel.state().phase==="idle"'));
+ ok('peer prism swap scores identically',await A.eval('__jewel.state().score>350')&&await A.eval('__jewel.net().hash')===await B.eval('__jewel.net().hash'));
+ ok('shared resolution dismisses local tip',await B.eval('__jewel.app.selected===-1&&__jewel.app.ui.specialGuideLayout()===null'));
+ for(const[p,name]of[[A,'host'],[B,'peer']])ok(name+' clean runtime',await p.eval('__jewel.diagnostics().errors.length===0')&&!p.logs.some(s=>s.startsWith('EXCEPTION')));
+}catch(error){const snapshot=async p=>{try{return p&&await observe(p);}catch(e){return{unavailable:String(e)};}};events.push({stage,error:String(error),at:new Date().toISOString(),host:await snapshot(A),peer:await snapshot(B),hostLogs:A?.logs,peerLogs:B?.logs});throw error;}
+finally{A?.kill();B?.kill();writeFileSync(`${out}/${label}-private-checks.json`,JSON.stringify(checks,null,2));writeFileSync(`${out}/${label}-private-events.json`,JSON.stringify(events,null,2));}
+console.log(JSON.stringify({passed:checks.filter(c=>c.pass).length,total:checks.length}));if(checks.some(c=>!c.pass))process.exitCode=1;

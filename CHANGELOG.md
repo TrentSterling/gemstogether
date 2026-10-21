@@ -1,3 +1,9 @@
+## 3.3.26 / Gauntlet A19 (2026-10-21) Know what your special gem does
+
+- Selecting a blast gem explains its 3 x 3 match effect; selecting a prism explains the colour-clearing swap.
+- The local tip stays readable on compact screens, announces once for accessibility, and yields to notices, cascades, results and panels.
+- Existing saves, controls, scoring, modes, co-op authority, audio and renderer remain unchanged. See `rounds/2026-10-21-A19.md` for tests and retained failures.
+
 ## 3.3.25 / Gauntlet A18 (2026-10-21) Pick your next personal target
 
 - Play shows your saved timed and 30-move best beside each challenge, and today's daily best beside today's board.
