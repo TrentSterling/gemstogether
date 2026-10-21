@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.12'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.13'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -3083,8 +3083,37 @@ CabinetUI.prototype.drawGameOver=function(){
  if(e.highlights[0])this.text(e.highlights[0].name+(e.highlights[0].chain?' x'+e.highlights[0].chain:''),cx,y+180*scale,Math.max(11,13*scale),'#8ff7ff','center',W-24);
  if(comparison){const ry=y+H-171,col=comparison.record?'#ffe27a':'#a6fff0';p.box(x+18,ry,W-36,44,'#123b42',5,.95);p.line(x+26,ry,x+W-26,ry,1,col,.7);this.text(comparison.title,cx,ry+6,Math.min(14,Math.max(11,bw*.034)),col,'center',W-48,.08,true);this.text(comparison.detail,cx,ry+25,11,UI_ART.text,'center',W-48);}
 const bx=x+18,ww=W-36,by=y+H-113;this.button(r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'exp-next-puzzle':'again',r.mode==='puzzle'&&r.reason==='PUZZLE COMPLETE'?'Next puzzle':'Play again',bx,by,ww,42);this.button('exp-endless','Return to endless',bx,by+52,ww,42);};
+const expeditionResultActions=['again','exp-next-puzzle','exp-endless'];
+const expeditionButton=CabinetUI.prototype.button;
+CabinetUI.prototype.button=function(id,label,...args){
+ const a=this.app;if(a.gameOver&&!a.panelOpen&&a.lastInputDevice==='pad'&&this.focus===id&&expeditionResultActions.includes(id))label=(/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Cross':'A')+' / '+label;
+ return expeditionButton.call(this,id,label,...args);
+};
+JewelApp.prototype.pollResultPad=function(g){
+ if(!g){this.resultPad=null;return;}
+ const ui=this.ui,hits=ui.hits.filter(h=>h.kind==='button'&&expeditionResultActions.includes(h.id)),now=performance.now(),
+  key=this.expedition?.run.finished?this.expedition.run.id:this.gameOver.birth,buttons=g.buttons.map(b=>!!b.pressed),
+  dir=buttons[12]||g.axes[1]<-.55?-1:buttons[13]||g.axes[1]>.55?1:0,neutral=!buttons.some(Boolean)&&g.axes.every(v=>Math.abs(v)<.55);
+ this.padState=this.padState||{};this.padState.id=g.id;this.pad=g.index;
+ // Keep board input history in sync, but never send result input to board controls.
+ this.padState.b=buttons;this.padState.aAt=0;this.padState.swapped=false;this.padState.dir=null;
+ if(this.lastInputDevice==='pad'&&!hits.some(h=>h.id===ui.focus))ui.focus=hits[0]?.id;
+ let S=this.resultPad;
+ if(!S||S.key!==key||S.id!==g.id){this.resultPad={key,id:g.id,buttons,dir,next:now+250,armed:neutral};return;}
+ const down=i=>buttons[i]&&!S.buttons[i];
+ if(!S.armed){S.armed=neutral;S.buttons=buttons;S.dir=dir;return;}
+ if(down(9)||down(8)){this.openPanel(down(9)?'settings':'coop');this.menuPad={buttons,next:now+180};this.resultPad=null;return;}
+ if(dir&&(dir!==S.dir||now>=S.next)){const i=hits.findIndex(h=>h.id===ui.focus);ui.focus=hits[(i+dir+hits.length)%hits.length]?.id;S.next=now+250;}
+ if(down(0)&&hits.some(h=>h.id===ui.focus)){this.audio.start().catch(()=>{});ui.activate(ui.focus);if(!this.gameOver){ui.focus=null;this.resultPadLatch=true;}}
+ S.buttons=buttons;S.dir=dir;
+};
 const expeditionPollPad=JewelApp.prototype.pollPad;
-JewelApp.prototype.pollPad=function(){const g=Array.from(navigator.getGamepads?.()||[]).find(p=>p?.connected);if(g&&(g.buttons.some(b=>b.pressed)||g.axes.some(v=>Math.abs(v)>.55)))this.lastInputDevice='pad';if(!this.panelOpen)return expeditionPollPad.call(this);if(!g)return;const S=this.menuPad||(this.menuPad={buttons:[],next:0}),now=performance.now(),bt=i=>!!g.buttons[i]?.pressed,down=i=>bt(i)&&!S.buttons[i],ui=this.ui;this.padState=this.padState||{};this.padState.id=g.id;
+JewelApp.prototype.pollPad=function(){const pads=Array.from(navigator.getGamepads?.()||[]).filter(p=>p?.connected),g=pads.find(p=>p.mapping==='standard')||pads[0];if(g&&(g.buttons.some(b=>b.pressed)||g.axes.some(v=>Math.abs(v)>.55)))this.lastInputDevice='pad';
+ if(this.gameOver&&!this.panelOpen)return this.pollResultPad(g);
+ if(this.resultPad){this.resultPadLatch=this.resultPadLatch||this.resultPad.buttons[0];this.resultPad=null;}
+ // An A press that starts a new board must not become a gem selection on release.
+ if(this.resultPadLatch){const buttons=g?.buttons.map(b=>!!b.pressed)||[];if(this.padState){this.padState.b=buttons;this.padState.aAt=0;this.padState.swapped=false;this.padState.dir=null;}this.resultPadLatch=!!buttons[0];return;}
+ if(!this.panelOpen)return expeditionPollPad.call(this);if(!g)return;const S=this.menuPad||(this.menuPad={buttons:[],next:0}),now=performance.now(),bt=i=>!!g.buttons[i]?.pressed,down=i=>bt(i)&&!S.buttons[i],ui=this.ui;this.padState=this.padState||{};this.padState.id=g.id;
  if(down(1)||down(9)){this.closePanel();S.buttons=g.buttons.map(b=>b.pressed);return;}let dir=bt(12)||g.axes[1]<-.55?-1:bt(13)||g.axes[1]>.55?1:0;
  if(dir&&now>S.next){S.next=now+180;const hits=ui.hits.filter(h=>h.kind==='button'),i=hits.findIndex(h=>h.id===ui.focus);ui.focus=hits[(i+dir+hits.length)%hits.length]?.id;if(!hits.length)ui.scroll=clamp(ui.scroll+dir*55,0,ui.maxScroll);}
  if((bt(6)||bt(7))&&now>S.next){S.next=now+130;ui.scroll=clamp(ui.scroll+(bt(7)?1:-1)*100,0,ui.maxScroll);}
