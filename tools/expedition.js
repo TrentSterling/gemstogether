@@ -478,7 +478,10 @@ const expeditionResultActions=['again','exp-next-puzzle','exp-endless'];
 const expeditionButton=CabinetUI.prototype.button;
 CabinetUI.prototype.button=function(id,label,...args){
  const a=this.app;if(a.gameOver&&!a.panelOpen&&this.focus===id&&expeditionResultActions.includes(id)){
-  if(a.lastInputDevice==='keyboard')label='Enter / '+label;
+  if(a.lastInputDevice==='keyboard'){
+   const cue='Enter / '+label;
+   label=this.measure(cue,12)<=args[2]-17?cue:'Enter';
+  }
   else if(a.lastInputDevice==='pad')label=(/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Cross':'A')+' / '+label;
  }
  return expeditionButton.call(this,id,label,...args);
