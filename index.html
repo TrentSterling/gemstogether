@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.14'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.15'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1326,15 +1326,15 @@ class CabinetUI {
  hit(id,x,y,w,h,kind='button',meta=null,label=id){let b={id,x,y,w,h,kind,meta,label};if(this.ink.clipping){const c=this.ink.clipping,X=Math.max(x,c.x),Y=Math.max(y,c.y),R=Math.min(x+w,c.x+c.w),B=Math.min(y+h,c.y+c.h);if(R<=X||B<=Y)return;b={...b,x:X,y:Y,w:R-X,h:B-Y};}this.hits.push(b);}
  button(id,label,x,y,w,h=42,on=false){const p=this.ink,hot=this.hover===id||this.focus===id,pressed=this.pointer?.id===id;const py=y+(pressed?2:0);p.box(x,y+3,w,h,'#020d13',8,1);p.box(x,py,w,h,hot?UI_ART.edge:UI_ART.brass,8,1,.8,.3);p.box(x+2,py+2,w-4,h-4,on?'#24504f':UI_ART.enamel,6,1,.9,.22);if(on)p.line(x+12,py+h-6,x+w-12,py+h-6,1.8,UI_ART.aqua,.8);this.text(label,x+w/2,py+(h-15)/2,15,hot?'#fff0c9':UI_ART.text,'center',w-17,.11,true);if(this.focus===id)p.box(x+w/2-9,py+h-3,18,2,UI_ART.aqua,0);this.hit(id,x,y,w,h,'button',null,label);}
  lineDivider(x,y,w){this.ink.line(x,y,x+w,y,1,'#806d49',.45);}
- drawHUD(){const a=this.app,p=this.ink,w=a.cssWidth,h=a.cssHeight;
+ drawHUD(){const a=this.app,p=this.ink,w=a.cssWidth,h=a.cssHeight,record=a.expedition?.hudBest()||{label:'Best',score:a.best,challenge:false},bestText=record.score===null?'Set one':record.score.toLocaleString('en-US');
   // Use an unshaken camera for controls. The board's camera impulse never moves a hit target.
   const tan=Math.tan(21*PI/180),aspect=w/h,framing=cabinetFraming(w,h),z=framing.distance;const stable=matMul(perspective(42*PI/180,aspect,.1,150),lookAt([0,.62,z],[0,0,0],[0,1,0]));const screen=pos=>project(pos,stable,w,h);
   const [left,top]=screen([-3.98,4.02,.15]),[right,bottom]=screen([3.98,-4.1,.15]);this.boardRect={x:left,y:top,w:right-left,h:bottom-top};const wide=framing.wide;this.wide=wide;
   if(wide){const nw=Math.min(350,(right-left)*.77),nh=h<460?34:43,ny=Math.max(5,top-nh-5);this.plaque(w/2-nw/2,ny,nw,nh);this.text(GAME_BRAND.wordmark,w/2,ny+9,h<460?18:23,UI_ART.highlight,'center',nw-34,.12,true);
-   const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,a.practice?159:257);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
+   const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,a.practice?159:257);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);const bestLabel=record.challenge&&this.measure(record.label,12)+Math.min(this.measure(bestText,17),sw-80)+42<=sw?record.label:'Best',labelWidth=this.measure(bestLabel,12);this.text(bestLabel,sx+17,sy+110,12,UI_ART.dim);this.text(bestText,sx+sw-17,sy+108,17,UI_ART.text,'right',bestLabel==='Best'?sw-80:sw-42-labelWidth);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
   }else{
    const nw=Math.min(w-28,350),titleY=Math.max(10,top-93);this.plaque(w/2-nw/2,titleY,nw,40);this.text(GAME_BRAND.wordmark,w/2,titleY+11,21,UI_ART.highlight,'center',nw-30,.12,true);
-   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
+   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(bestText,w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
   }
   const gap=7,railW=Math.min(w-24,528),bw=(railW-gap*3)/4,rx=(w-railW)/2,ry=Math.min(h-57,bottom+28);if(a.aaCompare){const cw=(railW-gap*2)/3;this.button('aa-on','AA on',rx,ry,cw,42,!a.aaCompareBypass);this.button('aa-off','AA off',rx+cw+gap,ry,cw,42,a.aaCompareBypass);this.button('aa-done','Done',rx+2*(cw+gap),ry,cw,42);this.text('Frozen frame / '+(a.aaCompareBypass?'AA off':({off:'Off',fxaa:'FXAA',msaa:'4x MSAA',hybrid:'MSAA + FXAA'})[a.effectiveAA]),w/2,Math.min(h-17,ry+55),11,UI_ART.aqua,'center',w-24);}else{this.coopRail(bottom);this.coopBadge();}
   if(w>=600&&h>=460&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0&&!a.practice&&!a.coop?.code){this.text('Tap a gem, then its neighbour',w/2,Math.min(h-17,ry+55),11,UI_ART.dim,'center',w-28);}
@@ -2773,6 +2773,14 @@ class GemsExpedition {
   const title=delta===null?(daily?'FIRST DAILY SCORE':'FIRST SCORE SAVED'):delta>0?(daily?'NEW DAILY BEST':'NEW PERSONAL BEST'):delta===0?(daily?'DAILY BEST TIED':'PERSONAL BEST TIED'):(-delta).toLocaleString()+(daily?' TO DAILY BEST':' TO YOUR BEST');
   const label=daily?'Best for this daily board':q.mode==='timed'?'Two-minute best':'30-move best';
   return {title,detail:label+': '+best.toLocaleString(),record:delta===null||delta>0};
+ }
+ // A challenge target is the local completed record for this mode/board, never
+ // the legacy all-mode high score. Reading it must not save or alter shared state.
+ hudBest(){
+  const a=this.a,r=this.run;
+  if(!this.active||!['timed','moves','daily'].includes(r.mode))return {label:'Best',score:a.best,challenge:false};
+  const best=r.mode==='daily'?(this.profile.daily?.day===r.day?this.profile.daily:null):this.profile.bests[r.mode];
+  return {label:r.mode==='daily'?'Daily best':r.mode==='timed'?'Timed best':'30-move best',score:best?.score??null,challenge:true};
  }
  ghostScore(){const samples=this.profile.bests.timed?.samples||[],t=this.run.elapsed;let score=0;for(const x of samples){if(x[0]>t)break;score=x[1];}return score;}
  announce(label,col='#ffd98a',duration=2){this.announcement={label,col,at:this.a.time,duration};}

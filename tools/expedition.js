@@ -137,6 +137,14 @@ class GemsExpedition {
   const label=daily?'Best for this daily board':q.mode==='timed'?'Two-minute best':'30-move best';
   return {title,detail:label+': '+best.toLocaleString(),record:delta===null||delta>0};
  }
+ // A challenge target is the local completed record for this mode/board, never
+ // the legacy all-mode high score. Reading it must not save or alter shared state.
+ hudBest(){
+  const a=this.a,r=this.run;
+  if(!this.active||!['timed','moves','daily'].includes(r.mode))return {label:'Best',score:a.best,challenge:false};
+  const best=r.mode==='daily'?(this.profile.daily?.day===r.day?this.profile.daily:null):this.profile.bests[r.mode];
+  return {label:r.mode==='daily'?'Daily best':r.mode==='timed'?'Timed best':'30-move best',score:best?.score??null,challenge:true};
+ }
  ghostScore(){const samples=this.profile.bests.timed?.samples||[],t=this.run.elapsed;let score=0;for(const x of samples){if(x[0]>t)break;score=x[1];}return score;}
  announce(label,col='#ffd98a',duration=2){this.announcement={label,col,at:this.a.time,duration};}
  teamMoment(){if(this.a.time-(this.lastHighFive??-100)<1)return;this.lastHighFive=this.a.time;this.unlock('HIGH_FIVE');this.announce('HIGH FIVE','#8ff7ff',1.8);const fx=this.a.fx,t=this.a.time;fx.trace([.55,1,1],t,1.4);if(fx.on){for(const side of [-1,1])fx.firework([side*4.10,4.10,.30],[.55,1,1],t,1.4);}this.teamFanfare(false);}

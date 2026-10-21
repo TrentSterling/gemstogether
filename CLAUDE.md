@@ -1,6 +1,13 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.14**, round A07 (2026-10-21). Moves and daily
+Current gauntlet release: **3.3.15**, round A08 (2026-10-21). Challenge score
+plaques read completed local records through `GemsExpedition.hudBest()`. Daily
+uses the shared run's date; absent records say Set one and zero remains valid.
+Full mode labels only fit when the previous number-width budget is preserved.
+`tools/best-target-audit.mjs` covers presentation, modes, real input and purity;
+`tools/best-target-coop-audit.mjs` covers distinct local host/peer records.
+
+Gauntlet release **3.3.14**, round A07 (2026-10-21). Moves and daily
 challenges have a backed remaining-budget card and gauge, a static final-five
 cue, FINAL MOVE and LAST CASCADE text. `moveBudgetHUD` only reads existing shared
 state. `tools/move-budget-audit.mjs` covers layouts, real input, boundaries and

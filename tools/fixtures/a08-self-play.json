@@ -1,0 +1,40 @@
+{
+  "provenance": "A08 isolated real self-play on 2026-10-21; 30-move record before first Daily completion",
+  "events": [
+    {
+      "label": "daily-after-move-record",
+      "at": "2026-10-21T03:54:43.139Z",
+      "profile": {
+        "version": 1,
+        "gems": 200,
+        "visited": [
+          0,
+          1
+        ],
+        "achievements": [
+          "FIRST_LIGHT",
+          "BLAST_FORGED",
+          "RESONANCE",
+          "SCORE_5000",
+          "STAGE_TIDEPOOL"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 49,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {
+          "moves": {
+            "score": 8700,
+            "samples": []
+          }
+        },
+        "daily": null
+      },
+      "legacyBest": 8700
+    }
+  ]
+}

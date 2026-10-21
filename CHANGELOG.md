@@ -1,3 +1,10 @@
+## 3.3.15 / Gauntlet A08 (2026-10-21) A personal best worth chasing
+
+- Timed, 30-move and Daily score plaques show the player's completed record for that challenge. Daily records belong to the current board date.
+- First attempts say Set one; a saved zero remains a record. The target stays fixed until the existing completion logic accepts a new best.
+- Wide plaques name the mode when it fits without shrinking the score; compact layouts preserve readability. Co-op partners see their own local records.
+- Save formats, scoring, controls, co-op, comfort settings and audio remain intact. See `rounds/2026-10-21-A08.md` and the release evidence.
+
 ## 3.3.14 / Gauntlet A07 (2026-10-21) Make every move count
 
 - The 30-move and daily challenges put the remaining budget first, with a solid backing and remaining-moves bar that stays readable over the stage scenery.
