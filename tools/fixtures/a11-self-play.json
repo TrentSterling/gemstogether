@@ -1,0 +1,1595 @@
+{
+  "at": "2026-10-21T07:00:02.324Z",
+  "events": [
+    {
+      "label": "390 normal play",
+      "at": "2026-10-21T06:59:55.539Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": false,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 105.25,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 198.5,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 291.75,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 136.33333333333331,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 260.66666666666663,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "390 Showcase starts",
+      "at": "2026-10-21T06:59:55.601Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": true,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 105.25,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 198.5,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 291.75,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Stop demo"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 136.33333333333331,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 260.66666666666663,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "390 Showcase stops",
+      "at": "2026-10-21T06:59:55.807Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 105.25,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 198.5,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 291.75,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 136.33333333333331,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 260.66666666666663,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "390 manual play after Showcase",
+      "at": "2026-10-21T06:59:55.941Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 105.25,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 198.5,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 291.75,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 136.33333333333331,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 260.66666666666663,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "390 opens Play",
+      "at": "2026-10-21T06:59:56.149Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 105.25,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 198.5,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 291.75,
+          "y": 618.7149081865008,
+          "w": 86.25,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 136.33333333333331,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 260.66666666666663,
+          "y": 668.7149081865008,
+          "w": 117.33333333333333,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "1280 normal play",
+      "at": "2026-10-21T06:59:58.467Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": false,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 180,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 312.42857142857144,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 444.8571428571429,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 577.2857142857143,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 709.7142857142858,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 842.1428571428572,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 974.5714285714287,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "1280 Showcase starts",
+      "at": "2026-10-21T06:59:58.473Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": true,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 180,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 312.42857142857144,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 444.8571428571429,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 577.2857142857143,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Stop demo"
+        },
+        {
+          "id": "sound",
+          "x": 709.7142857142858,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 842.1428571428572,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 974.5714285714287,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "1280 Showcase stops",
+      "at": "2026-10-21T06:59:58.715Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 180,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 312.42857142857144,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 444.8571428571429,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 577.2857142857143,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 709.7142857142858,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 842.1428571428572,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 974.5714285714287,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "1280 manual play after Showcase",
+      "at": "2026-10-21T06:59:58.729Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 180,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 312.42857142857144,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 444.8571428571429,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 577.2857142857143,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 709.7142857142858,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 842.1428571428572,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 974.5714285714287,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "1280 opens Play",
+      "at": "2026-10-21T06:59:58.972Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 180,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 312.42857142857144,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 444.8571428571429,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 577.2857142857143,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 709.7142857142858,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 842.1428571428572,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 974.5714285714287,
+          "y": 718.1157024008455,
+          "w": 125.42857142857143,
+          "h": 42,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "320 normal play",
+      "at": "2026-10-21T07:00:01.655Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": false,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "320 Showcase starts",
+      "at": "2026-10-21T07:00:01.717Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": true,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Stop demo"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "320 Showcase stops",
+      "at": "2026-10-21T07:00:01.904Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "320 manual play after Showcase",
+      "at": "2026-10-21T07:00:02.041Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "label": "320 opens Play",
+      "at": "2026-10-21T07:00:02.215Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 600,
+      "moves": 4,
+      "practice": true,
+      "auto": false,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Showcase · real moves, real cascades",
+      "hits": [
+        {
+          "id": "hint",
+          "x": 12,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Hint"
+        },
+        {
+          "id": "play",
+          "x": 87.75,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Play"
+        },
+        {
+          "id": "journey",
+          "x": 163.5,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Journey"
+        },
+        {
+          "id": "demo",
+          "x": 239.25,
+          "y": 387.9999217855976,
+          "w": 68.75,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Showcase"
+        },
+        {
+          "id": "sound",
+          "x": 12,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Sound on"
+        },
+        {
+          "id": "settings",
+          "x": 113,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Settings"
+        },
+        {
+          "id": "coop-open",
+          "x": 214,
+          "y": 431.9999217855976,
+          "w": 94,
+          "h": 40,
+          "kind": "button",
+          "meta": null,
+          "label": "Co-op Room"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.17'")
+rep("version:'3.2.4'", "version:'3.3.18'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -608,6 +608,10 @@ rep('</head>', '<style>body.gems-panel-open #trontAbout:not([open]){visibility:h
 
 # A10: shared portrait framing leaves challenge status and touch controls clear.
 rep('function cabinetFraming(w,h){\n const tan=Math.tan(21*PI/180),aspect=w/h,base=Math.max(14.7,4.75/(tan*aspect));\n const stable=matMul(perspective(42*PI/180,aspect,.1,150),lookAt([0,.62,base],[0,0,0],[0,1,0]));\n const left=project([-3.98,4.02,.15],stable,w,h)[0],wide=left>180&&!(h>=320&&h<360&&w>=540);\n const distance=wide?base:Math.max(base,4.23*h/(2*tan*Math.max(72,h*.5-106)));\n return {distance,wide};\n}\n', (ROOT / 'tools' / 'portrait-framing.js').read_text(encoding='utf-8'))
+
+# A11: keep unsaved practice explicit after Showcase stops.
+rep("a.coop?.connected?'Team':a.auto?'Demo':'Score'", "a.coop?.connected?'Team':a.auto?'Demo':a.practice?'Lab':'Score'")
+rep("(async function boot(){", (ROOT / 'tools' / 'practice-status.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

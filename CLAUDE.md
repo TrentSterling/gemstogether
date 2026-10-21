@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.17**, round A10 (2026-10-21). Short portrait
+Current gauntlet release: **3.3.18**, round A11 (2026-10-21).
+`tools/practice-status.js` names unsaved Showcase/practice state, points to the
+existing Play picker and announces successful local toggle transitions. Its
+layout only reads state; preserve co-op authority and all save/scoring guards.
+Measured wrapping and rail clearance cover compact landscape cards.
+`practice-status-audit.mjs` and `practice-status-coop.mjs` verify the complete
+normal-to-practice-to-scored-run path, mobile layouts and private-room authority.
+
+Gauntlet release **3.3.17**, round A10 (2026-10-21). Short portrait
 screens use `tools/portrait-framing.js` to reserve challenge and control space.
 It returns immutable values cached by viewport width and height, shared by camera,
 HUD and rail placement. Recover rail spacing before zooming; preserve the legacy
