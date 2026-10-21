@@ -341,8 +341,24 @@ CabinetUI.prototype.drawHintSwap=function(){
  for(const line of lines)p.line(...line,3,'#a6fff0',1);
 };
 CabinetUI.prototype.drawCursor=function(){this.expeditionDecor();this.drawHintSwap();return expeditionDrawCursor.call(this);};
-CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['play','Play'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open',w<600&&n?.publicRoom?'Public / '+Math.max(1,n.playerCount):'Co-op Room']];const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
+CabinetUI.prototype.coopRail=function(bottom){const a=this.app,n=a.coop,w=a.cssWidth,h=a.cssHeight,gap=7,items=[['hint','Hint'],['play','Play'],['journey','Journey'],['demo',a.auto?'Stop demo':'Showcase'],['sound',a.prefs.muted?'Sound off':'Sound on'],['settings','Settings'],['coop-open',w<600&&n?.publicRoom?'Public / '+Math.max(1,n.playerCount):'Co-op Room']];
+ // On short landscape screens, the old second row covered the bottom gems.
+ // Keep full-height touch buttons: play controls below, utility controls beside.
+ if(h>=320&&h<360&&w>=540){const width=Math.min(w-24,528),x=(w-width)/2,y=h-55,bw=(width-gap*3)/4,
+   right=this.boardRect.x+this.boardRect.w,ux=Math.max(right+12,w/2+163),uw=w-ux-12,uy=Math.max(60,Math.min(this.boardRect.y+8,y-144));
+  items.forEach(([id,label],i)=>this.button(id,label,i<4?x+i*(bw+gap):ux,i<4?y:uy+(i-4)*48,i<4?bw:uw,40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false));return y;
+ }
+ const cols=w>=600?7:4,width=Math.min(w-24,w>=600?920:528),x=(w-width)/2,y=Math.min(h-(w>=600?57:105),bottom+28);
  items.forEach(([id,label],i)=>{const row=Math.floor(i/cols),count=Math.min(cols,items.length-row*cols),bw=(width-gap*(count-1))/count;this.button(id,label,x+(i%cols)*(bw+gap),y+row*50,bw,w>=600?42:40,id==='sound'?!a.prefs.muted:id==='demo'?a.auto:id==='coop-open'?!!n?.connected:false);});return y;};
+const expeditionCoopBadge=CabinetUI.prototype.coopBadge;
+CabinetUI.prototype.coopBadge=function(){const a=this.app,n=a.coop;
+ if(a.cssHeight>=320&&a.cssHeight<360&&a.cssWidth>=540){
+  if(a.panelOpen||!n?.code&&!n?.publicRoom)return;const b=this.hits.find(h=>h.id==='sound');if(!b)return;
+  const label=n.electing?'Host handoff':n.loading?'Connecting':n.publicRoom&&!n.room?'Offline / solo':!n.connected?'Waiting':n.publicRoom?'Public / '+n.playerCount:(n.role==='host'?'P1':'P2')+' connected',col=n.connected?COOP_PALETTE.online:COOP_PALETTE.waiting;
+  this.plaque(b.x,58,b.w,28);this.text(label,b.x+b.w/2,66,11,col,'center',b.w-12);return;
+ }
+ return expeditionCoopBadge.call(this);
+};
 
 CabinetUI.prototype.panelHint=function(){const a=this.app,device=a.lastInputDevice||(matchMedia('(pointer:coarse)').matches?'touch':'mouse');
  if(device==='touch')return 'Tap '+(this.tab==='announcer'?'Audio':'Back')+(this.maxScroll?' / swipe for more':' to return');
@@ -398,7 +414,11 @@ CabinetUI.prototype.activate=function(id){const a=this.app,e=a.expedition;if(!e)
  return expeditionActivate.call(this,id);
 };
 const expeditionClosePanel=JewelApp.prototype.closePanel;
-JewelApp.prototype.closePanel=function(){if(this.expedition?.photo){this.expedition.photo=null;this.fx.last=performance.now();this.ui.hits=[];}return expeditionClosePanel.call(this);};
+const expeditionOpenPanel=JewelApp.prototype.openPanel;
+JewelApp.prototype.openPanel=function(...args){const result=expeditionOpenPanel.apply(this,args);document.body.classList.add('gems-panel-open');return result;};
+// Back activates on pointerup. Let its compatibility click finish before the
+// About entry can receive input at the same screen position.
+JewelApp.prototype.closePanel=function(){if(this.expedition?.photo){this.expedition.photo=null;this.fx.last=performance.now();this.ui.hits=[];}const result=expeditionClosePanel.call(this);requestAnimationFrame(()=>{if(!this.panelOpen)document.body.classList.remove('gems-panel-open');});return result;};
 const expeditionFullscreen=JewelApp.prototype.fullscreen;
 JewelApp.prototype.fullscreen=function(){if(window.gemsDesktop)return window.gemsDesktop.fullscreen().catch(err=>this.toast(err.message));return expeditionFullscreen.call(this);};
 const expeditionGameOver=CabinetUI.prototype.drawGameOver;

@@ -1,7 +1,7 @@
 // Frame-stepped clips for before/after receipts. Manual clock (game + performance.now), so every build
 // renders the same moments at an exact 30 fps no matter how slow capture is. Solo only (#solo=1).
 //   node tools/clip.mjs <file|url> <label> [scene=cascade] [seconds=6]
-//   scenes: hint (request hint, then tap the suggested swap), cascade, swap, showcase
+//   scenes: hint (request hint, then tap the suggested swap), landscape (bottom-row touch), cascade, swap, showcase
 // -> tools/out/clips/<label>-<scene>/NNN.png, <label>-<scene>.mp4, <label>-<scene>.gif
 import {launch, until} from './cdp.mjs';
 import {resolve} from 'node:path';
@@ -15,14 +15,14 @@ const name = `${label}-${scene}`, dir = `tools/out/clips/${name}`;
 rmSync(dir, {recursive: true, force: true});
 mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
-const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H});
+const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H, mobile: scene==='landscape'});
 const log = [];
 let tour = false, padScript = null, padMove = null, autoplay = false, hintPair = null;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
   await until(() => page.eval(`!!(${J}&&${J}.ready)`), {timeout: 60000, label: 'boot'});
-  await page.eval(`document.getElementById('trontAbout')?.style.setProperty('display','none')`);
+  if(scene!=='landscape')await page.eval(`document.getElementById('trontAbout')?.style.setProperty('display','none')`);
   await until(() => page.eval(`${J}.app.phase==='idle'`), {timeout: 30000, label: 'idle'});
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
   if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
@@ -33,6 +33,8 @@ try {
     await page.call('Input.dispatchKeyEvent', {type:'keyDown',key:'h',code:'KeyH'});
     await page.call('Input.dispatchKeyEvent', {type:'keyUp',key:'h',code:'KeyH'});
     hintPair = await page.eval(`${J}.app.hintCells.map(i=>${J}.project(i))`);
+  } else if (scene === 'landscape') {
+    await page.eval(`${J}.app.newBoard(43)`);await step(120);
   } else if (scene === 'cascade') {
     await page.eval(`${J}.fixture('cascade')`);
   } else if (scene === 'swap') {
@@ -80,6 +82,11 @@ try {
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if(scene==='landscape'&&(f===30||f===40)){
+      const [x,y]=await page.eval(`${J}.project(${f===30?60:61})`);
+      await page.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+      await page.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    }
     if (hintPair && (f === 40 || f === 44)) {
       const [x,y] = hintPair[f === 40 ? 0 : 1];
       await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);
@@ -88,7 +95,7 @@ try {
     if (autoplay) await page.eval(`(()=>{const a=${J}.app;if(a.phase==='idle'){const m=a.board.legalMoves();if(m.length){const p=m[(a.board.moves*7)%m.length];${J}.swap(p[0],p[1]);}}})()`);
     if (tour && f % 60 === 10) await page.eval(`(()=>{const a=${J}.app,k=${Math.floor(f / 60) + 1},s=5000*k*(k+1)/2+10;a.board.score=s;a.displayScore=s;})()`);
     await page.shot(`${dir}/${String(f).padStart(3, '0')}.png`);
-    const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);
+    const s = await page.eval(`(()=>{const a=${J}.app;return {t:+a.time.toFixed(3),phase:a.phase,cascade:a.cascade,score:a.board.score,moves:a.board.moves,panel:!!a.panelOpen,flow:a.fx?+a.fx.flow.toFixed(3):0,laser:a.fx?+(a.fx.laser||0).toFixed(3):0}})()`);
     log.push(s);
     await step(2);
   }
