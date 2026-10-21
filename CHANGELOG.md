@@ -1,3 +1,10 @@
+## 3.3.18 / Gauntlet A11 (2026-10-21) Make unsaved practice explicit
+
+- Showcase and manual practice retain a visible status explaining that progress is not saved, with Play as the route to a new scored run.
+- Compact practice scores say Lab. Successful local Showcase transitions announce the unsaved state and return path; blocked co-op controls retain their authority message.
+- Readable wrapped cards fit desktop, phone and compact landscape layouts without covering gems or controls. Existing scoring, saves, modes, controls, co-op, comfort settings and audio stay intact.
+- See `rounds/2026-10-21-A11.md` and the timestamped release evidence.
+
 ## 3.3.17 / Gauntlet A10 (2026-10-21) Room to play on short phones
 
 - Short portrait screens give challenge status and controls separate space, keeping move counts, time and puzzle goals above fully readable buttons.

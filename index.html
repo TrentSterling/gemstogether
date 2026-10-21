@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.17'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.18'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1355,7 +1355,7 @@ class CabinetUI {
    const sw=Math.min(208,left-54),sx=left-sw-25,sy=h<460?Math.max(8,Math.min(top+(bottom-top)*.28,h-363)):top+(bottom-top)*.28;this.plaque(sx,sy,sw,a.practice?159:257);p.line(sx+sw,sy+72,left-3,sy+72,3,UI_ART.brass);this.text(a.coop?.connected?'Team score':a.auto?'Showcase':a.practice?'Lab score':'Score',sx+17,sy+18,14,UI_ART.dim);this.scoreAt=[sx+17+Math.min(70,sw*.3),sy+64];this.plaqueAt=[sx,sy,sw,159];const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),sx+17,sy+46-35*(sk-1)*.5,35*sk,UI_ART.highlight,'left',sw-34,.12,true);this.lineDivider(sx+16,sy+96,sw-32);const bestLabel=record.challenge&&this.measure(record.label,12)+Math.min(this.measure(bestText,17),sw-80)+42<=sw?record.label:'Best',labelWidth=this.measure(bestLabel,12);this.text(bestLabel,sx+17,sy+110,12,UI_ART.dim);this.text(bestText,sx+sw-17,sy+108,17,UI_ART.text,'right',bestLabel==='Best'?sw-80:sw-42-labelWidth);this.text(a.board.moves+' moves',sx+17,sy+137,11,UI_ART.muted);
   }else{
    const nw=Math.min(w-28,350),titleY=Math.max(10,top-93);this.plaque(w/2-nw/2,titleY,nw,40);this.text(GAME_BRAND.wordmark,w/2,titleY+11,21,UI_ART.highlight,'center',nw-30,.12,true);
-   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(bestText,w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
+   const sw=Math.min(w-28,Math.max(310,right-left)),sy=Math.max(titleY+47,top-42);this.plaque(w/2-sw/2,sy,sw,34);this.text(a.coop?.connected?'Team':a.auto?'Demo':a.practice?'Lab':'Score',w/2-sw/2+14,sy+10,12,UI_ART.dim);this.scoreAt=[w/2-40,sy+17];this.plaqueAt=null;const sk=1+.16*Math.exp(-(a.time-(this.scoreHit??-9))*11);this.text(Math.round(a.displayScore).toLocaleString('en-US'),w/2-18,sy+8-18*(sk-1)*.5,18*sk,UI_ART.highlight,'right',sw*.32,.12);this.text('Best',w/2+9,sy+11,11,UI_ART.muted);this.text(bestText,w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);
   }
   const gap=7,railW=Math.min(w-24,528),bw=(railW-gap*3)/4,rx=(w-railW)/2,ry=Math.min(h-57,bottom+28);if(a.aaCompare){const cw=(railW-gap*2)/3;this.button('aa-on','AA on',rx,ry,cw,42,!a.aaCompareBypass);this.button('aa-off','AA off',rx+cw+gap,ry,cw,42,a.aaCompareBypass);this.button('aa-done','Done',rx+2*(cw+gap),ry,cw,42);this.text('Frozen frame / '+(a.aaCompareBypass?'AA off':({off:'Off',fxaa:'FXAA',msaa:'4x MSAA',hybrid:'MSAA + FXAA'})[a.effectiveAA]),w/2,Math.min(h-17,ry+55),11,UI_ART.aqua,'center',w-24);}else{this.coopRail(bottom);this.coopBadge();}
   if(w>=600&&h>=460&&!a.panelOpen&&!a.aaCompare&&a.board.moves===0&&!a.practice&&!a.coop?.code){this.text('Tap a gem, then its neighbour',w/2,Math.min(h-17,ry+55),11,UI_ART.dim,'center',w-28);}
@@ -2952,6 +2952,7 @@ CabinetUI.prototype.moveBudgetHUD=function(){
 };
 CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
+ if(a.practice)this.practiceStatus();
  if((r.mode==='moves'||r.mode==='daily')&&!a.practice)this.moveBudgetHUD();
  else if(r.mode!=='zen'&&!a.practice){
   // Read the shared clock without advancing it. Urgency stays static for all comfort settings.
@@ -3302,6 +3303,36 @@ CabinetUI.prototype.drawControllerGuide=function(w,h,top,right,wide){
  const b=host?.getBoundingClientRect(),about=b&&b.width&&b.height?{x:b.x,y:b.y,w:b.width,h:b.height}:null,
   r=this.controllerGuideLayout(w,h,top,right,wide,about);
  this.plaque(r.x,r.y,r.w,r.h);for(let i=0;i<r.lines.length;i++)this.text(r.lines[i],r.x+r.w/2,r.y+(r.topPadding??7)+i*r.lineHeight,r.font,UI_ART.highlight,'center',r.w-2*(r.padding??12));
+};
+
+// Practice keeps the spectacle, but must not masquerade as a saved run.
+// This card only reads existing state; Play retains its existing mode picker.
+CabinetUI.prototype.practiceStatusLayout=function(){
+ const a=this.app,b=this.boardRect,label=a.auto?'SHOWCASE':'PRACTICE';
+ if(!a.practice||!b||a.panelOpen||a.gameOver||a.aaCompare||a.expedition?.photo||document.getElementById('trontAbout')?.open)return null;
+ const card=(x,y,w)=>{
+  const padding=w<110?4:8,wrap=text=>{const lines=[];let line='';for(const word of text.split(' ')){const next=line?line+' '+word:word;if(line&&this.measure(next,12)>w-padding*2){lines.push(line);line=word;}else line=next;}lines.push(line);return lines;},
+   detail=wrap(w<110?'Progress not saved':'No progress saved'),route=wrap('New run: Play'),lines=[label,...detail,...route];
+  return {x,y,w,h:38+17*(lines.length-1),font:12,padding,titleFont:this.measure(label,16)<=w-padding*2?16:12,label,lines,routeStart:1+detail.length,strip:false};
+ };
+ if(this.plaqueAt){const[x,y,w,h]=this.plaqueAt,r=card(x,y+h+12,w),rail=Math.min(a.cssHeight-cabinetFraming(a.cssWidth,a.cssHeight).railReserve,b.y+b.h+28);if(r.y+r.h+4>rail){r.x=a.cssWidth-x-w;r.y=b.y+7;}return r;}
+ // A near-square landscape can also run out of space above the control rail.
+ const reserve=cabinetFraming(a.cssWidth,a.cssHeight).railReserve;
+ if(a.cssWidth>a.cssHeight&&(a.cssHeight<460||b.y+b.h+28>a.cssHeight-reserve))return b.x<134?card(6,b.y+7,b.x-12):card(12,b.y+7,b.x-24);
+ const {cx,bw}=this.boardBox(),w=Math.max(bw,Math.min(320,a.cssWidth-24));
+ return {x:cx-w/2,y:b.y+b.h+6,w,h:22,font:11,label,lines:[label+' / no progress saved / Play'],strip:true};
+};
+CabinetUI.prototype.practiceStatus=function(){
+ const r=this.practiceStatusLayout();if(!r)return;
+ this.ink.box(r.x,r.y,r.w,r.h,'#12343c',5,1);
+ if(r.strip)this.text(r.lines[0],r.x+r.w/2,r.y+3,r.font,UI_ART.highlight,'center',r.w-8,.12,true);
+ else{this.text(r.lines[0],r.x+r.padding,r.y+7,r.titleFont,UI_ART.highlight,'left',r.w-r.padding*2,.12,true);for(let i=1;i<r.lines.length;i++)this.text(r.lines[i],r.x+r.padding,r.y+32+(i-1)*17,r.font,i>=r.routeStart?UI_ART.aqua:UI_ART.text,'left',r.w-r.padding*2);}
+};
+const practiceToggleDemo=JewelApp.prototype.toggleDemo;
+JewelApp.prototype.toggleDemo=function(...args){
+ const before=this.auto,result=practiceToggleDemo.apply(this,args);
+ if(this.auto!==before&&this.practice)document.getElementById('accessibility-status').textContent=(this.auto?'Showcase.':'Practice continues.')+' Progress is not saved. Open Play to start a new run.';
+ return result;
 };
 
 (async function boot(){let stage='GPU renderer';let app=null;try{

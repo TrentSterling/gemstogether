@@ -294,6 +294,7 @@ CabinetUI.prototype.moveBudgetHUD=function(){
 };
 CabinetUI.prototype.expeditionHUD=function(){
  const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;const r=e.run,w=a.cssWidth;
+ if(a.practice)this.practiceStatus();
  if((r.mode==='moves'||r.mode==='daily')&&!a.practice)this.moveBudgetHUD();
  else if(r.mode!=='zen'&&!a.practice){
   // Read the shared clock without advancing it. Urgency stays static for all comfort settings.
