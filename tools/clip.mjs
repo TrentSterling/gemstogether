@@ -1,7 +1,7 @@
 // Frame-stepped clips for before/after receipts. Manual clock (game + performance.now), so every build
 // renders the same moments at an exact 30 fps no matter how slow capture is. Solo only (#solo=1).
 //   node tools/clip.mjs <file|url> <label> [scene=cascade] [seconds=6]
-//   scenes: result-pad (controller replay), puzzle (persistent goal, then solve), hint, landscape, cascade, swap, showcase
+//   scenes: move-budget (last moves), result-pad (controller replay), puzzle, hint, landscape, cascade, swap, showcase
 // -> tools/out/clips/<label>-<scene>/NNN.png, <label>-<scene>.mp4, <label>-<scene>.gif
 import {launch, until} from './cdp.mjs';
 import {resolve} from 'node:path';
@@ -17,7 +17,7 @@ mkdirSync(dir, {recursive: true});
 const J = 'window.__jewel', W = +(process.env.W || 1280), H = +(process.env.H || 800);
 const page = await launch({port: +(process.env.PORT || 9610), width: W, height: H, mobile: scene==='landscape'});
 const log = [];
-let tour = false, padScript = null, padMove = null, autoplay = false, hintPair = null;
+let tour = false, padScript = null, padMove = null, autoplay = false, hintPair = null, budgetSwaps = 0;
 try {
   await page.goto(base + (process.env.WEBGL ? '?webgl' : '') + '#solo=1');
   await page.front();
@@ -27,7 +27,16 @@ try {
   await page.eval(`(()=>{const b=performance.now();window.__fake=0;performance.now=()=>b+window.__fake;${J}.advance(0);})()`);
   if (process.env.FLASH) await page.eval(`${J}.app.prefs.flash='${process.env.FLASH}'`);
   const step = n => page.eval(`(()=>{for(let i=0;i<${n};i++){window.__fake+=1000/60;${J}.advance(1/60);}return 1})()`);
-  if (scene === 'result-pad') {
+  if (scene === 'move-budget') {
+    await page.eval(`${J}.challenge('moves',{seed:1})`);await step(120);
+    // Reach the final three moves through actual pointer swaps, keeping rules intact.
+    for(let i=0;i<27;i++){
+      for(const [x,y]of await page.eval(`${J}.state().legalMoves[0].map(i=>${J}.project(i))`)){await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);}
+      await page.eval(`window.__fake+=12000;${J}.advance(12)`);
+    }
+    if(await page.eval(`${J}.state().moves`)!==27)throw Error('Move-budget clip preparation did not settle');
+    await page.eval(`${J}.app.ui.toastUntil=0;${J}.app.ui.mouse.inside=false`);await step(1);
+  } else if (scene === 'result-pad') {
     await page.eval(`${J}.challenge('puzzle',{puzzle:0})`);await step(120);
     for(const cell of [1,2]){const [x,y]=await page.eval(`${J}.project(${cell})`);await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);await step(6);}
     await step(180);
@@ -91,6 +100,10 @@ try {
   }
   const frames = Math.round(+secs * 30);
   for (let f = 0; f < frames; f++) {
+    if(scene==='move-budget'&&budgetSwaps<2&&f>=(budgetSwaps?75:15)&&await page.eval(`${J}.state().phase==='idle'`)){
+      for(const [x,y]of await page.eval(`${J}.state().legalMoves[0].map(i=>${J}.project(i))`)){await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);}
+      budgetSwaps++;
+    }
     if(scene==='puzzle'&&(f===30||f===40)){
       const [x,y]=await page.eval(`${J}.project(${f===30?28:36})`);
       await page.mouse('mousePressed',x,y);await page.mouse('mouseReleased',x,y);
