@@ -1,0 +1,653 @@
+[
+  {
+    "at": "2026-10-21T12:48:32.465Z",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "file": "../a16-evidence/before-1280-ornament.png",
+    "seed": 1,
+    "moves": [
+      [
+        1,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        5,
+        13
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        28,
+        36
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        12,
+        20
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        35,
+        36
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        20,
+        28
+      ],
+      [
+        17,
+        18
+      ]
+    ],
+    "state": {
+      "run": {
+        "id": "YPXHSSNDEPFH",
+        "mode": "zen",
+        "stageStart": 0,
+        "elapsed": 41.58333333333227,
+        "started": true,
+        "finished": false,
+        "reason": "",
+        "limit": 0,
+        "puzzle": 0,
+        "day": "",
+        "targets": [],
+        "forged": [
+          1
+        ],
+        "bestChain": 3,
+        "samples": [],
+        "cleared": 102
+      },
+      "profile": {
+        "version": 1,
+        "gems": 102,
+        "visited": [
+          0,
+          1
+        ],
+        "achievements": [
+          "FIRST_LIGHT",
+          "BLAST_FORGED",
+          "SCORE_5000",
+          "STAGE_TIDEPOOL",
+          "RESONANCE"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 28,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "ornaments": 1,
+      "score": 6150,
+      "notices": [
+        {
+          "at": 1.1509999999999996,
+          "args": [
+            "Endless: DAWN SHALLOWS"
+          ]
+        },
+        {
+          "at": 7.56766666666666,
+          "args": [
+            "Achievement: First light"
+          ]
+        },
+        {
+          "at": 12.251000000000204,
+          "args": [
+            "Achievement: Forge a sun"
+          ]
+        },
+        {
+          "at": 34.36766666666601,
+          "args": [
+            "Achievement: Five thousand"
+          ]
+        },
+        {
+          "at": 34.45099999999934,
+          "args": [
+            "Achievement: Tidepool"
+          ]
+        },
+        {
+          "at": 34.45099999999934,
+          "args": [
+            "5K! Score 5,100"
+          ]
+        },
+        {
+          "at": 35.1509999999993,
+          "args": [
+            "Achievement: Resonant"
+          ]
+        }
+      ],
+      "announcement": null,
+      "errors": []
+    }
+  },
+  {
+    "at": "2026-10-21T12:48:35.388Z",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "file": "../a16-evidence/before-390-ornament.png",
+    "seed": 1,
+    "moves": [
+      [
+        1,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        5,
+        13
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        28,
+        36
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        12,
+        20
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        35,
+        36
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        20,
+        28
+      ],
+      [
+        17,
+        18
+      ]
+    ],
+    "state": {
+      "run": {
+        "id": "K2DN5ZRV94BS",
+        "mode": "zen",
+        "stageStart": 0,
+        "elapsed": 41.58333333333227,
+        "started": true,
+        "finished": false,
+        "reason": "",
+        "limit": 0,
+        "puzzle": 0,
+        "day": "",
+        "targets": [],
+        "forged": [
+          1
+        ],
+        "bestChain": 3,
+        "samples": [],
+        "cleared": 102
+      },
+      "profile": {
+        "version": 1,
+        "gems": 102,
+        "visited": [
+          0,
+          1
+        ],
+        "achievements": [
+          "FIRST_LIGHT",
+          "BLAST_FORGED",
+          "SCORE_5000",
+          "STAGE_TIDEPOOL",
+          "RESONANCE"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 28,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "ornaments": 1,
+      "score": 6150,
+      "notices": [
+        {
+          "at": 1.1675999999999997,
+          "args": [
+            "Endless: DAWN SHALLOWS"
+          ]
+        },
+        {
+          "at": 7.58426666666666,
+          "args": [
+            "Achievement: First light"
+          ]
+        },
+        {
+          "at": 12.267600000000204,
+          "args": [
+            "Achievement: Forge a sun"
+          ]
+        },
+        {
+          "at": 34.384266666666015,
+          "args": [
+            "Achievement: Five thousand"
+          ]
+        },
+        {
+          "at": 34.467599999999344,
+          "args": [
+            "Achievement: Tidepool"
+          ]
+        },
+        {
+          "at": 34.467599999999344,
+          "args": [
+            "5K! Score 5,100"
+          ]
+        },
+        {
+          "at": 35.167599999999304,
+          "args": [
+            "Achievement: Resonant"
+          ]
+        }
+      ],
+      "announcement": null,
+      "errors": []
+    }
+  },
+  {
+    "at": "2026-10-21T12:48:38.257Z",
+    "viewport": {
+      "width": 568,
+      "height": 320
+    },
+    "file": "../a16-evidence/before-568-ornament.png",
+    "seed": 1,
+    "moves": [
+      [
+        1,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        5,
+        13
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        28,
+        36
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        12,
+        20
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        3,
+        11
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        35,
+        36
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        12
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        20,
+        28
+      ],
+      [
+        17,
+        18
+      ]
+    ],
+    "state": {
+      "run": {
+        "id": "LXPVQHFM3L3E",
+        "mode": "zen",
+        "stageStart": 0,
+        "elapsed": 41.58333333333227,
+        "started": true,
+        "finished": false,
+        "reason": "",
+        "limit": 0,
+        "puzzle": 0,
+        "day": "",
+        "targets": [],
+        "forged": [
+          1
+        ],
+        "bestChain": 3,
+        "samples": [],
+        "cleared": 102
+      },
+      "profile": {
+        "version": 1,
+        "gems": 102,
+        "visited": [
+          0,
+          1
+        ],
+        "achievements": [
+          "FIRST_LIGHT",
+          "BLAST_FORGED",
+          "SCORE_5000",
+          "STAGE_TIDEPOOL",
+          "RESONANCE"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 28,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "ornaments": 1,
+      "score": 6150,
+      "notices": [
+        {
+          "at": 1.1510000000000002,
+          "args": [
+            "Endless: DAWN SHALLOWS"
+          ]
+        },
+        {
+          "at": 7.5676666666666605,
+          "args": [
+            "Achievement: First light"
+          ]
+        },
+        {
+          "at": 12.251000000000204,
+          "args": [
+            "Achievement: Forge a sun"
+          ]
+        },
+        {
+          "at": 34.36766666666601,
+          "args": [
+            "Achievement: Five thousand"
+          ]
+        },
+        {
+          "at": 34.45099999999934,
+          "args": [
+            "Achievement: Tidepool"
+          ]
+        },
+        {
+          "at": 34.45099999999934,
+          "args": [
+            "5K! Score 5,100"
+          ]
+        },
+        {
+          "at": 35.1509999999993,
+          "args": [
+            "Achievement: Resonant"
+          ]
+        }
+      ],
+      "announcement": null,
+      "errors": []
+    }
+  }
+]

@@ -1,6 +1,15 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.22**, round A15 (2026-10-21).
+Current gauntlet release: **3.3.23**, round A16 (2026-10-21).
+`tools/ornament-notice.js` detects new lifetime-gem tiers around recordClear.
+Keep its queue transient and local, outside saves, runs and shared summaries.
+Dispatch and display share suppression, including impending completion: the
+Expedition tick precedes board resolution, so idle alone is insufficient.
+Reuse measured toast wrapping with its distinct ornament kind and preserve
+controller wording. `ornament-audit.mjs` and `ornament-coop.mjs` exercise real
+clears, deferred results, compact layouts and each private peer's own progress.
+
+Gauntlet release: **3.3.22**, round A15 (2026-10-21).
 `tools/puzzle-result.js` explains completed puzzle goals from the existing run,
 including remaining targets and forge/cascade tips. Preserve the once-per-commit
 announcement guard so repeated snapshots cannot overwrite focused action cues.
