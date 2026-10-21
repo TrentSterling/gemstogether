@@ -1,3 +1,10 @@
+## 3.3.22 / Gauntlet A15 (2026-10-21) Know why the puzzle ended
+
+- Puzzle results show the remaining goal and a short retry tip, or confirm the completed target, blast, prism or cascade goal. A high-scoring failed move now explains what is still missing.
+- Marked-gem outlines and other board decorations no longer paint over a finished puzzle result. Active puzzle guidance remains visible.
+- Accessible result feedback runs once; repeated co-op snapshots preserve focused keyboard action announcements. Saves, rules, controls and shared authority are unchanged.
+- See `rounds/2026-10-21-A15.md` and the timestamped release evidence.
+
 ## 3.3.21 / Gauntlet A14 (2026-10-21) One Tab to keep playing
 
 - The first Tab on a fresh result focuses Next puzzle or Play again; Shift+Tab enters at the last result action. Further traversal still reaches every utility control.

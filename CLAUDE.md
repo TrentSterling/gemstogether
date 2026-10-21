@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.21**, round A14 (2026-10-21).
+Current gauntlet release: **3.3.22**, round A15 (2026-10-21).
+`tools/puzzle-result.js` explains completed puzzle goals from the existing run,
+including remaining targets and forge/cascade tips. Preserve the once-per-commit
+announcement guard so repeated snapshots cannot overwrite focused action cues.
+Finished puzzles suppress board decorations that would cover the result modal.
+`puzzle-result-audit.mjs` and `puzzle-result-coop.mjs` cover real input, compact
+layouts, purity, shared results and host authority. No score or save rules change.
+
+Gauntlet release: **3.3.21**, round A14 (2026-10-21).
 `tools/result-keyboard.js` gives fresh results explicit first-Tab entry, then
 retains the full existing control cycle. Never reorder ui.hits or autofocus
 results during drawing. New result identities take precedence over stale focus;
