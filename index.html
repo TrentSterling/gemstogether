@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.24'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.25'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -2803,6 +2803,13 @@ class GemsExpedition {
   const best=r.mode==='daily'?(this.profile.daily?.day===r.day?this.profile.daily:null):this.profile.bests[r.mode];
   return {label:r.mode==='daily'?'Daily best':r.mode==='timed'?'Timed best':'30-move best',score:best?.score??null,challenge:true};
  }
+ // The picker starts today's daily board, even when the current shared run is older.
+ playRecord(mode,day=expeditionDay()){
+  if(!['timed','moves','daily'].includes(mode))return null;
+  const best=mode==='daily'?(this.profile.daily?.day===day?this.profile.daily:null):this.profile.bests[mode];
+  return best?.score==null?(mode==='daily'?"Set today's first best":'Set your first best'):
+   (mode==='daily'?"Today's best: ":'Your best: ')+best.score.toLocaleString('en-US');
+ }
  ghostScore(){const samples=this.profile.bests.timed?.samples||[],t=this.run.elapsed;let score=0;for(const x of samples){if(x[0]>t)break;score=x[1];}return score;}
  announce(label,col='#ffd98a',duration=2){this.announcement={label,col,at:this.a.time,duration};}
  teamMoment(){if(this.a.time-(this.lastHighFive??-100)<1)return;this.lastHighFive=this.a.time;this.unlock('HIGH_FIVE');this.announce('HIGH FIVE','#8ff7ff',1.8);const fx=this.a.fx,t=this.a.time;fx.trace([.55,1,1],t,1.4);if(fx.on){for(const side of [-1,1])fx.firework([side*4.10,4.10,.30],[.55,1,1],t,1.4);}this.teamFanfare(false);}
@@ -3063,7 +3070,7 @@ CabinetUI.prototype.panelHint=function(){const a=this.app,device=a.lastInputDevi
  return 'Esc to return'+(this.maxScroll?' / scroll for more':'');};
 
 CabinetUI.prototype.expeditionPanel=function(){
- const a=this.app,e=a.expedition,p=this.ink;if(this.tab==='photo'){this.photoPanel();return;}
+ const a=this.app,e=a.expedition,p=this.ink,today=expeditionDay();if(this.tab!=='play')this.playRecordFocus=null;if(this.tab==='photo'){this.photoPanel();return;}
  const m=this.panelLayout();this.panelRect=m;p.box(0,0,a.cssWidth,a.cssHeight,UI_ART.ink,0,.78);this.plaque(m.x,m.y,m.w,m.h,true);this.text(this.tab==='play'?'Play together':'Your journey',m.x+21,m.y+21,23,UI_ART.highlight,'left',m.w-133,.12,true);this.button('close','Back',m.x+m.w-94,m.y+12,76,37);
  const tabs=[['journey','Journey'],['play','Play'],['moments','Moments'],['comfort','Comfort'],['music-toys','Music']],cols=a.cssWidth<500?3:5,tw=(m.w-32-4*(cols-1))/cols;
  tabs.forEach(([id,label],i)=>this.button('exp-tab-'+id,label,m.x+16+(i%cols)*(tw+4),m.y+59+Math.floor(i/cols)*41,tw,34,this.tab===id));
@@ -3075,9 +3082,16 @@ CabinetUI.prototype.expeditionPanel=function(){
   row('exp-mode-zen','Start endless',true);title('Your treasury');const count=EXPEDITION_ORNAMENTS.filter(n=>e.profile.gems>=n).length,next=EXPEDITION_ORNAMENTS[count];para(count+' of 6 cabinet ornaments earned. '+(next?(next-e.profile.gems).toLocaleString()+' gems until your next ornament.':'Every ornament is yours.'));const start=count?EXPEDITION_ORNAMENTS[count-1]:0,f=next?clamp((e.profile.gems-start)/(next-start),0,1):1;p.box(x,y,w,8,UI_ART.enamel,3);p.box(x,y,w*f,8,UI_ART.highlight,3);y+=30;row('exp-photo','Photo mode');
  }else if(this.tab==='play'){
   para(a.coop?.mirror?'The host starts challenges for the room. Everyone shares the board, timer and move budget.':'Start a challenge for everyone on this board. Endless is always available.');
-  for(const [mode,label,desc]of [['zen','Endless','No timer or move limit.'],['timed','Two minutes','Resonance clears score double. Race your best run ghost.'],['moves','30 moves','Make each move count. Cascades cost no extra moves.'],['daily','Daily board: '+expeditionDay(),'A shared seed and 30 moves. Compare today with connected friends.']]){row('exp-mode-'+mode,label,e.run.mode===mode);para(desc);}
+  for(const [mode,label,desc]of [['zen','Endless','No timer or move limit.'],['timed','Two minutes','Resonance clears score double. Race your best run ghost.'],['moves','30 moves','Make each move count. Cascades cost no extra moves.'],['daily','Daily board: '+today,'A shared seed and 30 moves. Compare today with connected friends.']]){
+   row('exp-mode-'+mode,label,e.run.mode===mode);const record=e.playRecord(mode,today);
+   if(record){y=this.paragraph(record,x,y,w,12,UI_ART.aqua)+6;const hit=this.hits.find(h=>h.id==='exp-mode-'+mode);if(hit)hit.label=label+'. '+record;}
+   para(desc);
+  }
+  // Announce once on focus entry; redraws must not overwrite later status cues.
+  const focused=this.hits.find(h=>h.id===this.focus&&['exp-mode-timed','exp-mode-moves','exp-mode-daily'].includes(h.id));
+  if(this.playRecordFocus!==(focused?.id??null)){this.playRecordFocus=focused?.id??null;if(focused)$('accessibility-status').textContent=focused.label;}
   title('Puzzle boards');EXPEDITION_PUZZLES.forEach((q,i)=>{row('exp-puzzle-'+i,(e.profile.puzzles.includes(i)?'Solved / ':'')+(i+1)+'. '+q.name,e.selectedPuzzle===i);para(q.description);});
-  const d=e.profile.daily;if(d?.day===expeditionDay())para('Your daily best: '+d.score.toLocaleString());for(const d of e.dailyFriends.values())if(d.day===expeditionDay())para('Connected friend: '+d.score.toLocaleString());
+  for(const d of e.dailyFriends.values())if(d.day===today)para('Connected friend: '+d.score.toLocaleString());
   if(a.padState?.id){title('Controller');this.padLegend(x,y,w);y+=75;}
  }else if(this.tab==='moments'){
   title('This session');if(!e.highlights.length)para('Your best chains and Resonance payouts will appear here as you play.');
