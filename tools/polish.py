@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.20'")
+rep("version:'3.2.4'", "version:'3.3.21'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -623,6 +623,10 @@ rep("(async function boot(){", (ROOT / 'tools' / 'miss-hint.js').read_text(encod
 
 # A13: accepted run starts return keyboard control to the board after key release.
 rep("(async function boot(){", (ROOT / 'tools' / 'run-input.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# A14: first Tab reaches a result action without hiding the utility controls.
+rep("if(e.key==='Tab'){stop(e);let ix=this.hits.findIndex", "if(e.key==='Tab'){if(this.enterResultTab(e))return;stop(e);let ix=this.hits.findIndex")
+rep("(async function boot(){", (ROOT / 'tools' / 'result-keyboard.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

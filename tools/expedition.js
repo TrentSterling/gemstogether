@@ -477,7 +477,10 @@ const bx=x+18,ww=W-36,by=y+H-113;this.button(r.mode==='puzzle'&&r.reason==='PUZZ
 const expeditionResultActions=['again','exp-next-puzzle','exp-endless'];
 const expeditionButton=CabinetUI.prototype.button;
 CabinetUI.prototype.button=function(id,label,...args){
- const a=this.app;if(a.gameOver&&!a.panelOpen&&a.lastInputDevice==='pad'&&this.focus===id&&expeditionResultActions.includes(id))label=(/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Cross':'A')+' / '+label;
+ const a=this.app;if(a.gameOver&&!a.panelOpen&&this.focus===id&&expeditionResultActions.includes(id)){
+  if(a.lastInputDevice==='keyboard')label='Enter / '+label;
+  else if(a.lastInputDevice==='pad')label=(/dualsense|dualshock|playstation|054c/i.test(a.padState?.id||'')?'Cross':'A')+' / '+label;
+ }
  return expeditionButton.call(this,id,label,...args);
 };
 JewelApp.prototype.pollResultPad=function(g){

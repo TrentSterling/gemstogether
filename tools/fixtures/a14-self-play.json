@@ -1,0 +1,581 @@
+{
+  "baseline": "1694217f5a16e14cf7b4b2a58de0415faf4d71f9",
+  "events": [
+    {
+      "label": "1280 started puzzle through Play",
+      "at": "2026-10-21T10:54:17.440Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "1280 keyboard puzzle complete",
+      "at": "2026-10-21T10:54:17.557Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "1280 first Tab after result",
+      "at": "2026-10-21T10:54:17.562Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "1280 first Tab then Enter",
+      "at": "2026-10-21T10:54:17.764Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 2",
+      "at": "2026-10-21T10:54:17.767Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "play",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 3",
+      "at": "2026-10-21T10:54:17.770Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "journey",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 4",
+      "at": "2026-10-21T10:54:17.773Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "demo",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 5",
+      "at": "2026-10-21T10:54:17.776Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "sound",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 6",
+      "at": "2026-10-21T10:54:17.780Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 7",
+      "at": "2026-10-21T10:54:17.783Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "coop-open",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 8",
+      "at": "2026-10-21T10:54:17.786Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-next-puzzle",
+      "errors": []
+    },
+    {
+      "label": "1280 Tab 9",
+      "at": "2026-10-21T10:54:17.789Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-endless",
+      "errors": []
+    },
+    {
+      "label": "390 started puzzle through Play",
+      "at": "2026-10-21T10:54:19.825Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "390 keyboard puzzle complete",
+      "at": "2026-10-21T10:54:19.941Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "390 first Tab after result",
+      "at": "2026-10-21T10:54:19.945Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "390 first Tab then Enter",
+      "at": "2026-10-21T10:54:20.075Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 2",
+      "at": "2026-10-21T10:54:20.080Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "play",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 3",
+      "at": "2026-10-21T10:54:20.083Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "journey",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 4",
+      "at": "2026-10-21T10:54:20.087Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "demo",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 5",
+      "at": "2026-10-21T10:54:20.090Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "sound",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 6",
+      "at": "2026-10-21T10:54:20.092Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 7",
+      "at": "2026-10-21T10:54:20.096Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "coop-open",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 8",
+      "at": "2026-10-21T10:54:20.099Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-next-puzzle",
+      "errors": []
+    },
+    {
+      "label": "390 Tab 9",
+      "at": "2026-10-21T10:54:20.102Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-endless",
+      "errors": []
+    },
+    {
+      "label": "568 started puzzle through Play",
+      "at": "2026-10-21T10:54:22.190Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "568 keyboard puzzle complete",
+      "at": "2026-10-21T10:54:22.307Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "568 first Tab after result",
+      "at": "2026-10-21T10:54:22.313Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "568 first Tab then Enter",
+      "at": "2026-10-21T10:54:22.423Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "hint",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 2",
+      "at": "2026-10-21T10:54:22.426Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "play",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 3",
+      "at": "2026-10-21T10:54:22.430Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "journey",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 4",
+      "at": "2026-10-21T10:54:22.432Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "demo",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 5",
+      "at": "2026-10-21T10:54:22.435Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "sound",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 6",
+      "at": "2026-10-21T10:54:22.438Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 7",
+      "at": "2026-10-21T10:54:22.441Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "coop-open",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 8",
+      "at": "2026-10-21T10:54:22.444Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-next-puzzle",
+      "errors": []
+    },
+    {
+      "label": "568 Tab 9",
+      "at": "2026-10-21T10:54:22.447Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "play",
+      "focus": "exp-endless",
+      "errors": []
+    }
+  ]
+}
