@@ -1,6 +1,13 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.15**, round A08 (2026-10-21). Challenge score
+Current gauntlet release: **3.3.16**, round A09 (2026-10-21). Controller
+arrival uses `tools/controller-guide.js`, full device-appropriate text and a
+six-second toast kind. It reads HUD and About geometry without altering input
+or state. Normal notices retain their previous lifetime and rendering.
+`controller-guide-audit.mjs` covers layout, timing, transitions and purity;
+`controller-guide-input.mjs` covers actual Gamepad API signals across modes.
+
+Gauntlet release **3.3.15**, round A08 (2026-10-21). Challenge score
 plaques read completed local records through `GemsExpedition.hudBest()`. Daily
 uses the shared run's date; absent records say Set one and zero remains valid.
 Full mode labels only fit when the previous number-width budget is preserved.

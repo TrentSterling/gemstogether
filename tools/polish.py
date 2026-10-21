@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.15'")
+rep("version:'3.2.4'", "version:'3.3.16'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -579,6 +579,18 @@ rep("this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleStrin
     "const bestLabel=record.challenge&&this.measure(record.label,12)+Math.min(this.measure(bestText,17),sw-80)+42<=sw?record.label:'Best',labelWidth=this.measure(bestLabel,12);this.text(bestLabel,sx+17,sy+110,12,UI_ART.dim);this.text(bestText,sx+sw-17,sy+108,17,UI_ART.text,'right',bestLabel==='Best'?sw-80:sw-42-labelWidth);")
 rep("this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);",
     "this.text(bestText,w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);")
+
+# A09: full controller connection guidance, using the existing toast lifetime
+# and accessibility channel. Ordinary notices keep their previous presentation.
+rep("this.toast('Gamepad ready: A select, hold A + direction to swap, X hint, Y point');",
+    "this.toast(controllerGuideText(g.id),'controller');")
+rep("toast(message){if(this.ui){this.ui.toastMessage=String(message);this.ui.toastUntil=performance.now()+2800;}$('accessibility-status').textContent=message;}",
+    "toast(message,kind=''){if(this.ui){this.ui.toastMessage=String(message);this.ui.toastKind=kind;this.ui.toastDuration=kind==='controller'?6000:2800;this.ui.toastUntil=performance.now()+this.ui.toastDuration;}$('accessibility-status').textContent=kind==='controller'?'Controller ready. '+message:message;}")
+rep("(2800-(this.toastUntil-tnow))/180", "((this.toastDuration||2800)-(this.toastUntil-tnow))/180")
+rep("this.ink.opacity=tI*tO;const compactToast=", "this.ink.opacity=tI*tO;if(this.toastKind==='controller'){this.drawControllerGuide(w,h,top,right,wide);}else{const compactToast=")
+rep("this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);this.ink.opacity=1;}",
+    "this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);}this.ink.opacity=1;}")
+rep("(async function boot(){", (ROOT / 'tools' / 'controller-guide.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 # Patch 30: keep the pinned torrent strategy's three discovery trackers available.
 # A single tracker can stall peer discovery even while another tracker is reachable.
