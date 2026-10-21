@@ -1,6 +1,15 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.25**, round A18 (2026-10-21).
+Current gauntlet release: **3.3.26**, round A19 (2026-10-21).
+`tools/special-guide.js` explains the locally selected blast or prism while idle.
+Keep layout reads pure and announcements once per selected cell object. Tips
+yield to notices, results, panels, overlays, shared pending moves and the full
+side cascade lifetime (`app.comboEnd + .3`), not only the central callout.
+Use measured text, safe obstacles and the compact About-side fallback. Existing
+controller-guide calls keep their default toast text. The focused audit and
+private co-op test exercise actual forging, selection and activation.
+
+Gauntlet release: **3.3.25**, round A18 (2026-10-21).
 The Play picker shows each player's saved targets before starting a challenge.
 `GemsExpedition.playRecord(mode,day)` is independent of the current run and reads
 only local completed records. Capture today's UTC day once per menu draw; daily

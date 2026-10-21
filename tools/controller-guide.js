@@ -2,8 +2,8 @@
 const controllerGuideText=id=>/dualsense|dualshock|playstation|054c/i.test(id||'')?
  'Cross select / Hold Cross + direction to swap / Square hint / Triangle point':
  'A select / Hold A + direction to swap / X hint / Y point';
-CabinetUI.prototype.controllerGuideLayout=function(w,h,top,right,wide,about){
- const text=this.toastMessage,wrap=(width,font)=>{const lines=[];let line='';for(const word of text.split(' ')){const next=line?line+' '+word:word;if(line&&this.measure(next,font)>width){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);return lines;},
+CabinetUI.prototype.controllerGuideLayout=function(w,h,top,right,wide,about,text=this.toastMessage){
+ const wrap=(width,font)=>{const lines=[];let line='';for(const word of text.split(' ')){const next=line?line+' '+word:word;if(line&&this.measure(next,font)>width){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);return lines;},
   intersects=(r,b)=>b&&r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h+4>b.y,
   make=(x,y,width,font)=>{const lines=wrap(width-24,font),height=14+lines.length*(font+3);return {x,y,w:width,h:height,font,lineHeight:font+3,lines};};
  if(wide&&h<460){const x=right+16,width=w-x-12,y=Math.max(60,top+this.boardRect.h*.28),r=make(x,y,width,13);if(width>=150&&r.y+r.h+4<h-62&&!intersects(r,about))return r;}

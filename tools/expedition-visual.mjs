@@ -4,7 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {resolve} from 'node:path';
 import {mkdirSync,writeFileSync} from 'node:fs';
 const base=pathToFileURL(resolve('index.html')).href,J='window.__jewel',out='tools/out/expedition';mkdirSync(out,{recursive:true});
-let pass=0,fail=0;const receipts=[];const ok=(name,v)=>{v?pass++:fail++;receipts.push({name,pass:!!v});console.log(`${v?'PASS':'FAIL'} ${name}`);};
+let pass=0,fail=0;const receipts=[],panelReadiness=[];const ok=(name,v)=>{v?pass++:fail++;receipts.push({name,pass:!!v});console.log(`${v?'PASS':'FAIL'} ${name}`);};
 const idle=p=>until(()=>p.eval(`${J}.app.phase==='idle'`),{timeout:20000,label:'settled board'});
 async function touch(p,type,x,y){await p.call('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x,y,id:1,radiusX:6,radiusY:6,force:1}]});}
 async function tap(p,x,y){await touch(p,'touchStart',x,y);await sleep(40);await touch(p,'touchEnd',x,y);await sleep(100);}
@@ -45,7 +45,13 @@ for(const [w,h,gl]of [[1280,800,false],[390,844,false],[1280,800,true],[390,844,
    await p.call('Emulation.setDeviceMetricsOverride',{width:w,height:h,deviceScaleFactor:2,mobile:true});await until(()=>p.eval(`${J}.app.cssWidth===${w}&&${J}.app.cssHeight===${h}`),{label:'portrait resize'});await sleep(120);
   }
   for(const tab of ['journey','play','moments','comfort','music-toys']){
-   await p.eval(`${J}.app.openPanel(${JSON.stringify(tab)})`);await sleep(120);const ui=await p.eval(`${J}.ui()`);
+   await p.eval(`${J}.app.openPanel(${JSON.stringify(tab)})`);await sleep(120);
+   const before=await p.eval(`({frame:${J}.app.frameCount,width:${J}.app.cssWidth,height:${J}.app.cssHeight,ui:${J}.ui()})`);
+   // openPanel updates state immediately; draw rebuilds the hit list on a frame.
+   // Fixed wall-clock waits can still observe board hits under GPU load.
+   await p.eval('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r(true))))');
+   const after=await p.eval(`({frame:${J}.app.frameCount,width:${J}.app.cssWidth,height:${J}.app.cssHeight,ui:${J}.ui()})`),ui=after.ui;
+   panelReadiness.push({name,tab,before,after});
    ok(name+' '+tab+' has reachable controls',ui.hits.some(b=>b.id==='close')&&ui.hits.filter(b=>b.kind==='button').every(b=>b.x>=0&&b.y>=0&&b.x+b.w<=w+1&&b.y+b.h<=h+1));
    await p.shot(out+'/'+name+'-'+tab+'.png');await p.eval(`${J}.app.ui.scroll=${ui.maxScroll}`);await sleep(100);ok(name+' '+tab+' scroll renders clean',!(await p.eval(`${J}.diagnostics()`)).errors.length);
   }
@@ -63,4 +69,4 @@ for(const [w,h,gl]of [[1280,800,false],[390,844,false],[1280,800,true],[390,844,
   ok(name+' no GPU or script errors',!(await p.eval(`${J}.diagnostics()`)).errors.length&&!p.logs.some(l=>l.startsWith('EXCEPTION')));
  }catch(error){fail++;console.error(name,error.stack);if(p)console.log(p.logs.slice(-6));}finally{p?.kill();}
 }
-writeFileSync(out+'/visual-results.json',JSON.stringify({pass,fail,receipts},null,2));console.log(`${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;
+writeFileSync(out+'/visual-panel-readiness.json',JSON.stringify(panelReadiness,null,2));writeFileSync(out+'/visual-results.json',JSON.stringify({pass,fail,receipts},null,2));console.log(`${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;
