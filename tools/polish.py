@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.18'")
+rep("version:'3.2.4'", "version:'3.3.19'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -612,6 +612,14 @@ rep('function cabinetFraming(w,h){\n const tan=Math.tan(21*PI/180),aspect=w/h,ba
 # A11: keep unsaved practice explicit after Showcase stops.
 rep("a.coop?.connected?'Team':a.auto?'Demo':'Score'", "a.coop?.connected?'Team':a.auto?'Demo':a.practice?'Lab':'Score'")
 rep("(async function boot(){", (ROOT / 'tools' / 'practice-status.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# A12: assist after three genuine local no-match swaps on the same board.
+rep("this.phase='reject';this.deadline=this.time+d;}this.idleSince=this.time;",
+    "this.phase='reject';this.deadline=this.time+d;if(!authorised)this.noteFailedSwap();}this.idleSince=this.time;")
+rep("app.bounceSwap(a,b);return false;", "if(app.bounceSwap(a,b))app.noteFailedSwap();return false;")
+rep("this.pending=null;if(reason!=='No match')this.app.toast(reason);return;",
+    "this.pending=null;if(reason==='No match')this.app.noteFailedSwap();else this.app.toast(reason);return;")
+rep("(async function boot(){", (ROOT / 'tools' / 'miss-hint.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

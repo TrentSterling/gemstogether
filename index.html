@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.18'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.19'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1644,7 +1644,7 @@ class JewelApp {
  trySwap(a,b,authorised=false){if(this.gameOver)return false;
   if(!authorised&&(this.coop?.hosting||this.coop?.mirror))return this.coop.requestSwap(a,b);if(!authorised)this.turnOwner='me';
   if(this.aaCompare||this.phase!=='idle'||!this.board.adjacent(a,b))return false;
-  const aa=this.getActor(a),bb=this.getActor(b);if(!aa||!bb)return false;this.selected=-1;this.grab=-1;this.hintCells=[];this.keyboardCell=b;const pa=cellXY(a),pb=cellXY(b);this.presentation.startMove();this.motion(aa,pb,'swap',FEEL.swap,0,1);this.motion(bb,pa,'swap',FEEL.swap,0,-1);this.swapActors=[aa,bb];this.swapPositions=[pa,pb];this.swapResult=this.board.swap(a,b);this.cascade=0;this.audio.swap((pa[0]+pb[0])*.5);this.fx.swap(pa,pb);this.phase='swap';this.deadline=this.time+FEEL.swap+FEEL.swapSettle;if(!this.swapResult){const d=2*FEEL.swap+BOUNCE_HOLD;aa.move={type:'bounce',from:pa.slice(),to:pb.slice(),start:this.time,duration:d,sign:1};bb.move={type:'bounce',from:pb.slice(),to:pa.slice(),start:this.time,duration:d,sign:-1};this.phase='reject';this.deadline=this.time+d;}this.idleSince=this.time;this.lastInput=this.time;if(this.swapResult){aa.at=b;bb.at=a;this.swapCount++;$('instructions').classList.add('quiet');}if(this.coop?.hosting)this.coop.publishSwap(a,b);return true;
+  const aa=this.getActor(a),bb=this.getActor(b);if(!aa||!bb)return false;this.selected=-1;this.grab=-1;this.hintCells=[];this.keyboardCell=b;const pa=cellXY(a),pb=cellXY(b);this.presentation.startMove();this.motion(aa,pb,'swap',FEEL.swap,0,1);this.motion(bb,pa,'swap',FEEL.swap,0,-1);this.swapActors=[aa,bb];this.swapPositions=[pa,pb];this.swapResult=this.board.swap(a,b);this.cascade=0;this.audio.swap((pa[0]+pb[0])*.5);this.fx.swap(pa,pb);this.phase='swap';this.deadline=this.time+FEEL.swap+FEEL.swapSettle;if(!this.swapResult){const d=2*FEEL.swap+BOUNCE_HOLD;aa.move={type:'bounce',from:pa.slice(),to:pb.slice(),start:this.time,duration:d,sign:1};bb.move={type:'bounce',from:pb.slice(),to:pa.slice(),start:this.time,duration:d,sign:-1};this.phase='reject';this.deadline=this.time+d;if(!authorised)this.noteFailedSwap();}this.idleSince=this.time;this.lastInput=this.time;if(this.swapResult){aa.at=b;bb.at=a;this.swapCount++;$('instructions').classList.add('quiet');}if(this.coop?.hosting)this.coop.publishSwap(a,b);return true;
  }
  beginResolve(forced=null,preferred=[]){const plan=this.board.makeClearPlan(preferred,forced);if(!plan){this.finishTurn();return;}this.cascade++;this.maxCascadeSeen=Math.max(this.maxCascadeSeen,this.cascade);this.clearPlan=plan;this.phase='anticipate';const duration=plan.prism?FEEL.prismHold:plan.triggered.some(x=>x.special===1)?FEEL.blastHold:plan.create.length?FEEL.forgeHold:FEEL.matchHold;this.presentation.prepare(plan,duration);for(const i of [...plan.clear,...plan.create.map(s=>s.at)]){let a=this.getActor(i);if(a)a.charge={start:this.time,duration,mode:this.presentation.mode,source:this.presentation.source};}this.deadline=this.time+duration;if(this.coop?.hosting)this.coop.publish('anticipate',{plan:netPlan(plan),duration,cascade:this.cascade,maxCascade:this.maxCascadeSeen});}
 
@@ -1946,7 +1946,7 @@ class CoopRoom {
  publishSwap(a,b){if(!this.hosting)return;this.publish('start_swap',{a,b,board:netBoardSave(this.app),actors:this.app.swapActors.map(x=>netClone(x)),forced:this.app.swapResult?.forced?[...this.app.swapResult.forced]:null});}
  publishIdle(){if(!this.hosting)return;this.publish('idle',{board:netBoardSave(this.app),cascade:this.app.maxCascadeSeen,comboEnd:this.app.comboEnd||0,lastCascade:this.app.ui?.lastCascade||0});}
  requestSwap(a,b){
-  const app=this.app;if(!this.hosting&&(app.phase!=='idle'||app.frozen||this.pending)){this.rejectLocal(a,b,'The board is resolving');return false;}if(app.time<(app.bounceUntil||0))return false;if(app.phase==='idle'&&!app.frozen&&app.board.adjacent(a,b)&&!app.board.validSwap(a,b)){app.bounceSwap(a,b);return false;}
+  const app=this.app;if(!this.hosting&&(app.phase!=='idle'||app.frozen||this.pending)){this.rejectLocal(a,b,'The board is resolving');return false;}if(app.time<(app.bounceUntil||0))return false;if(app.phase==='idle'&&!app.frozen&&app.board.adjacent(a,b)&&!app.board.validSwap(a,b)){if(app.bounceSwap(a,b))app.noteFailedSwap();return false;}
   const msg={type:'swap_intent',id:this.clientID+'-'+(++this.nextIntent),epoch:this.epoch,rev:this.revision,r1:a/8|0,c1:a%8,r2:b/8|0,c2:b%8,ids:[app.board.cells[a]?.id,app.board.cells[b]?.id]};
   if(this.hosting){this.requests.push({msg,peer:'self'});this.drain();return this.lastAccepted===msg.id;}
   if(this.mirror){this.pending={id:msg.id,a,b,at:performance.now()};app.selected=-1;app.grab=-1;app.audio.select(app.board.cells[a]?.type||0,cellXY(a)[0]);this.send(msg);return true;}
@@ -1964,7 +1964,7 @@ class CoopRoom {
   else{this.revision++;this.lastAccepted=msg.id;this.stats.accepted++;const response={type:'swap_accepted',id:msg.id,epoch:this.epoch,rev:this.revision};this.seen.set(key,response);if(peer!=='self')this.send(response,peer);this.app.turnOwner=peer==='self'?'me':'partner';this.app.turnPlayer=peer==='self'?this.selfId:peer;this.app.trySwap(a,b,true);this.note('intent-accepted',{id:msg.id,a,b,peer});}
   if(this.seen.size>192)this.seen.delete(this.seen.keys().next().value);
  }}finally{this.queueing=false;}}
- rejectLocal(a,b,reason){if(Number.isInteger(a)&&Number.isInteger(b)&&a>=0&&b>=0&&a<64&&b<64&&this.app.phase==='idle'&&this.app.board.adjacent(a,b)&&this.app.bounceSwap(a,b)){this.pending=null;if(reason!=='No match')this.app.toast(reason);return;}const app=this.app;app.selected=-1;app.grab=-1;app.down=null;this.pending=null;this.rejectUntil=performance.now()+330;this.rejectCells=[a,b].filter(n=>Number.isInteger(n)&&n>=0&&n<64);app.audio.reject(Number.isInteger(a)&&a>=0&&a<64?cellXY(a)[0]:0);app.toast(reason);}
+ rejectLocal(a,b,reason){if(Number.isInteger(a)&&Number.isInteger(b)&&a>=0&&b>=0&&a<64&&b<64&&this.app.phase==='idle'&&this.app.board.adjacent(a,b)&&this.app.bounceSwap(a,b)){this.pending=null;if(reason==='No match')this.app.noteFailedSwap();else this.app.toast(reason);return;}const app=this.app;app.selected=-1;app.grab=-1;app.down=null;this.pending=null;this.rejectUntil=performance.now()+330;this.rejectCells=[a,b].filter(n=>Number.isInteger(n)&&n>=0&&n<64);app.audio.reject(Number.isInteger(a)&&a>=0&&a<64?cellXY(a)[0]:0);app.toast(reason);}
  receive(m,id){
   if(!m||typeof m!=='object'||m.v!==COOP.protocol||m.room!==this.code||typeof m.type!=='string')return;
   this.stats.received++;try{this.stats.bytesReceived+=JSON.stringify(m).length;}catch{return;}
@@ -3334,6 +3334,34 @@ JewelApp.prototype.toggleDemo=function(...args){
  if(this.auto!==before&&this.practice)document.getElementById('accessibility-status').textContent=(this.auto?'Showcase.':'Practice continues.')+' Progress is not saved. Open Play to start a new run.';
  return result;
 };
+
+// Repeated genuine misses get the existing local hint, after the gems settle.
+// This never sends a room message or changes board, score, RNG or saved progress.
+JewelApp.prototype.missHintAllowed=function(){
+ const co=this.coop;
+ return !(this.auto||this.oneShot||this.gameOver||this.expedition?.run?.finished||this.expedition?.photo||this.panelOpen||this.aaCompare||this.frozen||document.getElementById('trontAbout')?.open||co?.pending||co?.spectator||co?.electing||(co?.mirror&&!co.synced));
+};
+JewelApp.prototype.missHintKey=function(){return this.board.cells.map(t=>t?.id).join(',');};
+JewelApp.prototype.noteFailedSwap=function(){
+ if(!this.missHintAllowed()){this.missHint=null;return;}
+ const key=this.missHintKey(),old=this.missHint,epoch=this.coop?.epoch,
+  same=old&&old.cells===this.board.cells&&old.moves===this.board.moves&&old.key===key&&old.epoch===epoch&&this.time>=old.last,
+  attempts=[...(same?old.attempts.filter(t=>this.time-t<=12):[]),this.time].slice(-3);
+ this.missHint={cells:this.board.cells,moves:this.board.moves,key,epoch,attempts,count:attempts.length,last:this.time,readyAt:this.time+2*FEEL.swap+BOUNCE_HOLD+.05};
+};
+JewelApp.prototype.updateMissHint=function(){
+ const miss=this.missHint;if(!miss)return;
+ if(!this.missHintAllowed()||miss.cells!==this.board.cells||miss.moves!==this.board.moves||miss.epoch!==this.coop?.epoch||this.time<miss.last||this.time-miss.last>12||this.hintCells.length){this.missHint=null;return;}
+ if(miss.count<3||this.phase!=='idle'||this.time<miss.readyAt||this.time<(this.bounceUntil||0))return;
+ this.missHint=null;
+ if(miss.key!==this.missHintKey())return;
+ this.hintCells=this.bestMove(false)||[];
+ if(this.hintCells.length){this.hintUntil=this.time+4;this.idleSince=this.time;document.getElementById('accessibility-status').textContent='Try swapping the highlighted pair.';}
+};
+const missHintUpdate=JewelApp.prototype.update;
+JewelApp.prototype.update=function(...args){const result=missHintUpdate.apply(this,args);this.updateMissHint();return result;};
+const missHintManual=JewelApp.prototype.hint;
+JewelApp.prototype.hint=function(...args){const result=missHintManual.apply(this,args);if(this.hintCells.length)this.missHint=null;return result;};
 
 (async function boot(){let stage='GPU renderer';let app=null;try{
  const force=new URLSearchParams(location.search).has('webgl');$('load-status').textContent='Preparing GPU shaders...';

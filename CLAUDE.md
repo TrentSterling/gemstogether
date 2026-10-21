@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.18**, round A11 (2026-10-21).
+Current gauntlet release: **3.3.19**, round A12 (2026-10-21).
+`tools/miss-hint.js` offers the existing local hint after three genuine misses
+on one board within twelve seconds. Count only local no-match feedback; generic
+co-op rejects and authorised remote swaps must never count. Wait for bounce
+completion and cancel on pending shared moves, board changes or suppressed play.
+`miss-hint-audit.mjs` covers real input and all five modes; `miss-hint-coop.mjs`
+accepts a local file or live URL for isolated private host/peer verification.
+
+Gauntlet release: **3.3.18**, round A11 (2026-10-21).
 `tools/practice-status.js` names unsaved Showcase/practice state, points to the
 existing Play picker and announces successful local toggle transitions. Its
 layout only reads state; preserve co-op authority and all save/scoring guards.

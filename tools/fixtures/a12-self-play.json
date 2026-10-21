@@ -1,0 +1,799 @@
+{
+  "events": [
+    {
+      "label": "390 normal three swaps",
+      "at": "2026-10-21T08:49:40.215Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 15.167700000000362,
+      "idleSince": 12.151033333333537,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 rejected swap 1",
+      "at": "2026-10-21T08:49:40.346Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 17.16770000000034,
+      "idleSince": 15.667700000000387,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 4,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 rejected swap 2",
+      "at": "2026-10-21T08:49:40.478Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 19.16770000000023,
+      "idleSince": 17.667700000000313,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 5,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 rejected swap 3",
+      "at": "2026-10-21T08:49:40.612Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 21.16770000000012,
+      "idleSince": 19.667700000000202,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 6,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 rejected swap 4",
+      "at": "2026-10-21T08:49:40.896Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 23.16770000000001,
+      "idleSince": 21.667700000000092,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 waited for idle hint",
+      "at": "2026-10-21T08:49:40.913Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 31.36769999999956,
+      "idleSince": 29.684366666666307,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 32.084366666666305,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "390 explicit Hint button",
+      "at": "2026-10-21T08:49:41.128Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 34.567699999999384,
+      "idleSince": 34.367699999999395,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 38.367699999999395,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 normal three swaps",
+      "at": "2026-10-21T08:49:43.434Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 15.150900000000362,
+      "idleSince": 12.134233333333537,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 rejected swap 1",
+      "at": "2026-10-21T08:49:43.446Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 17.15090000000034,
+      "idleSince": 15.650900000000387,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 4,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 rejected swap 2",
+      "at": "2026-10-21T08:49:43.454Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 19.15090000000023,
+      "idleSince": 17.650900000000313,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 5,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 rejected swap 3",
+      "at": "2026-10-21T08:49:43.464Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 21.15090000000012,
+      "idleSince": 19.650900000000203,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 6,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 rejected swap 4",
+      "at": "2026-10-21T08:49:43.701Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 23.15090000000001,
+      "idleSince": 21.650900000000092,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 waited for idle hint",
+      "at": "2026-10-21T08:49:43.717Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 31.350899999999555,
+      "idleSince": 29.667566666666307,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 32.06756666666631,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "1280 explicit Hint button",
+      "at": "2026-10-21T08:49:43.960Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 34.55089999999938,
+      "idleSince": 34.35089999999939,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 38.35089999999939,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 normal three swaps",
+      "at": "2026-10-21T08:49:46.648Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 15.167500000000361,
+      "idleSince": 12.150833333333535,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 3,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 rejected swap 1",
+      "at": "2026-10-21T08:49:46.779Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 17.167500000000338,
+      "idleSince": 15.667500000000386,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 4,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 rejected swap 2",
+      "at": "2026-10-21T08:49:46.911Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 19.167500000000228,
+      "idleSince": 17.66750000000031,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 5,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 rejected swap 3",
+      "at": "2026-10-21T08:49:47.044Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 21.167500000000118,
+      "idleSince": 19.6675000000002,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 6,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 rejected swap 4",
+      "at": "2026-10-21T08:49:47.296Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 23.167500000000008,
+      "idleSince": 21.66750000000009,
+      "hintCells": [],
+      "hintUntil": 0,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 waited for idle hint",
+      "at": "2026-10-21T08:49:47.311Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 31.367499999999552,
+      "idleSince": 29.684166666666304,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 32.084166666666306,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    },
+    {
+      "label": "320 explicit Hint button",
+      "at": "2026-10-21T08:49:47.494Z",
+      "viewport": [
+        320,
+        480
+      ],
+      "score": 450,
+      "moves": 3,
+      "phase": "idle",
+      "time": 34.56749999999938,
+      "idleSince": 34.36749999999939,
+      "hintCells": [
+        28,
+        36
+      ],
+      "hintUntil": 38.36749999999939,
+      "profile": {
+        "version": 1,
+        "gems": 9,
+        "visited": [
+          0
+        ],
+        "achievements": [
+          "FIRST_LIGHT"
+        ],
+        "puzzles": [],
+        "input": {
+          "tap": 7,
+          "drag": 0,
+          "pad": 0,
+          "keyboard": 0
+        },
+        "onboarded": true,
+        "bests": {},
+        "daily": null
+      },
+      "announcement": "Achievement: First light",
+      "errors": []
+    }
+  ]
+}
