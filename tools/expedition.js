@@ -69,7 +69,7 @@ class GemsExpedition {
    const plan=b.makeClearPlan([m[1],m[0]]);this.run.targets=plan.clear.map(i=>b.cells[i].id);[b.cells[m[0]],b.cells[m[1]]]=[b.cells[m[1]],b.cells[m[0]]];
   }
   if(this.a.coop?.hosting){this.a.coop.revision++;this.a.coop.publish('reset',{state:this.a.coop.snapshot()});}
-  this.a.closePanel();this.a.toast(mode==='zen'?'Endless: '+FX_STAGES[stage].name:mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].description:mode==='daily'?'Daily board: '+this.run.day:'Challenge: '+EXPEDITION_MODES[mode]);return true;
+  this.a.closePanel();this.a.prepareRunInput();this.a.toast(mode==='zen'?'Endless: '+FX_STAGES[stage].name:mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].description:mode==='daily'?'Daily board: '+this.run.day:'Challenge: '+EXPEDITION_MODES[mode]);return true;
  }
  resetForBoard(fixture){if(this.starting)return;this.run=this.makeRun('zen');this.resultRecord=null;this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.stage=undefined;this.forgeFocus=null;}
  acceptSwap(){const r=this.run;if(!this.active)return true;if(r.finished)return false;if(r.mode==='timed'&&r.elapsed>=r.limit)return false;return !['moves','daily','puzzle'].includes(r.mode)||this.a.board.moves<r.limit;}

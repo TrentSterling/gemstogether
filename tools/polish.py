@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.19'")
+rep("version:'3.2.4'", "version:'3.3.20'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -620,6 +620,9 @@ rep("app.bounceSwap(a,b);return false;", "if(app.bounceSwap(a,b))app.noteFailedS
 rep("this.pending=null;if(reason!=='No match')this.app.toast(reason);return;",
     "this.pending=null;if(reason==='No match')this.app.noteFailedSwap();else this.app.toast(reason);return;")
 rep("(async function boot(){", (ROOT / 'tools' / 'miss-hint.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# A13: accepted run starts return keyboard control to the board after key release.
+rep("(async function boot(){", (ROOT / 'tools' / 'run-input.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

@@ -1,3 +1,10 @@
+## 3.3.20 / Gauntlet A13 (2026-10-21) Start ready to play
+
+- Starting or replaying a challenge returns keyboard control to the board. The first Space or Enter selects a gem instead of reopening Settings.
+- An activation held through a run start must be released before it can select on the new board. Pointer/controller starts also respect held keyboard keys.
+- Ordinary panel return, rejected co-op starts, native controls, input mappings, saves, modes and audio retain their existing behavior.
+- See `rounds/2026-10-21-A13.md` and the timestamped release evidence.
+
 ## 3.3.19 / Gauntlet A12 (2026-10-21) Help after repeated misses
 
 - Three genuine no-match swaps on the same board within twelve seconds reveal the existing legal-swap arrow after the bounce settles.
