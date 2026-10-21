@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.23'")
+rep("version:'3.2.4'", "version:'3.3.24'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -635,6 +635,9 @@ rep("(async function boot(){", (ROOT / 'tools' / 'puzzle-result.js').read_text(e
 rep("this.ui.toastDuration=kind==='controller'?6000:2800", "this.ui.toastDuration=kind==='controller'||kind==='ornament'?6000:2800")
 rep("if(this.toastKind==='controller'){this.drawControllerGuide(w,h,top,right,wide);}else{", "if(this.toastKind==='controller'){this.drawControllerGuide(w,h,top,right,wide);}else if(this.toastKind==='ornament'){this.drawOrnamentNotice(w,h,top,right,wide);}else{")
 rep("(async function boot(){", (ROOT / 'tools' / 'ornament-notice.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# A17: Play Solo detaches locally before retiring a stalled private transport.
+rep("(async function boot(){", (ROOT / 'tools' / 'private-solo.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

@@ -1,3 +1,10 @@
+## 3.3.24 / Gauntlet A17 (2026-10-21) Keep playing when a private connection stalls
+
+- Play Solo immediately keeps your board and returns control, even when a private connection cannot finish sending or closing.
+- Old connections retire before a new private/public join can reuse them. Repeated exits cancel waiting joins; same-room reconnection preserves the expected host identity.
+- Private regression tests retain connection-stage, WebRTC, tracker and input diagnostics on failure. Historical A14 replay and A16 startup failures remain separately recorded and unexplained.
+- See `rounds/2026-10-21-A17.md` and the timestamped release evidence.
+
 ## 3.3.23 / Gauntlet A16 (2026-10-21) Notice your earned ornaments
 
 - Newly earned cabinet ornaments receive a full, wrapped reward notice pointing to Journey. The notice follows cascades, existing celebrations and action feedback.

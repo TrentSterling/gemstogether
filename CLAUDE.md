@@ -214,3 +214,17 @@ Run the timing-sensitive audio gates without concurrent GPU/audio harnesses. Com
 Progression key: `gemstogether-expedition-v1`. Comfort settings are local; timers, move budgets, seeds and scoring are host-authoritative. Snapshot/heartbeat challenge state, Resonance and contribution identity survive host migration. `__jewel.expedition()`, `challenge(mode, options)` and `cheer()` expose the new harness hooks.
 
 Gotchas: Showcase and the lab fixtures run in practice mode (no stages, Resonance or milestones), so use the `res` scene for real play. Write patch scripts with the Write tool (bash heredocs break on apostrophes). After every push, wait for Pages, then run verify against https://tront.xyz/gemstogether/.
+
+
+### A17 private-room recovery
+
+`tools/private-solo.js` makes local Play Solo independent of transport completion.
+The pinned Trystero backpressure waiter can remain pending after channel closure.
+Retire captured old PCs, wait for membership removal, then finish empty-room
+cleanup before reusing discovery. Never flush stale queued gameplay, change
+expected private host identity or overwrite a newer room from a late cleanup.
+`node tools/private-solo-coop.mjs index.html final` covers actual private input,
+controlled pending sends, actual pinned-library backpressure, solo recovery and
+same-code rejoin. `tools/connection-observer.js` records bounded metadata only,
+without SDP/ICE addresses; puzzle-result-coop captures it on failures. Keep every
+failed receipt and distinguish harness, product and unknown historical causes.

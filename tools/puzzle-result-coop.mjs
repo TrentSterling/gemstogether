@@ -1,12 +1,14 @@
 // Isolated private host/peer, with actual keyboard moves and blocked peer start.
-import {launch,until,sleep} from './cdp.mjs';import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {mkdirSync,writeFileSync} from 'node:fs';
-const target=process.argv[2]||'index.html',label=process.argv[3]||'local',base=/^https?:/.test(target)?target:pathToFileURL(resolve(target)).href,out='tools/out/puzzle-result';mkdirSync(out,{recursive:true});let A,B;const checks=[],transitions=[];
+import {launch,until,sleep} from './cdp.mjs';import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+const target=process.argv[2]||'index.html',label=process.argv[3]||'local',base=/^https?:/.test(target)?target:pathToFileURL(resolve(target)).href,out='tools/out/puzzle-result';mkdirSync(out,{recursive:true});let A,B;let stage='boot';const checks=[],transitions=[];
 const ok=(name,pass)=>{checks.push({name,pass:!!pass});console.log(`${pass?'PASS':'FAIL'} ${name}`);};
 const press=async(p,key)=>{await p.call('Input.dispatchKeyEvent',{type:'keyDown',key,code:key===' '?'Space':key});await p.call('Input.dispatchKeyEvent',{type:'keyUp',key,code:key===' '?'Space':key});};
-const boot=async(p,hash)=>{await p.goto(base+hash);await until(()=>p.eval('window.__jewel?.ready&&__jewel.state().phase==="idle"'),{timeout:60000});};
+const boot=async(p,hash)=>{await p.call('Page.addScriptToEvaluateOnNewDocument',{source:readFileSync(new URL('./connection-observer.js',import.meta.url),'utf8')});await p.goto(base+hash);await until(()=>p.eval('window.__jewel?.ready&&__jewel.state().phase==="idle"'),{timeout:60000});};
 try{
  A=await launch({port:9891,width:1280,height:800});B=await launch({port:9892,width:390,height:844});await boot(A,'#solo=1');await A.eval('__jewel.app.openPanel("coop");__jewel.app.ui.activate("coop-host")');const code=await until(()=>A.eval('__jewel.net().code'));await boot(B,'#room='+code);
+ stage='initial private connection';
  await until(async()=>await A.eval('__jewel.net().connected')&&await B.eval('__jewel.net().connected&&__jewel.app.coop.synced'),{timeout:60000});
+ stage='shared gameplay';
  ok('isolated private room',await A.eval('!__jewel.net().publicRoom')&&await B.eval('!__jewel.net().publicRoom'));
  for(const p of[A,B])await p.eval('__jewel.app.closePanel()');
  await A.eval('__jewel.challenge("puzzle",{puzzle:0})');await until(()=>B.eval('__jewel.expedition().run.mode==="puzzle"&&__jewel.state().phase==="idle"'));
@@ -46,5 +48,8 @@ try{
  await until(async()=>await A.eval('__jewel.expedition().run.finished')&&await B.eval('__jewel.expedition().run.finished'));
  ok('peer retry solves target goal for both clients',await A.eval('__jewel.app.expedition.puzzleResultSummary().title==="All marked gems cleared"')&&await B.eval('__jewel.app.expedition.puzzleResultSummary().title==="All marked gems cleared"')&&await A.eval('__jewel.net().hash')===await B.eval('__jewel.net().hash'));
  for(const[p,name]of[[A,'host'],[B,'peer']])ok(name+' runtime clean',await p.eval('__jewel.diagnostics().errors.length===0'));
+}catch(error){
+ const snapshot=async p=>{try{return p&&await p.eval('({net:__jewel.net(),loading:__jewel.app.coop.loading,synced:__jewel.app.coop.synced,phase:__jewel.state().phase,focus:__jewel.app.ui.focus,selected:__jewel.app.selected,keyboardCell:__jewel.app.keyboardCell,panelOpen:__jewel.app.panelOpen,probe:__connectionProbe.summary(),events:__connectionProbe.events,errors:__jewel.diagnostics().errors})');}catch(e){return {unavailable:String(e)};}};
+ transitions.push({stage,at:new Date().toISOString(),error:String(error),host:await snapshot(A),peer:await snapshot(B),hostLogs:A?.logs,peerLogs:B?.logs});throw error;
 }finally{A?.kill();B?.kill();writeFileSync(`${out}/${label}-private-checks.json`,JSON.stringify(checks,null,2));writeFileSync(`${out}/${label}-private-transitions.json`,JSON.stringify(transitions,null,2));}
 console.log(JSON.stringify({passed:checks.filter(c=>c.pass).length,total:checks.length}));if(checks.some(c=>!c.pass))process.exitCode=1;
