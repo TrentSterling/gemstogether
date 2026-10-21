@@ -1,0 +1,142 @@
+{
+  "at": "2026-10-21T04:54:41.035Z",
+  "events": [
+    {
+      "label": "four-real-swaps",
+      "at": "2026-10-21T04:54:36.865Z",
+      "score": 600,
+      "moves": 4,
+      "viewport": [
+        1280,
+        800
+      ],
+      "toast": "Achievement: First light",
+      "drawn": [],
+      "errors": []
+    },
+    {
+      "label": "desktop-controller",
+      "at": "2026-10-21T04:54:37.745Z",
+      "score": 600,
+      "moves": 4,
+      "viewport": [
+        1280,
+        800
+      ],
+      "toast": "Gamepad ready: A select, hold A + direction to swap, X hint, Y point",
+      "drawn": [
+        [
+          "Gamepad ready: A select, hold A + direction to swap, X hint, Y point",
+          640,
+          766,
+          13,
+          "#f7e2b4",
+          "center",
+          575.81
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "label": "desktop-hint",
+      "hint": [
+        29,
+        30
+      ],
+      "errors": []
+    },
+    {
+      "label": "phone-controller",
+      "at": "2026-10-21T04:54:38.754Z",
+      "score": 600,
+      "moves": 4,
+      "viewport": [
+        390,
+        844
+      ],
+      "toast": "Gamepad ready: A select, hold A + direction to swap, X hint, Y point",
+      "drawn": [
+        [
+          "Gamepad ready: A select, hold A + di...",
+          195,
+          128.69054823858232,
+          13,
+          "#f7e2b4",
+          "center",
+          330.63
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "label": "phone-hint",
+      "hint": [
+        29,
+        30
+      ],
+      "errors": []
+    },
+    {
+      "label": "landscape-controller",
+      "at": "2026-10-21T04:54:39.751Z",
+      "score": 600,
+      "moves": 4,
+      "viewport": [
+        568,
+        320
+      ],
+      "toast": "Gamepad ready: A select, hold A + direction to swap, X hint, Y point",
+      "drawn": [
+        [
+          "Gamepad ready: A select, hold A + direction to swap, X hin...",
+          284,
+          15,
+          13,
+          "#f7e2b4",
+          "center",
+          513.28
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "label": "landscape-hint",
+      "hint": [
+        29,
+        30
+      ],
+      "errors": []
+    },
+    {
+      "label": "playstation-phone-controller",
+      "at": "2026-10-21T04:54:40.771Z",
+      "score": 600,
+      "moves": 4,
+      "viewport": [
+        390,
+        844
+      ],
+      "toast": "Gamepad ready: A select, hold A + direction to swap, X hint, Y point",
+      "drawn": [
+        [
+          "Gamepad ready: A select, hold A + di...",
+          195,
+          128.69054823858232,
+          13,
+          "#f7e2b4",
+          "center",
+          330.63
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "label": "playstation-phone-hint",
+      "hint": [
+        29,
+        30
+      ],
+      "errors": []
+    }
+  ]
+}

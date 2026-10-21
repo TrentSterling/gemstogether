@@ -1,3 +1,10 @@
+## 3.3.16 / Gauntlet A09 (2026-10-21) Know your controller
+
+- Connecting a controller shows complete select, hold-direction swap, hint and point instructions for six seconds, including Cross, Square and Triangle names for PlayStation devices.
+- Wrapped guidance fits desktop, phone and short landscape rails. The shortest phone layout reduces plaque padding while retaining readable text and clearing About, scores, gems and controls.
+- Ordinary notices keep their current behavior. Panels, results, photo mode, AA comparison and open About suppress the controller guide. The complete message reaches the accessibility status.
+- Input mapping, scoring, saves, modes, co-op and audio remain intact. See `rounds/2026-10-21-A09.md` and the release evidence.
+
 ## 3.3.15 / Gauntlet A08 (2026-10-21) A personal best worth chasing
 
 - Timed, 30-move and Daily score plaques show the player's completed record for that challenge. Daily records belong to the current board date.
