@@ -1,0 +1,149 @@
+{
+  "baseline": "610c73c57ac02e59c2ce7c46871f86c2e5f6425c",
+  "events": [
+    {
+      "label": "1280 started puzzle through Play",
+      "at": "2026-10-21T10:04:25.349Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "1280 ArrowUp then Space",
+      "at": "2026-10-21T10:04:25.507Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 19,
+      "panel": true,
+      "tab": "audio",
+      "focus": "close",
+      "errors": []
+    },
+    {
+      "label": "1280 puzzle completed after Escape workaround",
+      "at": "2026-10-21T10:04:25.702Z",
+      "viewport": [
+        1280,
+        800
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "audio",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "390 started puzzle through Play",
+      "at": "2026-10-21T10:04:27.840Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "390 ArrowUp then Space",
+      "at": "2026-10-21T10:04:27.944Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 19,
+      "panel": true,
+      "tab": "audio",
+      "focus": "close",
+      "errors": []
+    },
+    {
+      "label": "390 puzzle completed after Escape workaround",
+      "at": "2026-10-21T10:04:28.086Z",
+      "viewport": [
+        390,
+        844
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "audio",
+      "focus": null,
+      "errors": []
+    },
+    {
+      "label": "568 started puzzle through Play",
+      "at": "2026-10-21T10:04:30.252Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 27,
+      "panel": false,
+      "tab": "play",
+      "focus": "settings",
+      "errors": []
+    },
+    {
+      "label": "568 ArrowUp then Space",
+      "at": "2026-10-21T10:04:30.349Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 0,
+      "moves": 0,
+      "selected": -1,
+      "cell": 19,
+      "panel": true,
+      "tab": "audio",
+      "focus": "close",
+      "errors": []
+    },
+    {
+      "label": "568 puzzle completed after Escape workaround",
+      "at": "2026-10-21T10:04:30.480Z",
+      "viewport": [
+        568,
+        320
+      ],
+      "score": 150,
+      "moves": 1,
+      "selected": -1,
+      "cell": 2,
+      "panel": false,
+      "tab": "audio",
+      "focus": null,
+      "errors": []
+    }
+  ]
+}

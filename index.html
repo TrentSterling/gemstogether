@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.19'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.20'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -2727,7 +2727,7 @@ class GemsExpedition {
    const plan=b.makeClearPlan([m[1],m[0]]);this.run.targets=plan.clear.map(i=>b.cells[i].id);[b.cells[m[0]],b.cells[m[1]]]=[b.cells[m[1]],b.cells[m[0]]];
   }
   if(this.a.coop?.hosting){this.a.coop.revision++;this.a.coop.publish('reset',{state:this.a.coop.snapshot()});}
-  this.a.closePanel();this.a.toast(mode==='zen'?'Endless: '+FX_STAGES[stage].name:mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].description:mode==='daily'?'Daily board: '+this.run.day:'Challenge: '+EXPEDITION_MODES[mode]);return true;
+  this.a.closePanel();this.a.prepareRunInput();this.a.toast(mode==='zen'?'Endless: '+FX_STAGES[stage].name:mode==='puzzle'?EXPEDITION_PUZZLES[puzzle].description:mode==='daily'?'Daily board: '+this.run.day:'Challenge: '+EXPEDITION_MODES[mode]);return true;
  }
  resetForBoard(fixture){if(this.starting)return;this.run=this.makeRun('zen');this.resultRecord=null;this.current={chain:0,gems:0,points:0};this.highlights=[];this.lastClear.clear();this.a.fx.res=null;this.a.fx.stage=undefined;this.forgeFocus=null;}
  acceptSwap(){const r=this.run;if(!this.active)return true;if(r.finished)return false;if(r.mode==='timed'&&r.elapsed>=r.limit)return false;return !['moves','daily','puzzle'].includes(r.mode)||this.a.board.moves<r.limit;}
@@ -3362,6 +3362,29 @@ const missHintUpdate=JewelApp.prototype.update;
 JewelApp.prototype.update=function(...args){const result=missHintUpdate.apply(this,args);this.updateMissHint();return result;};
 const missHintManual=JewelApp.prototype.hint;
 JewelApp.prototype.hint=function(...args){const result=missHintManual.apply(this,args);if(this.hintCells.length)this.missHint=null;return result;};
+
+// Accepted starts hand keyboard control back to the board. An activation held
+// through the transition must be released before it can select a new gem.
+const runInputHeld=new Set();
+window.addEventListener('keydown',e=>{
+ if(!['Enter',' '].includes(e.key)||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.defaultPrevented||
+    e.target?.closest?.('input,select,textarea,button,a,summary,[contenteditable]')||document.getElementById('trontAbout')?.open)return;
+ const a=window.__jewel?.app;
+ if(a?.runStartKeys?.has(e.key)||e.repeat&&!runInputHeld.has(e.key)){
+  e.preventDefault();e.stopImmediatePropagation();return;
+ }
+ runInputHeld.add(e.key);
+},true);
+window.addEventListener('keyup',e=>{
+ runInputHeld.delete(e.key);window.__jewel?.app?.runStartKeys?.delete(e.key);
+},true);
+const clearRunInput=()=>{runInputHeld.clear();window.__jewel?.app?.runStartKeys?.clear();};
+window.addEventListener('blur',clearRunInput);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearRunInput();});
+JewelApp.prototype.prepareRunInput=function(){
+ if(this.ui)this.ui.focus=null;
+ this.runStartKeys=new Set(runInputHeld);
+};
 
 (async function boot(){let stage='GPU renderer';let app=null;try{
  const force=new URLSearchParams(location.search).has('webgl');$('load-status').textContent='Preparing GPU shaders...';

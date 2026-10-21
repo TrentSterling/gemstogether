@@ -1,6 +1,14 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.19**, round A12 (2026-10-21).
+Current gauntlet release: **3.3.20**, round A13 (2026-10-21).
+`tools/run-input.js` returns keyboard control to the board after an accepted
+Expedition start. Track held Enter/Space before the existing UI capture handler;
+release them before new-board selection. Keep the hook after validation and
+closePanel, never inside generic closePanel. Ordinary return focus and rejected
+co-op starts must stay intact. `run-input-audit.mjs` and `run-input-coop.mjs`
+exercise actual keyboard events, result replay and private host/peer authority.
+
+Gauntlet release: **3.3.19**, round A12 (2026-10-21).
 `tools/miss-hint.js` offers the existing local hint after three genuine misses
 on one board within twelve seconds. Count only local no-match feedback; generic
 co-op rejects and authorised remote swaps must never count. Wait for bounce
