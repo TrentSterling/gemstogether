@@ -1,6 +1,15 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.20**, round A13 (2026-10-21).
+Current gauntlet release: **3.3.21**, round A14 (2026-10-21).
+`tools/result-keyboard.js` gives fresh results explicit first-Tab entry, then
+retains the full existing control cycle. Never reorder ui.hits or autofocus
+results during drawing. New result identities take precedence over stale focus;
+same-result panel return keeps its place. The early run-input guard blocks held
+result activation; successful optional Endless keyboard replay also uses the
+existing prepareRunInput guard. `result-keyboard-audit.mjs` and
+`result-keyboard-coop.mjs` cover actual input and private host/peer transitions.
+
+Gauntlet release: **3.3.20**, round A13 (2026-10-21).
 `tools/run-input.js` returns keyboard control to the board after an accepted
 Expedition start. Track held Enter/Space before the existing UI capture handler;
 release them before new-board selection. Keep the hook after validation and

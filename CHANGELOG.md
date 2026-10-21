@@ -1,3 +1,10 @@
+## 3.3.21 / Gauntlet A14 (2026-10-21) One Tab to keep playing
+
+- The first Tab on a fresh result focuses Next puzzle or Play again; Shift+Tab enters at the last result action. Further traversal still reaches every utility control.
+- Focused keyboard result actions show Enter and announce Enter/Space activation. Existing controller A/Cross prompts and pointer targets remain intact.
+- Held completion/replay keys cannot skip a result or select a new-board gem, including optional Endless replay. New shared results discard stale result focus; same-result panel return retains its place.
+- See `rounds/2026-10-21-A14.md` and the timestamped release evidence.
+
 ## 3.3.20 / Gauntlet A13 (2026-10-21) Start ready to play
 
 - Starting or replaying a challenge returns keyboard control to the board. The first Space or Enter selects a gem instead of reopening Settings.

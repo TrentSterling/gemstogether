@@ -5,7 +5,7 @@ window.addEventListener('keydown',e=>{
  if(!['Enter',' '].includes(e.key)||e.ctrlKey||e.metaKey||e.altKey||e.isComposing||e.defaultPrevented||
     e.target?.closest?.('input,select,textarea,button,a,summary,[contenteditable]')||document.getElementById('trontAbout')?.open)return;
  const a=window.__jewel?.app;
- if(a?.runStartKeys?.has(e.key)||e.repeat&&!runInputHeld.has(e.key)){
+ if(a?.runStartKeys?.has(e.key)||e.repeat&&!runInputHeld.has(e.key)||a?.ui?.keyboardResultTarget?.()&&(e.repeat||runInputHeld.has(e.key))){
   e.preventDefault();e.stopImmediatePropagation();return;
  }
  runInputHeld.add(e.key);
