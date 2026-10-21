@@ -1,3 +1,10 @@
+## 3.3.19 / Gauntlet A12 (2026-10-21) Help after repeated misses
+
+- Three genuine no-match swaps on the same board within twelve seconds reveal the existing legal-swap arrow after the bounce settles.
+- The cue stays local in co-op. Stale, busy and spectator rejects do not count. Successful moves, new boards, manual hints and interrupted play clear the streak.
+- The accessible status suggests swapping the highlighted pair. Scoring, move budgets, save formats, controls, modes and audio remain unchanged.
+- See `rounds/2026-10-21-A12.md` and timestamped release evidence.
+
 ## 3.3.18 / Gauntlet A11 (2026-10-21) Make unsaved practice explicit
 
 - Showcase and manual practice retain a visible status explaining that progress is not saved, with Play as the route to a new scored run.
