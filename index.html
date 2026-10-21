@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.21'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.22'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -3009,7 +3009,7 @@ function gemContours(actor,app){
  loops.sort((a,b)=>area(b)-area(a));return loops.slice(0,1);
 }
 CabinetUI.prototype.expeditionDecor=function(){
- const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;
+ const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen||e.run.mode==='puzzle'&&e.run.finished)return;
  const marks=new Map(),mark=(i,col,width=2)=>marks.set(i,{col,width});
  if(a.prefs.highContrast)for(let i=0;i<64;i++)mark(i,'#ffffff',1.5);
  if(a.selected>=0&&a.phase==='idle'){mark(a.selected,'#ffe27a',3);for(const j of [a.selected-8,a.selected+8,a.selected-1,a.selected+1])if(a.board.adjacent(a.selected,j)){const q=window.__jewel.project(j),s=window.__jewel.project(a.selected),t=(a.time*1.5)%1,x=mix(s[0],q[0],t),y=mix(s[1],q[1],t);p.box(x-2.5,y-2.5,5,5,'#8ff7ff',2,.8);mark(j,'#8ff7ff',1);}}
@@ -3121,7 +3121,7 @@ JewelApp.prototype.fullscreen=function(){if(window.gemsDesktop)return window.gem
 const expeditionGameOver=CabinetUI.prototype.drawGameOver;
 CabinetUI.prototype.drawGameOver=function(){
  const a=this.app,e=a.expedition,r=e?.run;if(!r?.finished)return expeditionGameOver.call(this);if(a.panelOpen)return;
- const comparison=e.resultComparison(),p=this.ink,{cx,cy,bw}=this.boardBox(),W=Math.max(bw*.91,Math.min(320,a.cssWidth-24)),
+ const comparison=e.resultComparison()||e.puzzleResultSummary(),p=this.ink,{cx,cy,bw}=this.boardBox(),W=Math.max(bw*.91,Math.min(320,a.cssWidth-24)),
   H=Math.min(440,Math.max(comparison?380:330,bw*.84),a.cssHeight-24),x=cx-W/2,y=clamp(cy-H/2,12,Math.max(12,a.cssHeight-H-12)),
   // Keep the result, highlight and comparison above full-size replay buttons on short screens.
   scale=Math.min(1,(H-(comparison?183:125))/197);
@@ -3417,6 +3417,27 @@ CabinetUI.prototype.activate=function(id,...args){
   result=resultKeyboardActivate.call(this,id,...args);
  // Also cover the optional Endless result, whose legacy replay calls newBoard.
  if(keyboardResult&&!a.gameOver)a.prepareRunInput();
+ return result;
+};
+
+// Result feedback reads the existing shared goal state, never the score.
+GemsExpedition.prototype.puzzleResultSummary=function(){
+ const r=this.run;if(r.mode!=='puzzle'||!r.finished)return null;
+ const puzzle=EXPEDITION_PUZZLES[r.puzzle];if(!puzzle)return null;
+ const done=this.puzzleWon();let title,tip;
+ if(puzzle.goal==='targets'){title=done?'All marked gems cleared':'Marked gems: '+r.targets.length+' left';tip='Clear every marked gem';}
+ else if(puzzle.goal==='blast'){title=done?'Blast gem forged':'Blast gem still needed';tip='Match 4 in a line';}
+ else if(puzzle.goal==='prism'){title=done?'Prism forged':'Prism still needed';tip='Match 5 in a line';}
+ else {title='Best chain: '+r.bestChain+' / 5';tip='Reach a 5-wave cascade';}
+ return {title,detail:done?'Puzzle goal reached':tip};
+};
+const puzzleResultCommit=GemsExpedition.prototype.commitResult;
+GemsExpedition.prototype.commitResult=function(...args){
+ const before=this.committed,result=puzzleResultCommit.apply(this,args);
+ if(this.committed!==before){
+  const summary=this.puzzleResultSummary();
+  if(summary)document.getElementById('accessibility-status').textContent=this.run.reason+'. '+summary.title+'. '+summary.detail+'.';
+ }
  return result;
 };
 

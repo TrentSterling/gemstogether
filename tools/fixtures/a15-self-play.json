@@ -1,0 +1,365 @@
+[
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "at": "2026-10-21T11:58:10.347Z",
+    "file": "../a15-evidence/before-1280-puzzle-result.png",
+    "actions": [
+      "Play",
+      "first puzzle",
+      "tap28",
+      "tap36"
+    ],
+    "state": {
+      "run": {
+        "id": "9CB729DFNPN9",
+        "mode": "puzzle",
+        "stageStart": 0,
+        "elapsed": 6.216666666666666,
+        "started": true,
+        "finished": true,
+        "reason": "TRY THIS PUZZLE AGAIN",
+        "limit": 1,
+        "puzzle": 0,
+        "day": "",
+        "targets": [
+          3,
+          10,
+          18
+        ],
+        "forged": [
+          1
+        ],
+        "bestChain": 1,
+        "samples": [],
+        "cleared": 3,
+        "score": 300,
+        "moves": 1
+      },
+      "score": 300,
+      "moves": 1,
+      "texts": [
+        [
+          "TRY THIS PUZZLE AGAIN",
+          637.7308219816346,
+          203.4610450523872,
+          27,
+          "#f7e2b4",
+          "center",
+          468.736360288033,
+          0.12,
+          true
+        ],
+        [
+          "300",
+          637.7308219816346,
+          254.4610450523872,
+          60,
+          "#ece1c6",
+          "center",
+          468.736360288033,
+          0.13,
+          true
+        ],
+        [
+          "1 moves / 3 gems",
+          637.7308219816346,
+          325.4610450523872,
+          13,
+          "#adc0c3",
+          "center",
+          468.736360288033
+        ],
+        [
+          "CASCADE x1",
+          637.7308219816346,
+          358.4610450523872,
+          13,
+          "#8ff7ff",
+          "center",
+          468.736360288033
+        ],
+        [
+          "Play again",
+          637.7308219816346,
+          518.9610450523871,
+          15,
+          "#ece1c6",
+          "center",
+          439.736360288033,
+          0.11,
+          true
+        ],
+        [
+          "Return to endless",
+          637.7308219816346,
+          570.9610450523871,
+          15,
+          "#ece1c6",
+          "center",
+          439.736360288033,
+          0.11,
+          true
+        ]
+      ],
+      "objective": "Clear marked gems: 3 left"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "at": "2026-10-21T11:58:10.374Z",
+    "retry": {
+      "reason": "PUZZLE COMPLETE",
+      "score": 150,
+      "moves": 1,
+      "errors": []
+    }
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "at": "2026-10-21T11:58:12.669Z",
+    "file": "../a15-evidence/before-390-puzzle-result.png",
+    "actions": [
+      "Play",
+      "first puzzle",
+      "tap28",
+      "tap36"
+    ],
+    "state": {
+      "run": {
+        "id": "36FC3AFWJQWJ",
+        "mode": "puzzle",
+        "stageStart": 0,
+        "elapsed": 6.216666666666666,
+        "started": true,
+        "finished": true,
+        "reason": "TRY THIS PUZZLE AGAIN",
+        "limit": 1,
+        "puzzle": 0,
+        "day": "",
+        "targets": [
+          3,
+          10,
+          18
+        ],
+        "forged": [
+          1
+        ],
+        "bestChain": 1,
+        "samples": [],
+        "cleared": 3,
+        "score": 300,
+        "moves": 1
+      },
+      "score": 300,
+      "moves": 1,
+      "texts": [
+        [
+          "TRY THIS PUZZLE AGAIN",
+          194.60915341705015,
+          281.83931141839497,
+          25.6,
+          "#f7e2b4",
+          "center",
+          296,
+          0.12,
+          true
+        ],
+        [
+          "300",
+          194.60915341705015,
+          332.83931141839497,
+          57.599999999999994,
+          "#ece1c6",
+          "center",
+          296,
+          0.13,
+          true
+        ],
+        [
+          "1 moves / 3 gems",
+          194.60915341705015,
+          403.83931141839497,
+          13,
+          "#adc0c3",
+          "center",
+          296
+        ],
+        [
+          "CASCADE x1",
+          194.60915341705015,
+          436.83931141839497,
+          13,
+          "#8ff7ff",
+          "center",
+          296
+        ],
+        [
+          "Play again",
+          194.60915341705015,
+          487.339311418395,
+          15,
+          "#ece1c6",
+          "center",
+          267,
+          0.11,
+          true
+        ],
+        [
+          "Return to endless",
+          194.60915341705015,
+          539.339311418395,
+          15,
+          "#ece1c6",
+          "center",
+          267,
+          0.11,
+          true
+        ]
+      ],
+      "objective": "Clear marked gems: 3 left"
+    }
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "at": "2026-10-21T11:58:12.697Z",
+    "retry": {
+      "reason": "PUZZLE COMPLETE",
+      "score": 150,
+      "moves": 1,
+      "errors": []
+    }
+  },
+  {
+    "viewport": {
+      "width": 568,
+      "height": 320
+    },
+    "at": "2026-10-21T11:58:15.072Z",
+    "file": "../a15-evidence/before-568-puzzle-result.png",
+    "actions": [
+      "Play",
+      "first puzzle",
+      "tap28",
+      "tap36"
+    ],
+    "state": {
+      "run": {
+        "id": "YSW99HXTLP9T",
+        "mode": "puzzle",
+        "stageStart": 0,
+        "elapsed": 6.216666666666666,
+        "started": true,
+        "finished": true,
+        "reason": "TRY THIS PUZZLE AGAIN",
+        "limit": 1,
+        "puzzle": 0,
+        "day": "",
+        "targets": [
+          3,
+          10,
+          18
+        ],
+        "forged": [
+          1
+        ],
+        "bestChain": 1,
+        "samples": [],
+        "cleared": 3,
+        "score": 300,
+        "moves": 1
+      },
+      "score": 300,
+      "moves": 1,
+      "texts": [
+        [
+          "TRY THIS PUZZLE AGAIN",
+          283.80590618644396,
+          33.700507614213194,
+          22.22131979695432,
+          "#f7e2b4",
+          "center",
+          296,
+          0.12,
+          true
+        ],
+        [
+          "300",
+          283.80590618644396,
+          77.96954314720813,
+          49.99796954314721,
+          "#ece1c6",
+          "center",
+          296,
+          0.13,
+          true
+        ],
+        [
+          "1 moves / 3 gems",
+          283.80590618644396,
+          139.5989847715736,
+          11.284263959390863,
+          "#adc0c3",
+          "center",
+          296
+        ],
+        [
+          "CASCADE x1",
+          283.80590618644396,
+          168.24365482233503,
+          11.284263959390863,
+          "#8ff7ff",
+          "center",
+          296
+        ],
+        [
+          "Play again",
+          283.80590618644396,
+          208.5,
+          15,
+          "#ece1c6",
+          "center",
+          267,
+          0.11,
+          true
+        ],
+        [
+          "Return to endless",
+          283.80590618644396,
+          260.5,
+          15,
+          "#ece1c6",
+          "center",
+          267,
+          0.11,
+          true
+        ]
+      ],
+      "objective": "Clear marked gems: 3 left"
+    }
+  },
+  {
+    "viewport": {
+      "width": 568,
+      "height": 320
+    },
+    "at": "2026-10-21T11:58:15.100Z",
+    "retry": {
+      "reason": "PUZZLE COMPLETE",
+      "score": 150,
+      "moves": 1,
+      "errors": []
+    }
+  }
+]

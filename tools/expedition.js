@@ -351,7 +351,7 @@ function gemContours(actor,app){
  loops.sort((a,b)=>area(b)-area(a));return loops.slice(0,1);
 }
 CabinetUI.prototype.expeditionDecor=function(){
- const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen)return;
+ const a=this.app,e=a.expedition,p=this.ink;if(!e||e.photo||a.panelOpen||e.run.mode==='puzzle'&&e.run.finished)return;
  const marks=new Map(),mark=(i,col,width=2)=>marks.set(i,{col,width});
  if(a.prefs.highContrast)for(let i=0;i<64;i++)mark(i,'#ffffff',1.5);
  if(a.selected>=0&&a.phase==='idle'){mark(a.selected,'#ffe27a',3);for(const j of [a.selected-8,a.selected+8,a.selected-1,a.selected+1])if(a.board.adjacent(a.selected,j)){const q=window.__jewel.project(j),s=window.__jewel.project(a.selected),t=(a.time*1.5)%1,x=mix(s[0],q[0],t),y=mix(s[1],q[1],t);p.box(x-2.5,y-2.5,5,5,'#8ff7ff',2,.8);mark(j,'#8ff7ff',1);}}
@@ -463,7 +463,7 @@ JewelApp.prototype.fullscreen=function(){if(window.gemsDesktop)return window.gem
 const expeditionGameOver=CabinetUI.prototype.drawGameOver;
 CabinetUI.prototype.drawGameOver=function(){
  const a=this.app,e=a.expedition,r=e?.run;if(!r?.finished)return expeditionGameOver.call(this);if(a.panelOpen)return;
- const comparison=e.resultComparison(),p=this.ink,{cx,cy,bw}=this.boardBox(),W=Math.max(bw*.91,Math.min(320,a.cssWidth-24)),
+ const comparison=e.resultComparison()||e.puzzleResultSummary(),p=this.ink,{cx,cy,bw}=this.boardBox(),W=Math.max(bw*.91,Math.min(320,a.cssWidth-24)),
   H=Math.min(440,Math.max(comparison?380:330,bw*.84),a.cssHeight-24),x=cx-W/2,y=clamp(cy-H/2,12,Math.max(12,a.cssHeight-H-12)),
   // Keep the result, highlight and comparison above full-size replay buttons on short screens.
   scale=Math.min(1,(H-(comparison?183:125))/197);
