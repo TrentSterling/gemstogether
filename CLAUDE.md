@@ -1,6 +1,16 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.26**, round A19 (2026-10-21).
+Current gauntlet release: **3.3.27**, round A20 (2026-10-21).
+`tools/keyboard-tutorial.js` adapts the existing first-run hint using
+lastInputDevice, not keyboardActive (which gamepads also set). Preserve exact
+legacy pointer/controller draws and all input/save rules. Measure text and
+hit geometry against the board, About and controls; use spare side space when
+the compact strip cannot fit. Announcements are once per visible keyboard
+hint episode and yield to notices, menu/native focus and pending transport.
+The reminder preserves existing return focus. Focused audit and private co-op
+test exercise actual keyboard selection and swapping, with diagnostic receipts.
+
+Gauntlet release: **3.3.26**, round A19 (2026-10-21).
 `tools/special-guide.js` explains the locally selected blast or prism while idle.
 Keep layout reads pure and announcements once per selected cell object. Tips
 yield to notices, results, panels, overlays, shared pending moves and the full
