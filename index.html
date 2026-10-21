@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.22'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.23'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -1362,7 +1362,7 @@ class CabinetUI {
   if(this.comboEase(a)){const sy=wide?top+(bottom-top)*.31:Math.max(8,top-126),cx=(wide?Math.min(w-91,right+111):w/2)+this.cE.dx;this.ink.opacity=this.cE.al;
     if(wide){this.plaque(cx-77,sy,154,116,true);this.text((a.coop?.connected?'Co-op x':'x')+this.lastCascade,cx,sy+20-39*(this.cE.s-1)*.5,39*this.cE.s,UI_ART.highlight,'center',130,.14,true);this.text(a.coop?.connected?'TEAM CASCADE':this.lastCascade>=6?'Brilliant':this.lastCascade>=4?'Radiant':'Cascade',cx,sy+82,14,UI_ART.aqua,'center',132);}this.ink.opacity=1;
   }
-  const tnow=performance.now();if(this.toastUntil+260>tnow&&!a.panelOpen){const tI=smooth(clamp(((this.toastDuration||2800)-(this.toastUntil-tnow))/180)),tO=smooth(clamp((this.toastUntil+260-tnow)/260));this.ink.opacity=tI*tO;if(this.toastKind==='controller'){this.drawControllerGuide(w,h,top,right,wide);}else{const compactToast=wide&&h<460,text=this.fitLine(this.toastMessage,compactToast?Math.max(80,w-right-56):w-58,13),tw=Math.min(w-22,this.measure(text,13)+32),tx=compactToast?w-tw-12:(w-tw)/2;let ty=(compactToast?Math.max(60,top+(bottom-top)*.28):wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque(tx,ty,tw,32);this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);}this.ink.opacity=1;}
+  const tnow=performance.now();if(this.toastUntil+260>tnow&&!a.panelOpen){const tI=smooth(clamp(((this.toastDuration||2800)-(this.toastUntil-tnow))/180)),tO=smooth(clamp((this.toastUntil+260-tnow)/260));this.ink.opacity=tI*tO;if(this.toastKind==='controller'){this.drawControllerGuide(w,h,top,right,wide);}else if(this.toastKind==='ornament'){this.drawOrnamentNotice(w,h,top,right,wide);}else{const compactToast=wide&&h<460,text=this.fitLine(this.toastMessage,compactToast?Math.max(80,w-right-56):w-58,13),tw=Math.min(w-22,this.measure(text,13)+32),tx=compactToast?w-tw-12:(w-tw)/2;let ty=(compactToast?Math.max(60,top+(bottom-top)*.28):wide?h-43:Math.max(6,top-136))+(1-tI)*10+(1-tO)*6;this.plaque(tx,ty,tw,32);this.text(text,tx+tw/2,ty+9,13,UI_ART.highlight,'center',tw-20);}this.ink.opacity=1;}
  }
  trackCursor(e,down=null){
   const m=this.mouse,c=this.app.canvas;
@@ -1768,7 +1768,7 @@ class JewelApp {
  }
  updateUI(force=false){if(!force&&this.wallTime-this.lastUI<.12)return;this.lastUI=this.wallTime;$('score').textContent=Math.round(this.displayScore).toLocaleString();$('best').textContent=this.best.toLocaleString();$('moves').textContent=this.board.moves+' move'+(this.board.moves===1?'':'s');$('renderer').innerHTML='<b>'+this.renderer.name.toUpperCase()+'</b>'; 
   if(this.panelOpen){$('stats').textContent=`${this.renderer.name} · ${this.renderer.width} × ${this.renderer.height}\n${Math.round(this.fps)} FPS · ${this.renderer.drawCalls} draw calls\n${this.actors.size} jewels · ${this.world.triangles.toLocaleString()} environment triangles\n${this.world.sparks.active(this.time).toLocaleString()} sparks · ${this.world.shards.active(this.time).toLocaleString()} shards\nState: ${this.phase} · longest cascade: ${this.maxCascadeSeen}\nAudio voices: ${this.audio.voices.length} / 28`;}}
- toast(message,kind=''){if(this.ui){this.ui.toastMessage=String(message);this.ui.toastKind=kind;this.ui.toastDuration=kind==='controller'?6000:2800;this.ui.toastUntil=performance.now()+this.ui.toastDuration;}$('accessibility-status').textContent=kind==='controller'?'Controller ready. '+message:message;}
+ toast(message,kind=''){if(this.ui){this.ui.toastMessage=String(message);this.ui.toastKind=kind;this.ui.toastDuration=kind==='controller'||kind==='ornament'?6000:2800;this.ui.toastUntil=performance.now()+this.ui.toastDuration;}$('accessibility-status').textContent=kind==='controller'?'Controller ready. '+message:message;}
  hint(){if(this.phase!=='idle'){this.toast('Let the gems settle…');return;}this.hintCells=this.bestMove(false)||[];this.hintUntil=this.time+4;this.idleSince=this.time;if(this.hintCells.length)this.audio.select(this.board.cells[this.hintCells[0]].type,0);}
  toggleDemo(force=null){if(this.coop?.guardControl('demo'))return;this.auto=force===null?!this.auto:force;this.autoPair=null;this.oneShot=false;this.autoNext=this.time+.35;if(this.auto){this.practice=true;$('scores').querySelector('label').textContent='SHOWCASE';this.selected=-1;this.toast('Showcase · real moves, real cascades');}else if(this.practice)$('scores').querySelector('label').textContent='PRACTICE';$('demo-btn').textContent=this.auto?'Stop showcase':'Showcase';$('demo-btn').classList.toggle('on',this.auto);}
  toggleSound(){this.audio.start().catch(()=>{});this.prefs.muted=!this.prefs.muted;this.audio.setMute(this.prefs.muted);$('sound-btn').textContent=this.prefs.muted?'Sound off':'Sound on';this.savePreferences();}
@@ -3440,6 +3440,31 @@ GemsExpedition.prototype.commitResult=function(...args){
  }
  return result;
 };
+
+// Earned cabinet rewards stay local. Existing saves never announce retroactively.
+GemsExpedition.prototype.ornamentCount=function(){return EXPEDITION_ORNAMENTS.filter(n=>this.profile.gems>=n).length;};
+GemsExpedition.prototype.ornamentNoticeAllowed=function(){
+ const a=this.a,r=this.run,n=a.coop,ending=(r.mode==='timed'&&r.elapsed>=r.limit)||(['moves','daily','puzzle'].includes(r.mode)&&a.board.moves>=r.limit)||(r.mode==='puzzle'&&this.puzzleWon()),ann=this.announcement,age=ann?a.time-ann.at:0,
+  celebrating=[['co',1.2],['rc',1.6],['rp',2.4],['sc',2.6]].some(([key,duration])=>{const q=a.ui?.[key],t=q?a.time-q.birth:-1;return q&&t>=0&&t<=duration;});
+ return this.active&&a.phase==='idle'&&!r.finished&&!ending&&!a.gameOver&&!a.panelOpen&&!this.photo&&!a.aaCompare&&!a.frozen&&!n?.pending&&!n?.electing&&!(n?.mirror&&!n.synced)&&!document.getElementById('trontAbout')?.open&&!(ann&&age>=0&&age<ann.duration)&&!celebrating;
+};
+const ornamentRecordClear=GemsExpedition.prototype.recordClear;
+GemsExpedition.prototype.recordClear=function(...args){
+ const from=this.ornamentCount(),result=ornamentRecordClear.apply(this,args),to=this.ornamentCount();
+ if(to>from)this.ornamentNotice={from:Math.min(this.ornamentNotice?.from??from,from),to};
+ return result;
+};
+GemsExpedition.prototype.updateOrnamentNotice=function(){
+ const q=this.ornamentNotice,a=this.a;if(!q)return;
+ if(this.ornamentCount()<q.to){this.ornamentNotice=null;return;}
+ if(!this.ornamentNoticeAllowed()||!a.ui||a.ui.toastUntil+260>performance.now())return;
+ this.ornamentNotice=null;
+ const total=EXPEDITION_ORNAMENTS.length,earned=q.to-q.from,message=q.to===total?'All '+total+' ornaments earned! View your treasury in Journey.':earned>1?earned+' new ornaments! Treasury '+q.to+' of '+total+'. Open Journey.':'Ornament '+q.to+' of '+total+' earned! Find it in Journey.';
+ a.toast(message,'ornament');
+};
+const ornamentUpdate=JewelApp.prototype.update;
+JewelApp.prototype.update=function(...args){const result=ornamentUpdate.apply(this,args);this.expedition?.updateOrnamentNotice();return result;};
+CabinetUI.prototype.drawOrnamentNotice=function(...args){if(this.app.expedition?.ornamentNoticeAllowed())this.drawControllerGuide(...args);};
 
 (async function boot(){let stage='GPU renderer';let app=null;try{
  const force=new URLSearchParams(location.search).has('webgl');$('load-status').textContent='Preparing GPU shaders...';

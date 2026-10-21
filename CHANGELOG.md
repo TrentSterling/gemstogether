@@ -1,3 +1,10 @@
+## 3.3.23 / Gauntlet A16 (2026-10-21) Notice your earned ornaments
+
+- Newly earned cabinet ornaments receive a full, wrapped reward notice pointing to Journey. The notice follows cascades, existing celebrations and action feedback.
+- Results, panels, practice, spectator views and shared moves defer pending rewards. Final-move and timed completions keep the notice for resumed play; existing saves never replay historic unlocks.
+- Rewards remain local to each player in co-op. Save formats, thresholds, scores, controls and shared messages are unchanged.
+- See `rounds/2026-10-21-A16.md` and the timestamped release evidence.
+
 ## 3.3.22 / Gauntlet A15 (2026-10-21) Know why the puzzle ended
 
 - Puzzle results show the remaining goal and a short retry tip, or confirm the completed target, blast, prism or cascade goal. A high-scoring failed move now explains what is still missing.
