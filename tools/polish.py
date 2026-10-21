@@ -460,7 +460,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.14'")
+rep("version:'3.2.4'", "version:'3.3.15'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -570,6 +570,15 @@ rep(r""" if(this.plaqueAt&&!a.practice){const [x,y,w,h]=this.plaqueAt,yy=y+h+62,
   if(on){const f=clamp((R.until-t)/8,0,1);for(let k=0;k<6;k++)p.box(x+10+(w-20)*f*k/6,yy+19,(w-20)*f/6+1,7,gemHex((k+((t*10)|0))%6),2,.9);p.box(x+8,yy+15,w-16,15,'#ffffff',5,.12*glow);}
   else if(R){const fm=clamp(R.mine/cap,0,1),ft=clamp(R.theirs/cap,0,1-fm);if(fm>0)p.box(x+10,yy+19,(w-20)*fm,7,mineCol,2,1);if(ft>0)p.box(x+10+(w-20)*fm,yy+19,(w-20)*ft,7,theirCol,2,1);
    if(fm+ft>.85){const pu=.5+.5*Math.sin(t*9);p.box(x+8,yy+15,w-16,15,'#ffd98a',5,.18*pu);}}}""")
+
+# A08: show the player's completed record for the current challenge in the
+# existing score plaque. Narrow layouts keep their compact Best label.
+rep('drawHUD(){const a=this.app,p=this.ink,w=a.cssWidth,h=a.cssHeight;',
+    "drawHUD(){const a=this.app,p=this.ink,w=a.cssWidth,h=a.cssHeight,record=a.expedition?.hudBest()||{label:'Best',score:a.best,challenge:false},bestText=record.score===null?'Set one':record.score.toLocaleString('en-US');")
+rep("this.text('Best',sx+17,sy+110,12,UI_ART.dim);this.text(a.best.toLocaleString('en-US'),sx+sw-17,sy+108,17,UI_ART.text,'right',sw-80);",
+    "const bestLabel=record.challenge&&this.measure(record.label,12)+Math.min(this.measure(bestText,17),sw-80)+42<=sw?record.label:'Best',labelWidth=this.measure(bestLabel,12);this.text(bestLabel,sx+17,sy+110,12,UI_ART.dim);this.text(bestText,sx+sw-17,sy+108,17,UI_ART.text,'right',bestLabel==='Best'?sw-80:sw-42-labelWidth);")
+rep("this.text(a.best.toLocaleString('en-US'),w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);",
+    "this.text(bestText,w/2+sw/2-14,sy+10,14,UI_ART.text,'right',sw*.28);")
 
 # Patch 30: keep the pinned torrent strategy's three discovery trackers available.
 # A single tracker can stall peer discovery even while another tracker is reachable.
