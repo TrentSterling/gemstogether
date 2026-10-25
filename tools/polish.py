@@ -344,10 +344,7 @@ CabinetUI.prototype.drawStage=function(){const a=this.app,p=this.ink,fx=a.fx;if(
   p.box(x+2,yy+37,w-4,9,'#071418',4,.95);p.box(x+4,yy+39,w-8,5,col,2,.22);if(f>0)p.box(x+4,yy+39,Math.max(5,(w-8)*f),5,col,2,1);}
  else if(!a.practice){this.stripAt=null;const bt=this.hits.find(h=>h.id==='coop-open');if(bt&&bt.y+bt.h+64<a.cssHeight){const x=bt.x,w=bt.w,yy=bt.y+bt.h+12,f=clamp((a.displayScore-info.start)/(info.end-info.start),0,1);this.stripAt=[x,yy,w];
   this.text('STAGE '+info.n+'  '+info.name,x+4,yy,12,col,'left',w*.62,.12,true);p.box(x+w*.64,yy+4,w*.36-2,8,'#071418',4,.95);p.box(x+w*.64+2,yy+6,(w*.36-6),4,col,2,.22);if(f>0)p.box(x+w*.64+2,yy+6,Math.max(4,(w*.36-6)*f),4,col,2,1);}}
- const o=this.sc;if(!o)return;const age=a.time-o.birth,L=2.6;if(age<0)return;if(age>L){this.sc=null;return;}
- const {cx,cy,bw}=this.boardBox(),inn=clamp(age/.35,0,1),out=clamp((age-(L-.4))/.4,0,1),u=1+2.7*(inn-1)**3+1.7*(inn-1)**2,dx=(1-u)*-bw*.9+out*out*bw*1.1,oc=stageHex(o);
- p.opacity=clamp(inn*3,0,1)*(1-out);const Y=cy+bw*.04;p.box(cx-bw*.62+dx,Y,bw*1.24,bw*.34,'#071418',10,.85);p.box(cx-bw*.62+dx,Y,bw*1.24,5,oc,2,1);p.box(cx-bw*.62+dx,Y+bw*.34-5,bw*1.24,5,oc,2,1);
- this.text('STAGE '+o.n+(o.loop?'  ENCORE':''),cx+dx,Y+bw*.035,bw*.07,oc,'center',bw*1.2,.14,true);this.text(o.name,cx+dx*1.15,Y+bw*.13,bw*.14,'#ffffff','center',bw*1.2,.18,true);p.opacity=1;};
+ this.drawStageTitle();};
 const privateCoopBadge=CabinetUI.prototype.coopBadge;""")
 rep(r"""this.coopPresence();this.drawBurst();this.drawCallout();this.drawComets();""", r"""this.coopPresence();this.drawStage();this.drawBurst();this.drawCallout();this.drawComets();""")
 
@@ -460,7 +457,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.28'")
+rep("version:'3.2.4'", "version:'3.3.29'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -645,6 +642,13 @@ rep("(async function boot(){", (ROOT / 'tools' / 'keyboard-tutorial.js').read_te
 
 # A19: explain selected special gems without changing board input or notices.
 rep("(async function boot(){", (ROOT / 'tools' / 'special-guide.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# A22: measured shared title space; never cover a board waiting for input.
+rep("(async function boot(){", (ROOT / 'tools' / 'celebration-titles.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+rep("if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox()", "if(age>=0&&age<ann.duration&&!this.celebrationLayout()?.combo){const {cx,cy,bw}=this.boardBox()")
+# Only the large milestone float yields; score floats and idle social cheers remain.
+rep("special:true,size:over?50:46", "milestone:true,special:true,size:over?50:46")
+rep("const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos", "const age=a.time-f.birth;if(age<0||f.milestone&&(a.phase==='idle'||this.co&&a.time>=this.co.birth&&a.time-this.co.birth<=1.2))continue;const [x,y]=project(f.pos")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

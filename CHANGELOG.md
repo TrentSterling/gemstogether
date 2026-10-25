@@ -1,3 +1,9 @@
+## 3.3.29 / A22 (2026-10-25) Give every celebration room
+
+- High cascades and stage-up titles share separate measured space, including narrow layouts. The board clears of these titles as soon as the next move is playable.
+- Stage notices move into safe margins where space permits and yield to controller guidance. Reduced motion keeps the title geometry still.
+- A21 explosions, original title clocks, matching, saves, co-op and audio are preserved. Milestone floats yield to cascade titles without losing ordinary score floats or idle co-op cheers. See `rounds/2026-10-25-A22.md`.
+
 ## 3.3.28 / A21 (2026-10-25) Jennifer's cascade power-up
 
 - Second cascades erupt in broad gem-colored spokes and paired shock rings. Third cascades grow larger and add balanced fireworks outside the cabinet.
