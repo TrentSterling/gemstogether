@@ -1,3 +1,9 @@
+## 3.3.28 / A21 (2026-10-25) Jennifer's cascade power-up
+
+- Second cascades erupt in broad gem-colored spokes and paired shock rings. Third cascades grow larger and add balanced fireworks outside the cabinet.
+- Added effects respect Particles, Reduced Motion, Flashes, Combo Treatment and Juice. Low dims every new firework core; Off adds no burst. No new full-screen flash, camera movement, sound or gameplay delay.
+- Burst intensity caps at five, legacy cosmetic ring/firework growth caps at nine, and rapid duplicate bursts are suppressed. Matching, scores, saves and co-op rules are unchanged. See `rounds/2026-10-25-A21.md` for evidence and qualifications.
+
 ## 3.3.27 / Gauntlet A20 (2026-10-21) Learn keyboard play as you use it
 
 - The existing first-run hint follows keyboard input and teaches arrows, selection and neighbouring swaps; roomy instructions include Space and Enter.

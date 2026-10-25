@@ -1,6 +1,19 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.27**, round A20 (2026-10-21).
+Current gauntlet release: **3.3.28**, round A21 (2026-10-25).
+
+A21 gives early cascades a bounded local starburst and paired outside-cabinet
+fireworks. `ResonanceFX.cascadeBurst` is presentation only: never alter matches,
+scoring, network messages, hitstop, slow-time or audio to tune it. The added layer
+requires particles, motion, comboTreatment, nonzero Juice and an accepted flash
+event. Low scales both count and every new firework color, including white cores;
+Off emits none. The burst caps at tier five and once per 220 ms; existing match
+ring speeds/firework power cap at visual tier nine while true cascade values
+continue to gameplay/audio. Optional firework intensity/brightness arguments
+default to the original behavior for other callers. `tools/cascade-juice-audit.mjs`
+checks real nine-wave pointer play, both renderers, phone and comfort/state bounds.
+Headless `tools/cdp.mjs` never requests desktop focus and always mutes output.
+For baseline captures, retain all sibling About JS/CSS assets with the HTML.
 `tools/keyboard-tutorial.js` adapts the existing first-run hint using
 lastInputDevice, not keyboardActive (which gamepads also set). Preserve exact
 legacy pointer/controller draws and all input/save rules. Measure text and
