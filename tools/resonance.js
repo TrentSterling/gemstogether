@@ -106,14 +106,15 @@ class ResonanceFX {
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
  match(center,type,cascade,count,mode,mag,removed){
-  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j;this.flashEvent();this.stats.matches++;this.tier(cascade);
+  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j,visualTier=Math.min(cascade,9),flash=this.flashEvent();this.stats.matches++;this.tier(cascade);
   this.flow=Math.min(1.5,this.flow+.13+cascade*.055+count*.012+(special?.28:0));
   this.pulse=Math.min(1.5,this.pulse*.35+.5+cascade*.11+(special?.4:0));
   const gc=GEM_COLORS[type]||GEM_COLORS[5],m=Math.max(gc[0],gc[1],gc[2],1e-4);const n=gc.map(v=>v/m),l=(n[0]+n[1]+n[2])/3;this.target=n.map(v=>clamp(mix(l,v,2.2),.08,1));
   if(!this.on)return;const sp=a.world.sparks,col=gc,bright=mixColor(col,[1,1,1],.28);
   // Shockwaves: a tight one on the board, a wide one out in the world behind it.
-  sp.emit([center[0],center[1],.62],[6+cascade*1.3,0,0],vmul(bright,.9),.45,t,.42,12,0,0);
-  if(cascade>=2||special)sp.emit([center[0]*.5,center[1]*.5,-3.2],[17+cascade*2.2,0,0],vmul(bright,.3+Math.min(cascade,6)*.05),1,t,1.1,12,0,0);
+  sp.emit([center[0],center[1],.62],[6+visualTier*1.3,0,0],vmul(bright,.9),.45,t,.42,12,0,0);
+  if(cascade>=2||special)sp.emit([center[0]*.5,center[1]*.5,-3.2],[17+visualTier*2.2,0,0],vmul(bright,.3+Math.min(cascade,6)*.05),1,t,1.1,12,0,0);
+  this.cascadeBurst(center,col,cascade,t,flash);
   // Line sweep: streaks rip along the axis of the matched line, both ways.
   const pts=removed.map(r=>cellXY(r.at));const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
   const horiz=Math.max(...xs)-Math.min(...xs)>=Math.max(...ys)-Math.min(...ys);
@@ -129,15 +130,36 @@ class ResonanceFX {
   if(mode==='prism'||cascade>=5)this.nova(center,Math.min(900,260+cascade*90)*j,GEM_COLORS,t);
   // Fireworks around the cabinet once a cascade gets going.
   if(cascade>=3){const n=Math.min(cascade-2,5);for(let b=0;b<n;b++){const side=(b+cascade)&1?1:-1;
-   this.firework([side*(5.4+Math.random()*3.2),-3.2+Math.random()*7.5,-.6+Math.random()*1.1],GEM_COLORS[(type+b+cascade)%6],t+b*.11+Math.random()*.05,1+cascade*.08);}}
+   this.firework([side*(5.4+Math.random()*3.2),-3.2+Math.random()*7.5,-.6+Math.random()*1.1],GEM_COLORS[(type+b+cascade)%6],t+b*.11+Math.random()*.05,1+visualTier*.08);}}
+ }
+ // Early-chain payoff: a broad coloured starburst, then paired cabinet fireworks.
+ // Presentation only. No new screen flash, camera movement, audio or game-time pause.
+ cascadeBurst(center,col,cascade,t,flash){
+  const a=this.a,now=performance.now(),juice=Number(a.prefs.juice),j=clamp(Number.isFinite(juice)?juice/100:1,0,1.5);
+  if(cascade<2||!this.on||!a.prefs.motion||a.prefs.comboTreatment===false||!flash||this.F===0||j===0)return;
+  if(now>=(this.lastCascadeBurstAt??-10000)&&now-(this.lastCascadeBurstAt??-10000)<220)return;
+  this.lastCascadeBurstAt=now;this.stats.cascadeBursts=(this.stats.cascadeBursts||0)+1;
+  const tier=Math.min(cascade,5)-1,sp=a.world.sparks,comfort=this.F,bright=mixColor(col,[1,.96,.82],.26);
+  const n=Math.round((24+tier*20)*j*comfort),speed=6+tier*2,life=.46+tier*.045;
+  // Evenly spaced spokes make a clear silhouette rather than a dense white cloud.
+  for(let i=0;i<n;i++){const angle=TAU*i/n+(i%2)*.055,s=speed*(i%3===0?1.25:.78);
+   sp.emit([center[0],center[1],.74],[Math.cos(angle)*s,Math.sin(angle)*s,.3],vmul(i%3?col:bright,(1.2+tier*.12)*comfort),.11+tier*.025,t+(i%2)*.025,life,10,i*.73,-.8);
+  }
+  sp.emit([center[0],center[1],.64],[12+tier*3,0,0],vmul(bright,1.1*comfort),.65,t,.46,12,0,0);
+  sp.emit([center[0],center[1],.64],[9+tier*2,0,0],vmul(col,.9*comfort),.5,t+.065,.52,12,0,0);
+  if(cascade>=3){
+   // Outside the playing surface: two visible blooms, balanced about the cabinet.
+   const y=clamp(center[1],-2.6,2.6);
+   for(const side of [-1,1])this.firework([side*5.05,y,-.65],bright,t+.055,Math.min(1.5,1+tier*.12),j*comfort,comfort);
+  }
  }
  nova(c,n,cols,t){const sp=this.a.world.sparks;for(let i=0;i<n;i++){const an=Math.random()*TAU,s=2.5+Math.random()*9,sw=.55*(Math.random()<.5?1:-1);
    sp.emit([c[0],c[1],.8],[Math.cos(an)*s-Math.sin(an)*s*sw,Math.sin(an)*s+Math.cos(an)*s*sw,Math.random()*3],vmul(mixColor(cols[i%cols.length],[1,1,1],.2),1.2+Math.random()*1.1),.05+Math.random()*.08,t+Math.random()*.06,.55+Math.random()*.8,i%3?1:10,Math.random()*100,-1.2);}}
- firework(p,col,t,power=1){const sp=this.a.world.sparks,j=this.j;this.stats.fireworks++;
+ firework(p,col,t,power=1,j=this.j,brightness=1){const sp=this.a.world.sparks;this.stats.fireworks++;
   const n=Math.round(95*j*power),bright=mixColor(col,[1,1,1],.3);
   for(let i=0;i<n;i++){const u=Math.random()*2-1,an=Math.random()*TAU,r=Math.sqrt(1-u*u),s=2.6+Math.random()*2.4;
-   sp.emit(p,[Math.cos(an)*r*s,Math.sin(an)*r*s,u*s*.6],vmul(i%4?bright:[1,.96,.88],1.2+Math.random()*1.2),.04+Math.random()*.07,t,.8+Math.random()*.9,i%3?1:10,Math.random()*100,-1.8);}
-  sp.emit(p,[9,0,0],vmul(bright,.8),.3,t,.5,12,0,0);sp.emit(p,[0,0,0],vmul(bright,1.1),1.6,t,.22,8,0,0);
+   sp.emit(p,[Math.cos(an)*r*s,Math.sin(an)*r*s,u*s*.6],vmul(i%4?bright:[1,.96,.88],(1.2+Math.random()*1.2)*brightness),.04+Math.random()*.07,t,.8+Math.random()*.9,i%3?1:10,Math.random()*100,-1.8);}
+  sp.emit(p,[9,0,0],vmul(bright,.8*brightness),.3,t,.5,12,0,0);sp.emit(p,[0,0,0],vmul(bright,1.1*brightness),1.6,t,.22,8,0,0);
  }
  finish(cascade){this.climaxed=false;this.risered=false;if(cascade>=5)this.a.music?.exhale?.();if(cascade<3)return;const a=this.a,t=a.time,j=this.j;this.flow=Math.min(1.5,this.flow+.2);this.pulse=Math.min(1.5,this.pulse+.55);if(!this.on)return;this.stats.fountains++;
   const sp=a.world.sparks;this.fountain(Math.round(Math.min(1100,120*cascade)*j),t);

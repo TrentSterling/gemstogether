@@ -13,7 +13,7 @@ export async function launch({port, width = 1280, height = 800, headless = true,
     `--window-size=${width},${height}`, '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--disable-features=CalculateNativeWinOcclusion', '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling',
     '--no-first-run', '--no-default-browser-check', '--autoplay-policy=no-user-gesture-required', '--mute-audio', '--hide-scrollbars',
   ].filter(Boolean);
-  const proc = spawn(CHROME, args, {stdio: 'ignore'});
+  const proc = spawn(CHROME, args, {stdio: 'ignore', windowsHide: true});
   let info;
   for (let i = 0; i < 60; i++) {
     try { info = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json(); break; } catch { await sleep(250); }
@@ -48,7 +48,8 @@ export async function launch({port, width = 1280, height = 800, headless = true,
     // buttons defaults to the held-button bitmask for `button` (left 1, right 2, middle 4); 0 on release.
     mouse: (type, x, y, button = 'left', buttons = type === 'mouseReleased' ? 0 : ({left: 1, right: 2, middle: 4}[button] ?? 0)) =>
       call('Input.dispatchMouseEvent', {type, x, y, button, clickCount: 1, buttons}),
-    front: () => call('Page.bringToFront'),
+    // Headless regression runs must never request desktop focus.
+    front: () => headless ? Promise.resolve() : call('Page.bringToFront'),
     kill: () => { try { ws.send(JSON.stringify({id: ++seq, method: 'Browser.close'})); } catch {} setTimeout(() => { try { proc.kill(); } catch {} }, 500); },
   };
   return page;
