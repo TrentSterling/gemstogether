@@ -1,6 +1,19 @@
 # CLAUDE.md, Gems Together
 
-Current gauntlet release: **3.3.28**, round A21 (2026-10-25).
+Current gauntlet release: **3.3.29**, round A22 (2026-10-25).
+
+A22 gives cascade and stage titles separate measured lanes while resolving.
+`tools/celebration-titles.js` reads state only. Central cascades clear on idle;
+stage titles use safe spare margins or yield to the existing HUD. Controller
+and ornament notices take priority over docking. Preserve original co/sc births,
+stage travel, audio and A21 emissions. Only marked milestone floats yield while
+a cascade is visible or the board is idle; ordinary score floats and social
+cheers remain. Focused title and private co-op audits cover actual nine-wave
+input, idle transitions, long chains, comfort, rotation and independent clocks.
+Required Chrome, native Firefox, mobile/touch, co-op swap/point and independent
+code/visual review must pass on the exact candidate BEFORE publishing.
+
+Previous gauntlet release: **3.3.28**, round A21 (2026-10-25).
 
 A21 gives early cascades a bounded local starburst and paired outside-cabinet
 fireworks. `ResonanceFX.cascadeBurst` is presentation only: never alter matches,
