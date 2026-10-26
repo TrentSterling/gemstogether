@@ -457,7 +457,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.29'")
+rep("version:'3.2.4'", "version:'3.3.30'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -649,6 +649,10 @@ rep("if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox()", "if(age>=0&
 # Only the large milestone float yields; score floats and idle social cheers remain.
 rep("special:true,size:over?50:46", "milestone:true,special:true,size:over?50:46")
 rep("const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos", "const age=a.time-f.birth;if(age<0||f.milestone&&(a.phase==='idle'||this.co&&a.time>=this.co.birth&&a.time-this.co.birth<=1.2))continue;const [x,y]=project(f.pos")
+
+# A23: idle social notices use measured spare space without covering gems.
+rep("this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);", "this.drawSocialNotice(ann,age);")
+rep("(async function boot(){", (ROOT / 'tools' / 'social-notice.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

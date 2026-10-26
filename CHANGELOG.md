@@ -1,3 +1,9 @@
+## 3.3.30 / A23 candidate (2026-10-26) Keep cheers clear of playable gems
+
+- Idle cheers and social messages use measured space beside or below the cabinet, keeping playable gems visible.
+- Notices avoid the score, budgets, controls, stage cards and active toasts. Tight layouts yield text while preserving the existing celebration effects and timing.
+- No scoring, save, network or audio changes. Chrome and native Firefox rendering qualification passed; interaction release gates remain pending. See `rounds/2026-10-26-A23.md`.
+
 ## 3.3.29 / A22 (2026-10-25) Give every celebration room
 
 - High cascades and stage-up titles share separate measured space, including narrow layouts. The board clears of these titles as soon as the next move is playable.
