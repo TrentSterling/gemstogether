@@ -1,5 +1,21 @@
 # CLAUDE.md, Gems Together
 
+Current local art candidate: **3.4.0-candidate.2** (2026-10-26). Rich temple
+architecture, sculpted royal scarab and staged physical solar assemblies. Read
+`rounds/2026-10-26-EGYPTIAN-TEMPLE.md`. CPU/source and software asset review only;
+Chrome-only muted headless render/state inspection is approved through the official
+execution approval route; no input/focus/audio is approved. Firefox and the denied
+original input gate remain held. The wide crest has a projection-based punch
+correction and broader feathers, with CPU/source and bounded Chrome art review.
+Full native/input/co-op release qualification is incomplete. Do not publish.
+
+Local unpublished art candidate: **3.4.0-candidate.1** (2026-10-26), based on
+draft PR26 with its notice fixes preserved. `tools/egyptian-art.js` adds only
+carved cabinet geometry and bounded accepted-match presentation. Read
+`rounds/2026-10-26-EGYPTIAN-CANDIDATE.md` for the scope and held qualification.
+Do not infer release approval from CPU or staged-render evidence. The denied
+swap/private-co-op runner remains unrun pending explicit clarification.
+
 Current gauntlet release: **3.3.29**, round A22 (2026-10-25).
 
 A22 gives cascade and stage titles separate measured lanes while resolving.

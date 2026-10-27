@@ -53,7 +53,7 @@
    Rebrand release 3.2: keep the V3.1 wire IDs and storage keys stable. They are
    compatibility identifiers, NOT visible branding. This avoids splitting the
    public room or resetting settings/checkpoints on the same origin. */
-const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.3.30'});
+const GAME_BRAND=Object.freeze({name:'Gems Together',wordmark:'GEMS TOGETHER',version:'3.4.0-candidate.2'});
 class SeededRandom {
   constructor(seed=0x7b0915){this.state=seed>>>0 || 1;}
   next(){let x=this.state; x^=x<<13; x^=x>>>17; x^=x<<5; this.state=x>>>0; return this.state/4294967296;}
@@ -615,7 +615,7 @@ class ResonanceFX {
  info(){return {flow:+this.flow.toFixed(3),pulse:+this.pulse.toFixed(3),swirl:+this.swirl.toFixed(3),bass:+this.bass.toFixed(3),field:this.field.mesh.count,sparks:this.a.world.sparks.count,stage:this.stage,visualStage:this.visualStage,phase:this.visualPhase,travel:this.stageTravel?{...this.stageTravel}:null,entrance:this.stageEntrance?{...this.stageEntrance}:null,...this.stats};}
  // Called from explode() on the host, solo and co-op mirrors alike.
  match(center,type,cascade,count,mode,mag,removed){
-  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j,visualTier=Math.min(cascade,9),flash=this.flashEvent();this.stats.matches++;this.tier(cascade);
+  const a=this.a,special=mode==='prism'||mode==='blast',t=a.time,j=this.j,visualTier=Math.min(cascade,9),flash=this.flashEvent();this.stats.matches++;this.tier(cascade);a.egyptian?.match(cascade,t,flash);
   this.flow=Math.min(1.5,this.flow+.13+cascade*.055+count*.012+(special?.28:0));
   this.pulse=Math.min(1.5,this.pulse*.35+.5+cascade*.11+(special?.4:0));
   const gc=GEM_COLORS[type]||GEM_COLORS[5],m=Math.max(gc[0],gc[1],gc[2],1e-4);const n=gc.map(v=>v/m),l=(n[0]+n[1]+n[2])/3;this.target=n.map(v=>clamp(mix(l,v,2.2),.08,1));
@@ -1166,7 +1166,7 @@ function buildFloatingIslandUnit(seed=1){
 }
 
 function buildWorld(renderer){
- const g=new Geo(),gold=color('#ba8b4b'),paleGold=color('#e6c77e'),darkGold=color('#695033'),stone=color('#23333b'),black=color('#091821'),cyan=color('#38b4cf'),rng=new SeededRandom(19081);
+ const g=new Geo(),gold=color('#c99a43'),paleGold=color('#f0d18a'),darkGold=color('#73532b'),stone=color('#172f50'),black=color('#091821'),cyan=color('#38b4cf'),rng=new SeededRandom(19081);
  // The board is one physical piece, not sixty-four floating UI buttons.
  bevelBox(g,[0,0,-.38],8.50,8.50,.64,stone,0,.13,.22);
  bevelBox(g,[0,0,-.065],7.78,7.78,.16,black,0,.05,.10);
@@ -1203,6 +1203,7 @@ function buildWorld(renderer){
  // Marble terrace over dark, rippling water.
  g.quad([-90,-5.45,12],[90,-5.45,12],[90,-5.45,-100],[-90,-5.45,-100],color('#123443'),4,[[0,0],[1,0],[1,1],[0,1]]);
  g.cylinder([0,-5.65,-.1],11.4,11.7,.80,color('#17272e'),0,96);g.ring([0,-5.22,-.1],10.95,.035,darkGold,1,'y',128);g.ring([0,-5.21,-.1],9.85,.018,gold,1,'y',128);
+{ const g=new Geo();
  // Monumental garden architecture, built in depth around the board.
  for(const side of [-1,1]){
    const x=side*6.8,z=-5.2;g.cylinder([x,-4.65,z],.68,.83,1.05,stone,0,16);g.cylinder([x,1.4,z],.38,.48,11.0,color('#39494c'),0,20);
@@ -1218,6 +1219,7 @@ function buildWorld(renderer){
  }
  const arch=[];for(let i=0;i<=100;i++){let a=i/100*PI;arch.push([Math.cos(a)*6.8,.65+Math.sin(a)*6.8,-5.2]);}g.tube(arch,.25,color('#36474a'),0,12);const inner=arch.map(p=>[p[0]*.962,.65+(p[1]-.65)*.962,p[2]+.10]);g.tube(inner,.033,gold,1,8);
  for(let k=1;k<20;k++){let a=k/20*PI;g.tube([[Math.cos(a)*6.44,.65+Math.sin(a)*6.44,-5.05],[Math.cos(a)*7.02,.65+Math.sin(a)*7.02,-5.05]],.025,darkGold,1,4);}
+}
  // Distant floating gardens are now a reusable animated mesh with richer silhouettes.
  const islandUnit=buildFloatingIslandUnit(3401),islandMesh=renderer.createMesh(islandUnit.data(),8),islands=[];
  for(let island=0;island<7;island++){
@@ -1226,10 +1228,10 @@ function buildWorld(renderer){
  }
  // Crystals growing from the terrace, with different cuts and angles.
  for(let side of [-1,1])for(let j=0;j<7;j++){let a=j*1.9,s=.3+rng.next()*.55;g.append(tintGeo(gemGeometry(j%2?3:5,7),color(j%2?'#639eda':'#6fcfe5')),trs([side*(5.05+rng.next()),-5.10+s*.4,1.8+rng.next()*1.3],[rng.next()*.5-.25,rng.next()*.4,Math.sin(a)*.45],[s*.8,s*1.8,s]));}
- const worldMesh=renderer.createMesh(g.data());renderer.upload(worldMesh,new Float32Array(packedInstance(identity())),1);
+ buildEgyptianTempleCabinet(g);const worldMesh=renderer.createMesh(g.data());renderer.upload(worldMesh,new Float32Array(packedInstance(identity())),1);
  const gemBottoms=[];
  const gemMeshes=Array.from({length:6},(_,i)=>{const vertices=gemGeometry(i).data();let bottom=Infinity;for(let k=1;k<vertices.length;k+=12)bottom=Math.min(bottom,vertices[k]);gemBottoms.push(bottom);return renderer.createMesh(vertices,100);});
- const crown=renderer.createMesh(gemGeometry(1,7).data(),4);
+ const crown=renderer.createMesh(buildEgyptianRoyalCrown().data(),4);
  const orbitGeo=new Geo();orbitGeo.ring([0,0,0],.84,.022,gold,1,'y',80);orbitGeo.ring([0,0,0],.75,.009,paleGold,1,'y',80);for(let j=0;j<3;j++){let a=j/3*TAU;orbitGeo.append(gemGeometry(5,7),trs([Math.cos(a)*.84,0,Math.sin(a)*.84],[0,0,0],[.12,.12,.12]));}
  const orbit=renderer.createMesh(orbitGeo.data(),1);
  const haloGeo=new Geo();for(let sx of [-1,1])for(let sy of [-1,1]){let c=[sx*.392,sy*.392,0];haloGeo.tube([[c[0]-sx*.09,c[1],0],c,[c[0],c[1]-sy*.09,0]],.0085,[1,1,1],3,4);}const halos=renderer.createMesh(haloGeo.data(),8);
@@ -1642,13 +1644,13 @@ class JewelApp {
  constructor(renderer){
   this.renderer=renderer;this.canvas=renderer.canvas;this.world=buildWorld(renderer);this.audio=new JewelAudio();this.fx=new ResonanceFX(this);this.music=new ResonanceMusic(this);this.time=0;this.wallTime=0;this.phase='intro';this.deadline=0;this.cascade=0;this.actors=new Map();this.hover=-1;this.selected=-1;this.grab=-1;this.hintCells=[];this.hintUntil=0;this.keyboardCell=27;this.keyboardActive=false;this.auto=false;this.autoNext=0;this.autoPair=null;this.practice=false;this.pendingCase=null;this.queuedSwap=null;this.juice=0;this.shake=0;this.reactions=[];this.displayScore=0;this.fps=60;this.lastUI=0;this.frameCount=0;this.swapCount=0;this.shuffleCount=0;this.errors=[];this.animSpeed=1;this.frozen=false;this.debugManual=false;this.best=Math.max(0,Number(readStorage('gemstogether-best-v1',0))||0);
   this.prefs=Object.assign({volume:65,musicVolume:28,key:62,quality:1,juice:100,motion:!matchMedia('(prefers-reduced-motion: reduce)').matches,particles:true,muted:false,aaMode:'msaa',aaStrength:75,sharpness:0,livingLight:100,gemPolish:100,idleMotion:!matchMedia('(prefers-reduced-motion: reduce)').matches},readStorage('gemstogether-settings-v1',{}));
-  this.animSpeed=clamp(Number(this.prefs.animSpeed)||1,.35,1.5);this.applyPreferences();this.presentation=new JewelPresentation(this);this.living=new LivingJewels(this);this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);this.bindInput();this.installDebug();this.canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.showFailure('The graphics context was lost. Reload to restore the board.');});window.addEventListener('jewel-gpu-lost',e=>this.showFailure('The GPU device was lost. Reload to restore the board.'));
+  this.animSpeed=clamp(Number(this.prefs.animSpeed)||1,.35,1.5);this.applyPreferences();this.presentation=new JewelPresentation(this);this.egyptian=new EgyptianFeedback(this);this.living=new LivingJewels(this);this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);this.bindInput();this.installDebug();this.canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.showFailure('The graphics context was lost. Reload to restore the board.');});window.addEventListener('jewel-gpu-lost',e=>this.showFailure('The GPU device was lost. Reload to restore the board.'));
  }
  applyPreferences(){let p=this.prefs;p.livingLight=clamp(Number.isFinite(+p.livingLight)?+p.livingLight:100,0,150);p.gemPolish=clamp(Number.isFinite(+p.gemPolish)?+p.gemPolish:100,0,150);p.idleMotion=!!p.idleMotion;$('living-light').value=p.livingLight;$('gem-polish').value=p.gemPolish;$('idle-motion').checked=p.idleMotion;p.volume=clamp(Number(p.volume)||0,0,100);p.quality=clamp(Number(p.quality)||1,.5,2);if(!['off','fxaa','msaa','hybrid'].includes(p.aaMode))p.aaMode='msaa';p.aaStrength=clamp(Number.isFinite(+p.aaStrength)?+p.aaStrength:75,0,100);p.sharpness=clamp(+p.sharpness||0,0,50);p.juice=clamp(+p.juice||100,50,150);this.audio.volume=p.volume/100;this.audio.musicVolume=p.musicVolume/100;this.audio.key=+p.key||62;this.audio.muted=!!p.muted;$('volume').value=p.volume;$('music-volume').value=p.musicVolume;$('quality').value=p.quality;$('render-scale').value=Math.round(p.quality*100);$('aa-strength').value=p.aaStrength;$('sharpness').value=p.sharpness;$('juice').value=p.juice;$('key').value=p.key;$('motion').checked=p.motion;$('particles').checked=p.particles;$('sound-btn').textContent=p.muted?'Sound off':'Sound on';$('best').textContent=this.best.toLocaleString();}
  savePreferences(){writeStorage('gemstogether-settings-v1',this.prefs);}
  makeActor(tile,at,pos=null){return {id:tile.id,tile,at,pos:pos||cellXY(at),move:null,pop:null,charge:null,hover:0,scale:[1,1,1],rotation:[0,0,0],seed:(tile.id*2.3999632297)%TAU,impact:0,energy:0};}
  newBoard(seed=Date.now(),fixture=null){if(this.coop?.mirror&&!this.coop.replaying){this.toast("The host controls the shared board");return false;}this.gameOver=null;this.seed=seed;this.finishAACompare();
-  if(this.ui){this.ui.floats=[];this.ui.lastCascade=0;}if(this.presentation)this.presentation.reset();this.down=null;this.frozen=false;$('freeze').checked=false;this.comboEnd=0;
+  if(this.ui){this.ui.floats=[];this.ui.lastCascade=0;}if(this.presentation)this.presentation.reset();if(this.egyptian)this.egyptian.reset();this.down=null;this.frozen=false;$('freeze').checked=false;this.comboEnd=0;
   this.auto=false;$('demo-btn').textContent='Showcase';$('demo-btn').classList.remove('on');this.board=new JewelBoard(FIXTURES[fixture]?.seed??seed);this.practice=!!fixture;this.selected=-1;this.grab=-1;this.hover=-1;this.hintCells=[];this.actors.clear();this.world.sparks.clear();this.world.shards.clear();this.cascade=0;this.displayScore=0;this.juice=0;this.queuedSwap=null;this.autoPair=null;this.oneShot=false;this.reactions=[];this.shake=0;$('float-layer').replaceChildren();$('combo').classList.remove('active');$('instructions').classList.remove('quiet');$('scores').querySelector('label').textContent=fixture?'LAB SCORE':'SCORE';
   if(FIXTURES[fixture])this.queuedSwap=FIXTURES[fixture].pair.slice();
   if(fixture==='prism'){this.board.cells[27].special=2;this.queuedSwap=[27,28];}
@@ -1775,14 +1777,14 @@ class JewelApp {
  finishAACompare(){if(!this.aaCompare)return;this.aaCompare=false;this.aaCompareBypass=false;this.frozen=!!this.aaWasFrozen;$('freeze').checked=this.frozen;this.syncAA();}
  resize(){this.cssWidth=innerWidth;this.cssHeight=innerHeight;const scale=(devicePixelRatio||1)*this.prefs.quality,maxDim=Math.min(4096,this.renderer.gl?this.renderer.gl.getParameter(this.renderer.gl.MAX_RENDERBUFFER_SIZE):this.renderer.device.limits.maxTextureDimension2D);let w=Math.round(this.cssWidth*scale),h=Math.round(this.cssHeight*scale);if(Math.max(w,h)>maxDim){const k=maxDim/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k);}if(w*h>8294400){const k=Math.sqrt(8294400/(w*h));w=Math.round(w*k);h=Math.round(h*k);}this.renderer.setAA(!this.aaCompareBypass&&(this.prefs.aaMode==='msaa'||this.prefs.aaMode==='hybrid'));this.renderer.resize(w,h);this.syncAA();this.updateCamera();}
  updateCamera(){const aspect=this.cssWidth/this.cssHeight,tan=Math.tan(42/2*PI/180),z=cabinetFraming(this.cssWidth,this.cssHeight).distance;let shake=this.prefs.motion?this.shake:0;const sx=Math.sin(this.time*54)*shake*.026,sy=Math.sin(this.time*43+1)*shake*.022;this.eye=[sx,.62+sy,z*(1-.045*(this.punch||0))];this.target=[0,0,0];this.forward=vnorm(vsub(this.target,this.eye));this.right=vnorm(vcross(this.forward,[0,1,0]));this.up=vcross(this.right,this.forward);this.vp=matMul(perspective(42*PI/180,aspect,.1,150),lookAt(this.eye,this.target,[Math.sin(this.time*33)*shake*.002,1,0]));this.tanFov=tan;}
- draw(){this.syncAA();this.updateCamera();const cabinetMeshes=this.presentation.build();cabinetMeshes.push(this.living.build());cabinetMeshes.push(...(this.expedition?.meshes()||[]));const r=this.renderer,u=r.uniforms;u.set(this.vp,0);u.set([...this.eye,1],16);u.set([...this.right,0],20);u.set([...this.up,0],24);u.set([this.time,this.juice,this.cssWidth/this.cssHeight,this.tanFov],28);u.set([1.08+this.juice*.035,.70,this.prefs.motion?1:0,1],32);u.set([r.width,r.height,1/r.width,1/r.height],36);u.set([...this.forward,0],40);u.set([(this.effectiveAA==='fxaa'||this.effectiveAA==='hybrid')?this.prefs.aaStrength/100:0,this.prefs.sharpness/100,0,0],44);u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.music?.tick();this.pollPad?.();this.fx.uniforms(u);
+ draw(){this.syncAA();this.updateCamera();const cabinetMeshes=this.presentation.build();cabinetMeshes.push(...this.egyptian.build());cabinetMeshes.push(this.living.build());cabinetMeshes.push(...(this.expedition?.meshes()||[]));const r=this.renderer,u=r.uniforms;u.set(this.vp,0);u.set([...this.eye,1],16);u.set([...this.right,0],20);u.set([...this.up,0],24);u.set([this.time,this.juice,this.cssWidth/this.cssHeight,this.tanFov],28);u.set([1.08+this.juice*.035,.70,this.prefs.motion?1:0,1],32);u.set([r.width,r.height,1/r.width,1/r.height],36);u.set([...this.forward,0],40);u.set([(this.effectiveAA==='fxaa'||this.effectiveAA==='hybrid')?this.prefs.aaStrength/100:0,this.prefs.sharpness/100,0,0],44);u.set([this.living.clock,this.living.light,this.living.polish,0],48);this.fx.frame();this.music?.tick();this.pollPad?.();this.fx.uniforms(u);
   const batches=Array.from({length:6},()=>[]),special=[];for(const a of this.actors.values()){if(a.scale[0]<.001)continue;const m=trs(a.pos,a.rotation,a.scale);batches[a.tile.type].push(...packedInstance(m,GEM_COLORS[a.tile.type],a.energy,2,a.hover,a.tile.special,a.seed));}
   batches.forEach((b,i)=>r.upload(this.world.gemMeshes[i],new Float32Array(b),b.length/24));r.upload(this.world.specialMesh,new Float32Array(special),special.length/24);
   const hover=[];let cells=new Map();for(const i of this.hintCells)cells.set(i,'hint');if(this.hover>=0)cells.set(this.hover,'hover');if(this.keyboardActive&&!this.auto&&!this.panelOpen)cells.set(this.keyboardCell,'keyboard');if(this.selected>=0)cells.set(this.selected,'selected');
   for(const [i,kind]of cells){const ac=this.getActor(i);if(!ac||ac.pop||ac.pos[1]>3.67)continue;
    const pos=cellXY(i),armed=kind==='keyboard'&&this.padState?.aAt&&!this.padState.swapped&&this.padState.b[0],pulse=.5+.5*Math.sin(this.time*5),col=color(kind==='hint'?'#70d8ce':kind==='selected'||kind==='keyboard'?armed?'#86e5ed':'#f8d885':'#b5d4d2'),strength=kind==='hint'?.38+.18*pulse:kind==='keyboard'?.75+.4*pulse:.8;
    hover.push(...packedInstance(trs([pos[0],pos[1],.085]),vmul(col,strength),0,3));}
-  r.upload(this.world.halos,new Float32Array(hover),hover.length/24);r.upload(this.world.crown,new Float32Array(packedInstance(trs([0,4.98+Math.sin(this.time)*.03,.05],[.06,Math.sin(this.time*.35)*.35,0],[.90,1.23,.9]),color('#429dff'),this.juice*.32+this.presentation.crownEnergy,7)),1);r.upload(this.world.orbit,new Float32Array(packedInstance(trs([0,4.97,.04],[.16, this.time*.22+this.presentation.crownSpin,.16*Math.sin(this.time*.35)]))),1);
+  r.upload(this.world.halos,new Float32Array(hover),hover.length/24);const egyptPose=this.egyptian.pose;r.upload(this.world.crown,new Float32Array(packedInstance(trs([egyptPose.x,egyptPose.y+Math.sin(this.time)*.03*egyptPose.scale,egyptPose.z],[.06,Math.sin(this.time*.35)*.35,0],[.90*egyptPose.scale,1.23*egyptPose.scale,.9*egyptPose.scale]),[1,1,1],this.juice*.32+this.presentation.crownEnergy,-1)),1);r.upload(this.world.orbit,new Float32Array(packedInstance(trs([0,4.97,.04],[.16, this.time*.22+this.presentation.crownSpin,.16*Math.sin(this.time*.35)]))),1);
   const islandInstances=[];const idleWorld=this.prefs.motion&&!this.frozen;
   for(const is of this.world.islands){const t=this.time*is.speed+is.phase;const bob=idleWorld?Math.sin(t)*is.bob:0;const yaw=idleWorld?Math.sin(t*.67)*is.twist:0;const pitch=idleWorld?Math.cos(t*.83)*is.pitch:0;const roll=idleWorld?Math.sin(t*.51+1.2)*is.roll:0;islandInstances.push(...packedInstance(trs([is.base[0],is.base[1]+bob,is.base[2]],[pitch,yaw,roll],[is.scale,is.scale,is.scale]),is.tint,0,-1));}
   r.upload(this.world.islandMesh,new Float32Array(islandInstances),this.world.islands.length);
@@ -3756,6 +3758,571 @@ CabinetUI.prototype.drawSocialNotice=function(ann,age){
  p.box(r.x,r.y,r.w,r.h,'#071418',5,.94);p.box(r.x,r.y,3,r.h,ann.col,1,1);
  this.text(ann.label,r.x+r.w/2,r.y+5,r.font,ann.col,'center',r.w-16,.15,true);
 };
+
+/* Egyptian cabinet and earned visual payoffs. Geometry and local presentation only.
+   No random numbers, input, audio, score, save or transport writes. */
+const EGYPT_ART={gold:color('#d2a64b'),edge:color('#f3d895'),lapis:color('#183d76'),deep:color('#0b203d'),turquoise:color('#35b9b1'),ink:color('#061625')};
+
+function egyptRelief(g,outline,z,depth,col,kind=1){
+ const p=outline.slice();let area=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];area+=p[i][0]*q[1]-q[0]*p[i][1];}if(area<0)p.reverse();
+ const center=p.reduce((a,v)=>[a[0]+v[0]/p.length,a[1]+v[1]/p.length],[0,0]);
+ for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];g.tri([center[0],center[1],z+depth],[a[0],a[1],z],[b[0],b[1],z],col,kind);g.quad([a[0],a[1],z-depth],[b[0],b[1],z-depth],[b[0],b[1],z],[a[0],a[1],z],col,kind);}return g;
+}
+function egyptAnkh(g,x,y,z,s,col,kind=1){
+ const loop=[];for(let i=0;i<=20;i++){const a=i/20*TAU;loop.push([x+Math.cos(a)*s*.20,y+s*.20+Math.sin(a)*s*.27,z]);}
+ g.tube(loop,s*.043,col,kind,5);g.tube([[x,y-s*.08,z],[x,y-s*.62,z]],s*.044,col,kind,5);g.tube([[x-s*.28,y-s*.14,z],[x+s*.28,y-s*.14,z]],s*.044,col,kind,5);
+}
+function egyptLotus(g,x,y,z,s){
+ for(let i=-2;i<=2;i++){const spread=i*.23,top=.30-Math.abs(i)*.065;egyptRelief(g,[[x,y-s*.20],[x+s*(spread-.09),y+s*(top-.10)],[x+s*spread,y+s*top],[x+s*(spread+.09),y+s*(top-.10)]],z,.018,Math.abs(i)===1?EGYPT_ART.turquoise:EGYPT_ART.gold);}
+ g.tube([[x-s*.43,y-s*.19,z+.025],[x,y-s*.27,z+.035],[x+s*.43,y-s*.19,z+.025]],s*.025,EGYPT_ART.edge,1,5);
+}
+function egyptScarab(g,x,y,z,s){
+ const shell=[[-.25,-.12],[-.20,-.35],[0,-.45],[.20,-.35],[.25,-.12],[.19,.20],[0,.28],[-.19,.20]].map(([a,b])=>[x+a*s,y+b*s]);
+ egyptRelief(g,shell,z,.12*s,EGYPT_ART.gold);
+ const inset=shell.map(([a,b])=>[x+(a-x)*.76,y+(b-y)*.80]);egyptRelief(g,inset,z+.045*s,.13*s,EGYPT_ART.turquoise,7);
+ g.tube([[x,y-.32*s,z+.19*s],[x,y+.17*s,z+.19*s]],.018*s,EGYPT_ART.edge,1,5);
+ for(const side of [-1,1])for(let i=0;i<3;i++)g.tube([[x+side*.18*s,y+(.08-i*.14)*s,z+.07*s],[x+side*.32*s,y+(.17-i*.19)*s,z+.05*s],[x+side*.39*s,y+(.20-i*.20)*s,z+.02*s]],.025*s,EGYPT_ART.gold,1,5);
+ g.append(tintGeo(gemGeometry(1,7),EGYPT_ART.lapis),trs([x,y+.30*s,z+.10*s],[0,0,0],[.24*s,.22*s,.20*s]));
+ g.tube([[x-.11*s,y+.39*s,z],[x-.18*s,y+.43*s,z],[x,y+.46*s,z],[x+.18*s,y+.43*s,z],[x+.11*s,y+.39*s,z]],.020*s,EGYPT_ART.edge,1,5);
+}
+function buildEgyptianCrown(){const g=new Geo();egyptScarab(g,0,0,.03,.78);return g;}
+let egyptianCrownCache=null;
+function egyptianCrownPlacement(w=1280,h=800,obstacle=null){
+ const obstacleKey=obstacle?[obstacle.left,obstacle.top,obstacle.right,obstacle.bottom].join(','):'';
+ if(egyptianCrownCache?.w===w&&egyptianCrownCache.h===h&&egyptianCrownCache.obstacleKey===obstacleKey)return egyptianCrownCache;
+ const f=cabinetFraming(w,h);let x=0,y=4.98,z=.05,scale=1,mount='crown',haloScale=0;
+ if(!f.wide){
+  const vp=matMul(perspective(42*PI/180,w/h,.1,150),lookAt([0,.62,f.distance],[0,0,0])),screenY=y=>project([0,y,.05],vp,w,h)[1];
+  const titleY=Math.max(10,project([-3.98,4.02,.15],vp,w,h)[1]-93),ppu=screenY(4.98)-screenY(5.98);
+  const topSafe=12+h*.025,bottomSafe=titleY-12,fittedScale=Math.min(1,(bottomSafe-topSafe)/(1.4*ppu));
+  if(fittedScale*1.4*ppu>=32){
+   scale=fittedScale;const target=titleY>120?Math.max(topSafe+1.4*ppu*scale*.5,titleY-78):topSafe+1.4*ppu*scale*.5;let lo=0,hi=24;
+   for(let i=0;i<32;i++){const mid=(lo+hi)*.5;if(screenY(mid)>target)lo=mid;else hi=mid;}y=(lo+hi)*.5;mount='sky';
+   haloScale=Math.min(.14*scale,(target-topSafe)/(ppu*7*1.14),(bottomSafe-target)/(ppu*7*1.14));
+   // The shared About control moves to the top-right in short views. Keep its measured lane clear.
+   const halfWidth=2.35*scale*ppu,halfHeight=.70*scale*ppu;
+   if(obstacle&&target-halfHeight<obstacle.bottom+12&&target+halfHeight>obstacle.top-12&&w*.5+halfWidth>obstacle.left-12){
+    const targetX=obstacle.left-16-halfWidth;
+    if(targetX-halfWidth>=12)x=(targetX-w*.5)/(project([1,y,z],vp,w,h)[0]-w*.5);
+    else{x=0;y=4.98;z=.05;scale=1;mount='crown';haloScale=0;}
+   }
+  }
+ }
+ const projection=perspective(42*PI/180,w/h,.1,150),stable=matMul(projection,lookAt([0,.62,f.distance],[0,0,0]));
+ const ppu=project([0,4.98,z],stable,w,h)[1]-project([0,5.98,z],stable,w,h)[1];
+ if(f.wide){
+  // Fit the sculpted body AND expanded feather union above the unchanged title.
+  const top=project([-3.98,4.02,.15],stable,w,h)[1],titleTop=Math.max(5,top-(h<460?34:43)-5),bottom=titleTop-5;
+  scale=Math.min(1,Math.max(.12,(bottom-8)/(1.4*ppu)));
+  const target=(8+bottom)*.5;let lo=0,hi=24;
+  for(let i=0;i<32;i++){const mid=(lo+hi)*.5;if(project([0,mid,z],stable,w,h)[1]>target)lo=mid;else hi=mid;}y=(lo+hi)*.5;
+ }
+ if(obstacle){
+  // Apply measured About avoidance to every mount, including the compact fallback.
+  // Bounds include the existing maximum punch/shake camera envelope, not just quiet view.
+  const cameras=[];
+  for(const punch of [0,1.2])for(const sx of [-.0221,.0221])for(const sy of [-.0187,.0187])for(const roll of [-.0017,.0017])cameras.push(matMul(projection,lookAt([sx,.62+sy,f.distance*(1-.045*punch)],[0,0,0],[roll,1,0])));
+  const halfWing=f.wide?3.8:2.37;
+  const envelope=()=>{const b={left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity};for(const vp of cameras)for(const dx of [-halfWing,halfWing])for(const dy of [-.72,.72])for(const dz of [-.25,.27]){const q=project([x+dx*scale,y+dy*scale,z+dz*scale],vp,w,h);b.left=Math.min(b.left,q[0]);b.right=Math.max(b.right,q[0]);b.top=Math.min(b.top,q[1]);b.bottom=Math.max(b.bottom,q[1]);}return b;};
+  for(let i=0;i<3;i++){
+   const b=envelope();if(b.right<=obstacle.left-12||b.left>=obstacle.right+12||b.bottom<=obstacle.top-12||b.top>=obstacle.bottom+12)break;
+   const shift=obstacle.left-14-b.right;
+   if(b.left+shift>=10)x+=shift/(ppu*1.05);
+   else scale*=Math.max(.5,(obstacle.left-24)/Math.max(1,b.right-b.left));
+  }
+ }
+ const screenY=1-2*project([x,y,z],stable,w,h)[1]/h;
+ return egyptianCrownCache={w,h,x,y,z,scale,mount,haloScale,obstacleKey,screenY};
+}
+function egyptianCrownFramePose(base,a){
+ // The wide crest occupies the narrow sky above the stable title. Keep its centre
+ // in that lane during camera punch/shake, without shrinking it or moving the camera.
+ if(!cabinetFraming(base.w,base.h).wide||!a.vp||(!a.punch&&!(a.prefs.motion&&a.shake)))return base;
+ const m=a.vp,n=base.screenY,d=m[5]-n*m[7];
+ if(Math.abs(d)<1e-8)return base;
+ const y=(n*(m[3]*base.x+m[11]*base.z+m[15])-(m[1]*base.x+m[9]*base.z+m[13]))/d;
+ return Number.isFinite(y)?{...base,y}:base;
+}
+function buildEgyptianWings(){
+ const g=new Geo();
+ for(const side of [-1,1]){
+  // Tapered feather fans, each with a raised gold edge and a recessed enamel vane.
+  for(let i=0;i<9;i++){
+   const rootX=.18+i*.045,tipX=.64+i*.19,tipY=.20-i*.047;
+   const p=[[side*rootX,.08-i*.022],[side*(tipX-.17),tipY-.13],[side*tipX,tipY],[side*(tipX-.04),tipY+.09],[side*(rootX+.05),.19-i*.018]];
+   egyptRelief(g,p,0,.055,EGYPT_ART.gold);
+   const c=p.reduce((a,v)=>[a[0]+v[0]/p.length,a[1]+v[1]/p.length],[0,0]);
+   egyptRelief(g,p.map(v=>[c[0]+(v[0]-c[0])*.76,c[1]+(v[1]-c[1])*.62]),.06,.012,i%3===0?EGYPT_ART.lapis:EGYPT_ART.turquoise,0);
+  }
+  g.tube([[side*.18,.16,.03],[side*.75,.30,.03],[side*1.45,.27,.03],[side*2.20,.01,.03]],.036,EGYPT_ART.edge,1,6);
+ }
+ return g;
+}
+function buildEgyptianCabinet(g){
+ // A real carved channel supports the earned light chase, outside the gem aperture.
+ const channel=[[-4.22,-4.12,.395],[-4.22,4.22,.195],[4.22,4.22,.195],[4.22,-4.12,.395],[-4.22,-4.12,.395]];
+ g.tube(channel,.046,EGYPT_ART.gold,1,6);
+ g.tube(channel.map(([x,y,z])=>[x,y,z+.032]),.032,EGYPT_ART.deep,0,5);
+ // Narrow relief strips remain outside the original 8x8 gem aperture.
+ for(const side of [-1,1]){
+  const x=side*4.43;
+  bevelBox(g,[x,0,.04],.36,7.55,.26,EGYPT_ART.lapis,0,.035,.045);
+  for(const dx of [-.14,.14])g.tube([[x+dx,-3.77,.20],[x+dx,3.77,.20]],.013,EGYPT_ART.edge,1,5);
+  for(let row=-3;row<=3;row++){
+   const y=row*1.04;
+   if(row%2===0)egyptAnkh(g,x,y+.04,.21,.30,EGYPT_ART.gold);
+   else egyptLotus(g,x,y,.22,.32);
+   g.box(x,y-.40,.20,.20,.035,.025,EGYPT_ART.turquoise,0);
+  }
+  // Inlaid lotus corner caps make the motif readable even when the wider scenery crops.
+  for(const y of [-4.05,4.05])egyptLotus(g,side*3.48,y,.20,.52);
+  // Stepped lapis obelisks in the existing courtyard, behind the cabinet and HUD.
+  const ox=side*6.15,oz=-3.7;
+  bevelBox(g,[ox,-1.05,oz],.80,7.65,.72,EGYPT_ART.deep,0,.06,.07);
+  bevelBox(g,[ox,-4.82,oz],1.14,.36,1.02,EGYPT_ART.gold,1,.05,.08);
+  egyptRelief(g,[[ox-.38,2.77],[ox+.38,2.77],[ox,3.56]],oz+.37,.13,EGYPT_ART.gold);
+  for(let row=0;row<5;row++){
+   const y=-3.9+row*1.35;
+   if(row%2)egyptLotus(g,ox,y,oz+.40,.60);else egyptAnkh(g,ox,y+.10,oz+.40,.52,EGYPT_ART.turquoise,0);
+  }
+  g.tube([[ox-.29,-4.55,oz+.40],[ox-.29,2.70,oz+.40]],.015,EGYPT_ART.gold,1,5);
+  g.tube([[ox+.29,-4.55,oz+.40],[ox+.29,2.70,oz+.40]],.015,EGYPT_ART.gold,1,5);
+  for(const x of [side*1.15,side*2.18,side*3.18])egyptLotus(g,x,-4.45,.34,.56);
+ }
+ // Turquoise-and-gold collar under the title, with outward solar feathers.
+ for(const side of [-1,1])for(let i=0;i<7;i++){
+  const x=side*(2.65+i*.16);egyptRelief(g,[[x-.055,4.20],[x+.055,4.20],[x+.08,4.42],[x,4.49],[x-.08,4.42]],.13,.025,i%2?EGYPT_ART.gold:EGYPT_ART.turquoise,1);
+ }
+}
+function buildEgyptianSun(){
+ const g=new Geo();
+ for(let i=0;i<16;i++){
+  const a=i/16*TAU,at=(r,d=0)=>[Math.cos(a+d)*r,Math.sin(a+d)*r];
+  egyptRelief(g,[at(4.62,-.025),at(6.5,-.011),at(7.0),at(6.5,.011),at(4.62,.025)],0,.015,[1,.72,.27],8);
+  egyptRelief(g,[at(4.74,-.008),at(6.80),at(4.74,.008)],.025,.008,[1,.94,.67],8);
+ }
+ g.ring([0,0,0],4.72,.025,[.25,.78,.75],8,'z',96);
+ g.ring([0,0,0],5.02,.015,[1,.79,.35],8,'z',96);
+ return g;
+}
+function egyptianRod(from,to){const x=vnorm(vsub(to,from)),y=vnorm([-x[1],x[0],0]),z=vcross(x,y),length=Math.hypot(...vsub(to,from));return new Float32Array([...vmul(x,length),0,...y,0,...z,0,...from,1]);}
+class EgyptianFeedback {
+ constructor(app){
+  this.a=app;this.reset();const r=app.renderer;
+  this.wings=r.createMesh(buildEgyptianRoyalWings().data(),1);
+  const staff=new Geo();bevelBox(staff,[0,.5,0],.16,1,.14,EGYPT_ART.gold,1,.02,.025);staff.tube([[0,.05,.08],[0,.95,.08]],.022,EGYPT_ART.turquoise,0,5);this.staff=r.createMesh(staff.data(),1);
+  const edge=new Geo();edge.tube([[0,0,0],[1,0,0]],.025,[1,1,1],8,5);this.edges=r.createMesh(edge.data(),24);
+  this.seals=r.createMesh(buildEgyptianSolarSeal().data(),2);
+  this.sun=r.createMesh(buildEgyptianSolarFan().data(),4);
+  this.shutters=r.createMesh(buildEgyptianSolarShutter().data(),8);
+ }
+ reset(){this.events=[];this.accepted=0;this.lastAt=-100;this.lastTier=0;this.lastFrame={energy:0,tier:0,edges:0,seals:0,sun:0,shutters:0,stage:'idle',eventAge:null};}
+ match(cascade,time,flash){
+  const p=this.a.prefs;if(!flash||!p.motion||!p.particles||p.comboTreatment===false||p.flash==='off'||!(+p.juice>0))return;
+  if(!Number.isFinite(+cascade)||!Number.isFinite(time))return;
+  const tier=clamp(Math.floor(cascade),1,9);if(time-this.lastAt<.30&&tier<=this.lastTier)return;
+  this.lastAt=time;this.lastTier=tier;this.events.push({time,tier});if(this.events.length>3)this.events.shift();this.accepted++;
+ }
+ build(){
+  const a=this.a,p=a.prefs,r=a.renderer,t=a.time,edges=[],seals=[],sun=[],shutters=[];
+  this.events=this.events.filter(e=>t>=e.time&&t-e.time<2.1);
+  const allowed=p.motion&&p.particles&&p.comboTreatment!==false&&p.flash!=='off'&&+p.juice>0&&!a.panelOpen&&!a.gameOver&&!a.aaCompare&&!a.expedition?.run?.finished&&!a.expedition?.photo;
+  if(!allowed)this.events=[];
+  const comfort=p.flash==='low'?.35:1,juice=clamp((+p.juice||0)/100,0,1.5);
+  let energy=0,tier=0,lead=0,unfold=0,resolve=0,eventAge=null,dominance=-1;
+  // Keep each accepted event's tier, age and envelope together. A new x1 cannot
+  // borrow the tier of a fading x7 and relight its high-tier sculpture.
+  if(allowed)for(const e of this.events){const age=t-e.time,q=egyptianSolarEnvelope(age),env=q.charge*q.resolve,weight=env*(1+e.tier*.08);
+   if(weight>dominance){dominance=weight;energy=env;tier=e.tier;lead=q.charge;unfold=q.unfold;resolve=q.resolve;eventAge=age;}}
+  energy*=comfort*juice;
+  const sculpture=unfold*resolve*clamp(comfort*juice),stage=energy<=.0001?'idle':eventAge<.28?'charge':eventAge<1.12?'unfold':'resolve';
+  // Geometry opens once on an earned hit. No oscillation, strobe or new particle emission.
+  const open=clamp(energy)*Math.min(tier/3,1),scale=.90+open*.16,poseKey=a.cssWidth+'x'+a.cssHeight;
+  if(this.poseKey!==poseKey||!this.aboutMeasured){const obstacle=a.cssHeight<=640&&typeof document!=='undefined'?document.querySelector('#trontAbout > summary')?.getBoundingClientRect():null;this.basePose=egyptianCrownPlacement(a.cssWidth,a.cssHeight,obstacle?.width?obstacle:null);this.poseKey=poseKey;this.aboutMeasured=a.cssHeight>640||typeof document==='undefined'||!!obstacle?.width;}
+  this.pose=egyptianCrownFramePose(this.basePose,a);
+  // Wide cabinets have a shallow sky slot: spread the feathers horizontally
+  // without flattening the scarab body or changing the full phone silhouette.
+  const pose=this.pose,wingSpread=cabinetFraming(pose.w,pose.h).wide?1.6:1;
+  const wingMatrix=trs([pose.x,pose.y,pose.z-.005],[0,0,0],[scale*pose.scale*wingSpread,(1.23+open*.10)*pose.scale,.9*pose.scale]);
+  r.upload(this.wings,new Float32Array(packedInstance(wingMatrix,[1,1,1],0,-1)),1);
+  const staff=[];if(pose.mount==='sky'||Math.abs(pose.x)>.001||Math.abs(pose.y-4.98)>.001){const v=[pose.x,pose.y-4.66-.35*pose.scale,pose.z+.24],up=vnorm(v),side=vnorm([up[1],-up[0],0]),normal=vcross(side,up);staff.push(...packedInstance(new Float32Array([...vmul(side,pose.scale),0,...v,0,...normal,0,0,4.66,-.18,1]),[1,1,1],0,-1));}
+  r.upload(this.staff,new Float32Array(staff),staff.length/24);
+  if(energy>.0001){
+   const route=[[-4.22,-4.12,.447],[-4.22,4.22,.247],[4.22,4.22,.247],[4.22,-4.12,.447]],col=[1,.76,.34];
+   for(let side=0;side<4;side++)for(let k=0;k<3;k++){
+    const from=route[side],to=route[(side+1)%4],v=vsub(to,from),s=clamp(lead*1.25-k*.12),q=vadd(from,vmul(v,s)),length=Math.min(.55,Math.hypot(...v)*s);
+    if(length>.001)edges.push(...packedInstance(egyptianRod(vadd(q,vmul(vnorm(v),-length)),q),vmul(col,energy*(1-k*.26)),.85,8));
+   }
+   if(tier>=3)for(const side of [-1,1]){const size=.30*clamp(energy);seals.push(...packedInstance(trs([side*4.43,.03,.37],[0,0,0],[size,size,size]),[1,1,1],energy*.28,-1));}
+   // Hinged enamel solar shutters open outwards, never across the playable aperture.
+   if(tier>=4)for(const side of [-1,1])for(let row=0;row<4;row++){
+    const angle=(side<0?PI:0)+side*((row-1.5)*.13+.34*(1-unfold));
+    const size=sculpture*(tier>=5?1.0:.72);
+    if(size>.001)shutters.push(...packedInstance(trs([side*4.72,-3+row*2,-1.30],[0,0,angle],[size,size,size]),[1,1,1],energy*.22,-1));
+   }
+   // x4 charges physical feathers; compact layouts use their visible carved rail inlays.
+   if(tier>=4)for(const side of [-1,1])for(let i=0;i<6;i++){
+    let matrix;
+    if(pose.mount==='sky'){
+     const spine=x=>egyptianRoyalWingRimAt(x,side,.055),x=.35+i*.29;
+     matrix=egyptianRod(transform(wingMatrix,spine(x)),transform(wingMatrix,spine(x+.14*lead)));
+    }else if(!cabinetFraming(pose.w,pose.h).wide)matrix=trs([side*4.43-.08,(i-3)*1.04-.40,.24],[0,0,0],[.16*lead,1,1]);
+    else matrix=trs([side*(2.65+i*.16),4.22,.17],[0,0,PI/2],[.20*lead,1,1]);
+    edges.push(...packedInstance(matrix,vmul([.35,1,.91],energy*lead),.85,8));
+   }
+   if(tier>=5){
+    // A broad physical sun unfolds from behind the cabinet, then folds back into it.
+    const grow=.56+.49*sculpture;
+    sun.push(...packedInstance(trs([0,0,-2.00],[0,0,-PI/48*unfold],[grow,grow,1]),[1,1,1],energy*.34,-1));
+    if(pose.mount==='sky'&&pose.haloScale>0){const size=pose.haloScale*sculpture;sun.push(...packedInstance(trs([pose.x,pose.y,pose.z-.45],[0,0,0],[size,size,1]),[1,1,1],energy*.30,-1));}
+    // Encore reveals a second staggered enamel rank, a new silhouette rather than more particles.
+    if(tier>=7){const outer=.56+.60*sculpture;
+     sun.push(...packedInstance(trs([0,0,-2.23],[0,0,PI/24*unfold],[outer,outer,1]),[.62,.94,1],energy*.25,-1));
+     if(pose.mount==='sky'&&pose.haloScale>0){const size=pose.haloScale*1.1*sculpture;sun.push(...packedInstance(trs([pose.x,pose.y,pose.z-.49],[0,0,PI/24*unfold],[size,size,1]),[.62,.94,1],energy*.22,-1));}
+    }
+   }
+  }
+  r.upload(this.edges,new Float32Array(edges),edges.length/24);r.upload(this.seals,new Float32Array(seals),seals.length/24);r.upload(this.sun,new Float32Array(sun),sun.length/24);r.upload(this.shutters,new Float32Array(shutters),shutters.length/24);
+  this.lastFrame={energy,tier,edges:edges.length/24,seals:seals.length/24,sun:sun.length/24,shutters:shutters.length/24,stage,eventAge};
+  return [this.wings,this.staff,this.edges,this.seals,this.sun,this.shutters];
+ }
+ info(){return {accepted:this.accepted,queued:this.events.length,...this.lastFrame};}
+}
+
+/* Sculpted royal scarab and feathered sun. Merged, deterministic static assets.
+   No gameplay, frame clocks, random samples, input, audio or transport access. */
+const EGYPT_ROYAL={
+ gold:color('#c59b42'),edge:color('#f5d992'),shadow:color('#735021'),
+ lapis:color('#123765'),lapisHi:color('#285b91'),turquoise:color('#2baea4'),
+ jade:color('#74d7bd'),deep:color('#061c32'),carnelian:color('#a84d2d')
+};
+const EGYPT_ROYAL_WING_RIM=[[.22,.20,.14],[.48,.353,.15],[.90,.423,.15],[1.39,.402,.14],[1.91,.275,.115],[2.19,.17,.08]];
+function egyptianRoyalWingRimAt(x,side=1,front=0){
+ x=clamp(x,EGYPT_ROYAL_WING_RIM[0][0],EGYPT_ROYAL_WING_RIM.at(-1)[0]);
+ for(let i=1;i<EGYPT_ROYAL_WING_RIM.length;i++){
+  const a=EGYPT_ROYAL_WING_RIM[i-1],b=EGYPT_ROYAL_WING_RIM[i];
+  if(x<=b[0]){const t=(x-a[0])/(b[0]-a[0]);return [side*x,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t+front];}
+ }
+}
+
+// Two bevel bands and a raised table give enamel/metal real depth in both renderers.
+function egyptRoyalBezel(g,outline,z,depth,col,kind=0){
+ let p=outline.map(v=>v.slice());
+ let area=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];area+=p[i][0]*q[1]-q[0]*p[i][1];}if(area<0)p.reverse();
+ const c=p.reduce((a,v)=>[a[0]+v[0]/p.length,a[1]+v[1]/p.length],[0,0]);
+ const inset=(v,s,h)=>[c[0]+(v[0]-c[0])*s,c[1]+(v[1]-c[1])*s,h];
+ for(let i=0;i<p.length;i++){
+  const a=p[i],b=p[(i+1)%p.length],aa=inset(a,.80,z+depth),bb=inset(b,.80,z+depth);
+  g.quad([a[0],a[1],z-.027],[b[0],b[1],z-.027],[b[0],b[1],z],[a[0],a[1],z],vmul(col,.62),kind);
+  g.quad([a[0],a[1],z],[b[0],b[1],z],bb,aa,vmul(col,1.12),kind);
+  g.tri([c[0],c[1],z+depth+.006],aa,bb,col,kind);
+ }
+ return g;
+}
+
+function egyptRoyalEllipse(g,x,y,rx,ry,z,depth,col,kind=0,steps=20){
+ return egyptRoyalBezel(g,Array.from({length:steps},(_,i)=>{const a=i/steps*TAU;return[x+Math.cos(a)*rx,y+Math.sin(a)*ry];}),z,depth,col,kind);
+}
+
+function egyptRoyalFeather(g,root,tip,width,z,enamel){
+ const dx=tip[0]-root[0],dy=tip[1]-root[1],length=Math.hypot(dx,dy),n=[-dy/length,dx/length];
+ const at=(t,w)=>[root[0]+dx*t+n[0]*w,root[1]+dy*t+n[1]*w];
+ const outline=[at(0,0),at(.22,-width),at(.76,-width*.66),at(1,0),at(.76,width*.66),at(.22,width)];
+ egyptRoyalBezel(g,outline,z,.040,EGYPT_ROYAL.gold,1);
+ const inset=outline.map(v=>[root[0]+(v[0]-root[0])*.91+dx*.045,root[1]+(v[1]-root[1])*.91+dy*.045]);
+ egyptRoyalBezel(g,inset,z+.047,.022,enamel,0);
+ // A raised shaft separates the two enamel vanes; paired incisions are broad facets.
+ const p=at(.10,0),q=at(.91,0);
+ g.tube([[p[0],p[1],z+.079],[q[0],q[1],z+.075]],.009,EGYPT_ROYAL.edge,1,5);
+ for(const t of [.34,.54,.72])for(const side of [-1,1]){
+  const a=at(t-.07,side*width*.60),b=at(t+.035,0),c=at(t+.045,side*width*.60);
+  egyptRoyalBezel(g,[a,b,c],z+.071,.004,side===1?EGYPT_ROYAL.lapisHi:EGYPT_ROYAL.deep,0);
+ }
+}
+
+function buildEgyptianRoyalWings(){
+ const g=new Geo();
+ // The flight feathers form a scalloped fan; the upper coverts overlap in relief.
+ const tips=[[.55,-.38],[.76,-.41],[.99,-.39],[1.23,-.34],[1.48,-.26],[1.71,-.16],[1.92,-.045],[2.09,.055],[2.22,.15]];
+ for(const side of [-1,1]){
+  const mirror=p=>[p[0]*side,p[1]];
+  const under=[[.14,.11],[.49,.30],[.91,.36],[1.45,.36],[1.94,.26],[2.20,.15],[1.97,-.08],[1.47,-.30],[.75,-.43],[.31,-.20]];
+  egyptRoyalBezel(g,under.map(mirror),-.105,.025,EGYPT_ROYAL.deep,0);
+  for(let i=0;i<tips.length;i++){
+   const root=[.18+i*.105,.10+i*.021];
+   egyptRoyalFeather(g,mirror(root),mirror(tips[i]),i<5?.085:.061,-.045+i*.003,i%3===0?EGYPT_ROYAL.lapis:EGYPT_ROYAL.turquoise);
+  }
+  // Raised lapis shoulder is a single authored assembly, bordered by heavy gold.
+  const shoulder=[[.17,.15],[.42,.34],[.88,.425],[1.39,.405],[1.94,.275],[2.19,.17],[1.62,.255],[.91,.285],[.40,.20]];
+  egyptRoyalBezel(g,shoulder.map(mirror),.055,.045,EGYPT_ROYAL.gold,1);
+  const inlay=[[.28,.195],[.46,.304],[.89,.378],[1.38,.365],[1.80,.272],[1.39,.305],[.90,.326],[.45,.247]];
+  egyptRoyalBezel(g,inlay.map(mirror),.107,.022,EGYPT_ROYAL.lapis,0);
+  // Compact coverts create a second tier and a readable alternating enamel rhythm.
+  for(let i=0;i<7;i++){
+   const x=.38+i*.205,y=.245+.085*Math.sin(i/6*PI),root=[x,y],tip=[x+.22,y-.18+.065*i/6];
+   egyptRoyalFeather(g,mirror(root),mirror(tip),.043,.116,i%2?EGYPT_ROYAL.turquoise:EGYPT_ROYAL.lapisHi);
+  }
+  const rim=EGYPT_ROYAL_WING_RIM.map(p=>[p[0]*side,p[1],p[2]]);
+  g.tube(rim,.018,EGYPT_ROYAL.edge,1,6);
+  // Gold-and-carnelian shoulder clasp roots the feather fan in the beetle's body.
+  egyptRoyalBezel(g,[[.16,.20],[.30,.27],[.43,.18],[.34,.07],[.20,.07]].map(mirror),.145,.040,EGYPT_ROYAL.gold,1);
+  egyptRoyalBezel(g,[[.225,.19],[.30,.225],[.36,.18],[.31,.125],[.24,.12]].map(mirror),.191,.020,EGYPT_ROYAL.carnelian,0);
+ }
+ return g;
+}
+
+function buildEgyptianRoyalCrown(){
+ const g=new Geo(),c=EGYPT_ROYAL;
+ // A solid sun held aloft by the forelegs, with a darker core and physical bezel.
+ egyptRoyalEllipse(g,0,.282,.196,.196,-.085,.032,c.shadow,1,24);
+ egyptRoyalEllipse(g,0,.282,.179,.179,-.045,.040,c.gold,1,24);
+ egyptRoyalEllipse(g,0,.282,.134,.134,.005,.018,c.carnelian,0,20);
+ g.ring([0,.282,.032],.145,.010,c.edge,1,'z',32);
+ for(let i=0;i<12;i++){
+  const a=i/12*TAU,p=(r,d)=>[Math.cos(a+d)*r,.282+Math.sin(a+d)*r];
+  egyptRoyalBezel(g,[p(.15,-.045),p(.187,0),p(.15,.045)],-.001,.018,c.edge,1);
+ }
+ // Broad lobed torso: sculpted gold carapace, split turquoise elytra and lapis collar.
+ const body=[[-.235,.030],[-.245,-.11],[-.195,-.285],[-.080,-.385],[.080,-.385],[.195,-.285],[.245,-.11],[.235,.030],[.14,.135],[-.14,.135]];
+ egyptRoyalBezel(g,body,-.020,.102,c.gold,1);
+ for(const side of [-1,1]){
+  const shell=[[.018,.060],[.130,.080],[.207,.010],[.205,-.135],[.157,-.266],[.066,-.337],[.018,-.325]].map(([x,y])=>[x*side,y]);
+  egyptRoyalBezel(g,shell,.094,.085,side===1?c.turquoise:c.jade,0);
+  // Short relief ribs follow the domed shell, not a field of separate dots.
+  for(let row=0;row<3;row++){
+   const y=-.05-row*.085;
+   g.tube([[side*.035,y-.025,.193],[side*.12,y,.185],[side*(.18-row*.018),y+.035,.162]],.0075,c.lapis,0,5);
+  }
+  // Three deliberately jointed legs make the insect recognisable at phone scale.
+  const legs=[[[.18,.035,.06],[.30,.17,.06],[.30,.34,.06],[.22,.43,.01]],
+              [[.22,-.10,.04],[.365,-.065,.035],[.405,-.13,.025]],
+              [[.17,-.25,.025],[.31,-.30,.015],[.34,-.41,.005]]];
+  for(const points of legs){
+   g.tube(points.map(([x,y,z])=>[side*x,y,z]),.020,c.gold,1,6);
+   const knee=points[1];egyptRoyalEllipse(g,side*knee[0],knee[1],.032,.027,knee[2]+.008,.018,c.edge,1,8);
+  }
+ }
+ g.tube([[0,-.34,.195],[0,-.08,.205],[0,.065,.189]],.012,c.edge,1,6);
+ egyptRoyalBezel(g,[[-.145,.07],[.145,.07],[.17,.15],[.115,.205],[-.115,.205],[-.17,.15]],.115,.062,c.lapis,0);
+ g.tube([[-.145,.085,.178],[0,.105,.194],[.145,.085,.178]],.011,c.edge,1,6);
+ egyptRoyalBezel(g,[[-.092,.175],[.092,.175],[.105,.237],[.055,.276],[-.055,.276],[-.105,.237]],.146,.055,c.gold,1);
+ // A lapis eye band and central turquoise ridge separate head from the sun disk.
+ egyptRoyalBezel(g,[[-.08,.202],[.08,.202],[.075,.226],[-.075,.226]],.206,.009,c.deep,0);
+ egyptRoyalBezel(g,[[0,.185],[.024,.227],[0,.258],[-.024,.227]],.215,.018,c.turquoise,0);
+ egyptRoyalBezel(g,[[-.061,-.366],[.061,-.366],[.042,-.424],[0,-.465],[-.042,-.424]],.032,.046,c.gold,1);
+ egyptRoyalBezel(g,[[-.025,-.386],[.025,-.386],[0,-.439]],.085,.024,c.lapis,0);
+ return g;
+}
+
+/* Authored Egyptian temple cabinet. Static merged geometry only.
+   No input, state, randomness, audio, storage or renderer calls. */
+
+function egyptTemplePrism(g,outline,front,back,col,kind=0){
+ const p=outline.slice();let area=0;
+ for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];area+=p[i][0]*q[1]-q[0]*p[i][1];}
+ if(area<0)p.reverse();
+ const c=p.reduce((s,v)=>[s[0]+v[0]/p.length,s[1]+v[1]/p.length],[0,0]);
+ for(let i=0;i<p.length;i++){
+  const a=p[i],b=p[(i+1)%p.length];
+  g.tri([c[0],c[1],front],[a[0],a[1],front],[b[0],b[1],front],col,kind);
+  g.tri([c[0],c[1],back],[b[0],b[1],back],[a[0],a[1],back],vmul(col,.66),kind);
+  g.quad([a[0],a[1],back],[b[0],b[1],back],[b[0],b[1],front],[a[0],a[1],front],vmul(col,.79),kind);
+ }
+}
+
+function egyptTempleCartouche(g,x,y,z,w,h){
+ // Continuous metal surround, a visibly recessed enamel bed, and a raised ankh.
+ bevelBox(g,[x,y,z],w,h,.09,EGYPT_ART.gold,1,.025,Math.min(w*.42,.17));
+ bevelBox(g,[x,y,z+.052],w-.075,h-.10,.025,EGYPT_ART.ink,0,.008,Math.min(w*.31,.13));
+ bevelBox(g,[x,y,z+.071],w-.13,h-.17,.022,EGYPT_ART.lapis,0,.006,Math.min(w*.25,.11));
+ const s=Math.min((w-.13)/.65,(h-.20)/1.12);
+ egyptAnkh(g,x,y+.10*s,z+.099,s,EGYPT_ART.edge,1);
+ if(h>2){
+  egyptLotus(g,x,y+h*.31,z+.102,w*.94);
+  egyptTempleWingSeal(g,x,y-h*.30,z+.102,w*.72);
+  for(const dy of [-h*.15,h*.15])g.box(x,y+dy,z+.096,w*.55,.025,.026,EGYPT_ART.gold,1);
+ }
+ g.box(x,y-h*.5-.017,z+.025,w*.66,.035,.07,EGYPT_ART.gold,1);
+}
+
+function egyptTempleWingSeal(g,x,y,z,s){
+ // A sun held by symmetrical tapering feathers; solid enamel rather than light dots.
+ const disk=[];for(let i=0;i<16;i++){const a=i/16*TAU;disk.push([x+Math.cos(a)*s*.17,y+Math.sin(a)*s*.17]);}
+ egyptRelief(g,disk,z,.065*s,EGYPT_ART.gold,1);
+ for(const side of [-1,1])for(let i=0;i<4;i++){
+  const a=.14+i*.06,b=.30+i*.15,drop=.05+i*.045;
+  const feather=[[x+side*a*s,y+.07*s],[x+side*b*s,y+(.13-drop)*s],
+   [x+side*(b+.12)*s,y+(.10-drop)*s],[x+side*(b+.03)*s,y+(-.03-drop)*s],[x+side*a*s,y-.015*s]];
+  egyptRelief(g,feather,z-.02,.035*s,i%2?EGYPT_ART.turquoise:EGYPT_ART.lapis,0);
+  g.tube([[x+side*a*s,y+.075*s,z+.025],[x+side*(b+.1)*s,y+(.10-drop)*s,z+.025]],.014*s,EGYPT_ART.gold,1,5);
+ }
+}
+
+function egyptTempleCavetto(g,x,y,z,width,depth){
+ // Four physical courses flare outward like a temple cavetto cornice.
+ const courses=[[-.20,.74,.13,EGYPT_ART.deep],[-.095,.83,.11,EGYPT_ART.gold],
+  [.02,.94,.14,EGYPT_ART.lapis],[.14,1,.10,EGYPT_ART.gold]];
+ for(const [dy,scale,h,col] of courses)bevelBox(g,[x,y+dy,z],width*scale,h,depth+(scale-.74)*.5,col,col===EGYPT_ART.gold?1:0,.018,.035);
+ for(let i=0;i<9;i++){
+  const xx=x+(i-4)*width*.086;
+  egyptRelief(g,[[xx-.027,y-.03],[xx+.027,y-.03],[xx+.045,y+.085],[xx,y+.105],[xx-.045,y+.085]],z+depth*.5+.045,.012,i%2?EGYPT_ART.turquoise:EGYPT_ART.edge,1);
+ }
+}
+
+function egyptTemplePylon(g,side){
+ const x=side*6.15,z=-3.7;
+ // Battered pylon walls, not flat rectangular signs. The side/back faces have depth.
+ const shape=[[x-.77,-4.90],[x+.77,-4.90],[x+.52,5.50],[x-.52,5.50]];
+ egyptTemplePrism(g,shape,z+.30,z-.72,EGYPT_ART.deep,0);
+ const inset=[[x-.60,-4.56],[x+.60,-4.56],[x+.39,5.26],[x-.39,5.26]];
+ egyptTemplePrism(g,inset,z+.325,z+.29,EGYPT_ART.lapis,0);
+ const outline=shape.map(([a,b])=>[a,b,z+.33]);outline.push(outline[0]);g.tube(outline,.034,EGYPT_ART.gold,1,6);
+ // Quiet inset mortar courses let large ceremonial relief carry the attention.
+ for(const yy of [-3.2,-1.55,.10,1.75,3.4,4.9]){
+  const half=.52+((5.50-yy)/10.40)*.25;
+  g.box(x,yy,z+.335,half*1.74,.025,.018,EGYPT_ART.ink,0);
+ }
+ egyptTempleCartouche(g,x,.16,z+.36,.68,5.30);
+ egyptTempleWingSeal(g,x,4.38,z+.40,.88);
+ egyptLotus(g,x,-3.58,z+.40,.95);
+ // Lotus cups create a wide cap silhouette and a materially readable capital.
+ for(const dx of [-.43,0,.43]){
+  const xx=x+dx;
+  egyptRelief(g,[[xx-.16,5.39],[xx+.16,5.39],[xx+.25,5.86],[xx,6.08],[xx-.25,5.86]],z+.22,.09,dx===0?EGYPT_ART.turquoise:EGYPT_ART.gold,1);
+  egyptRelief(g,[[xx-.10,5.50],[xx+.10,5.50],[xx+.16,5.81],[xx,5.93],[xx-.16,5.81]],z+.33,.035,EGYPT_ART.lapis,0);
+ }
+ egyptTempleCavetto(g,x,6.07,z+.05,2.10,1.18);
+ bevelBox(g,[x,-4.78,z-.04],1.69,.30,1.25,EGYPT_ART.gold,1,.045,.06);
+ bevelBox(g,[x,-5.01,z-.10],1.92,.18,1.43,EGYPT_ART.deep,0,.035,.04);
+ // Stepped turquoise-and-gold plinth, deliberately below and behind the controls.
+ bevelBox(g,[x,-4.56,z+.01],1.47,.14,1.11,EGYPT_ART.turquoise,0,.02,.035);
+}
+
+function egyptTempleGateway(g){
+ // A low-contrast monumental rear portal anchors the cabinet in an actual temple.
+ // Every vertex here is behind z=-6.4; it adds no foreground board/HUD occluder.
+ const stone=vmul(EGYPT_ART.deep,.74),blue=vmul(EGYPT_ART.lapis,.78),gold=vmul(EGYPT_ART.gold,.78),z=-7.25;
+ for(const side of [-1,1]){
+  const x=side*8.50;
+  egyptTemplePrism(g,[[x-.91,-5.55],[x+.91,-5.55],[x+.69,5.55],[x-.69,5.55]],z+.42,z-.62,stone,0);
+  for(const dx of [-.42,0,.42])bevelBox(g,[x+dx,.05,z+.43],.22,10.28,.09,blue,0,.025,.05);
+  bevelBox(g,[x,5.15,z+.01],2.09,.50,1.20,gold,1,.035,.05);
+  bevelBox(g,[x,-5.43,z],2.22,.31,1.30,blue,0,.04,.05);
+  for(const yy of [-3.75,0,3.75]){
+   const seal=new Geo();egyptTempleWingSeal(seal,0,0,0,1.05);
+   g.append(seal,trs([x,yy,z+.53],[0,0,0],[1,1,.7]));
+  }
+ }
+ bevelBox(g,[0,5.82,z],18.86,.74,1.32,stone,0,.065,.10);
+ bevelBox(g,[0,6.23,z+.02],19.28,.19,1.48,gold,1,.035,.045);
+ bevelBox(g,[0,5.45,z+.27],18.23,.12,.72,blue,0,.018,.03);
+ // Alternating broad enamel feathers form a frieze rather than tiny texture noise.
+ for(let i=-8;i<=8;i++){
+  const x=i*.98;
+  egyptRelief(g,[[x-.24,5.57],[x+.24,5.57],[x+.31,5.91],[x,6.06],[x-.31,5.91]],z+.69,.025,i%2?blue:gold,i%2?0:1);
+  egyptRelief(g,[[x-.11,5.68],[x+.11,5.68],[x+.14,5.90],[x,5.98],[x-.14,5.90]],z+.73,.016,vmul(EGYPT_ART.turquoise,.65),0);
+ }
+}
+
+function buildEgyptianTempleArchitecture(g){
+ for(const side of [-1,1])egyptTemplePylon(g,side);
+ egyptTempleGateway(g);
+ return g;
+}
+
+function buildEgyptianTempleCabinet(g){
+ // The original earned light-chase has its own exposed channel, unchanged in place.
+ const channel=[[-4.22,-4.12,.395],[-4.22,4.22,.195],[4.22,4.22,.195],[4.22,-4.12,.395],[-4.22,-4.12,.395]];
+ g.tube(channel,.046,EGYPT_ART.gold,1,6);
+ g.tube(channel.map(([x,y,z])=>[x,y,z+.032]),.032,EGYPT_ART.deep,0,5);
+ for(const side of [-1,1]){
+  const x=side*4.43;
+  // A built-up narrow pilaster: backer, enamel spine, gold arrises and raised panels.
+  bevelBox(g,[x,0,.025],.36,7.59,.29,EGYPT_ART.gold,1,.028,.045);
+  bevelBox(g,[x,0,.185],.285,7.50,.045,EGYPT_ART.deep,0,.009,.025);
+  bevelBox(g,[x,0,.218],.22,7.43,.024,EGYPT_ART.lapis,0,.006,.018);
+  for(const dx of [-.145,.145])g.tube([[x+dx,-3.77,.235],[x+dx,3.77,.235]],.014,EGYPT_ART.edge,1,5);
+  for(let row=-2;row<=2;row++){
+   const y=row*1.43;
+   egyptTempleCartouche(g,x,y,.245,.255,.99);
+   // Clasp plates join the panels to the rail and catch a distinct metal highlight.
+   for(const dy of [-.62,.62]){
+    bevelBox(g,[x,y+dy,.24],.34,.10,.075,EGYPT_ART.gold,1,.012,.02);
+    egyptRelief(g,[[x-.095,y+dy],[x,y+dy-.035],[x+.095,y+dy],[x,y+dy+.035]],.29,.022,EGYPT_ART.turquoise,0);
+   }
+  }
+  for(const yy of [-3.69,3.69])egyptLotus(g,x,yy,.265,.29);
+  // Corner lotus fittings are entirely outside the board's existing aperture.
+  for(const yy of [-4.15,4.15]){
+   bevelBox(g,[side*3.48,yy,.18],.67,.245,.10,EGYPT_ART.deep,0,.018,.04);
+   egyptLotus(g,side*3.48,yy,.26,.48);
+  }
+ }
+ // Deep lower cornice with broad fan-shaped enamel inlays; no controls extend here.
+ bevelBox(g,[0,-4.405,.10],8.11,.31,.36,EGYPT_ART.deep,0,.025,.045);
+ for(const yy of [-4.54,-4.26])g.tube([[-4.04,yy,.30],[4.04,yy,.30]],.018,EGYPT_ART.gold,1,6);
+ for(let i=-5;i<=5;i++){
+  const x=i*.72;
+  egyptRelief(g,[[x-.30,-4.50],[x+.30,-4.50],[x+.22,-4.33],[x,-4.285],[x-.22,-4.33]],.305,.036,i%2?EGYPT_ART.lapis:EGYPT_ART.turquoise,0);
+  g.tube([[x-.28,-4.49,.35],[x,-4.30,.35],[x+.28,-4.49,.35]],.012,EGYPT_ART.gold,1,5);
+  g.box(x,-4.40,.358,.025,.13,.025,EGYPT_ART.edge,1);
+ }
+ // The title-side collar stays below y=4.50 and behind the exposed chase.
+ bevelBox(g,[0,4.325,-.075],8.08,.23,.22,EGYPT_ART.deep,0,.018,.035);
+ for(const side of [-1,1])for(let i=0;i<7;i++){
+  const x=side*(2.65+i*.16);
+  egyptRelief(g,[[x-.055,4.20],[x+.055,4.20],[x+.08,4.42],[x,4.49],[x-.08,4.42]],.13,.025,i%2?EGYPT_ART.gold:EGYPT_ART.turquoise,1);
+ }
+ buildEgyptianTempleArchitecture(g);
+ return g;
+}
+
+/* Royal solar assemblies: fixed meshes animated by accepted-match presentation only. */
+function buildEgyptianSolarSeal(){
+ const g=new Geo(),rim=[];
+ for(let i=0;i<16;i++){const a=i/16*TAU;rim.push([Math.cos(a)*.62,Math.sin(a)*.76]);}
+ egyptRelief(g,rim,-.05,.065,EGYPT_ART.gold);
+ egyptRelief(g,rim.map(([x,y])=>[x*.84,y*.86]),.025,.035,EGYPT_ART.deep,0);
+ egyptRelief(g,rim.map(([x,y])=>[x*.69,y*.73]),.063,.022,EGYPT_ART.lapis,0);
+ egyptAnkh(g,0,.08,.13,.86,EGYPT_ART.edge,1);
+ for(const side of [-1,1])for(let i=0;i<4;i++){
+  const y=-.45+i*.27,x=side*(.49-Math.abs(y)*.12);
+  egyptRelief(g,[[x-.04,y],[x,y+.07],[x+.04,y],[x,y-.07]],.10,.025,EGYPT_ART.turquoise,0);
+ }
+ return g;
+}
+function buildEgyptianSolarShutter(){
+ const g=new Geo();
+ const p=[[0,-.10],[.54,-.20],[1.35,-.08],[1.68,.12],[1.02,.34],[.34,.29],[0,.10]];
+ egyptRelief(g,p,0,.10,EGYPT_ART.gold);
+ egyptRelief(g,p.map(([x,y])=>[.05+x*.91,y*.70+.025]),.10,.035,EGYPT_ART.lapis,0);
+ egyptRelief(g,[[.24,.06],[1.42,.12],[.93,.23],[.34,.20]],.15,.027,EGYPT_ART.turquoise,0);
+ g.tube([[.12,.04,.19],[.82,.08,.22],[1.51,.13,.14]],.022,EGYPT_ART.edge,1,5);
+ for(let i=0;i<5;i++){const x=.32+i*.18;g.tube([[x,-.09,.14],[x+.16,.10,.21],[x+.13,.24,.14]],.012,EGYPT_ART.gold,1,4);}
+ return g;
+}
+function buildEgyptianSolarFan(){
+ const g=new Geo();
+ // Broad, layered cloisonne feathers replace wire-only radial rays. The centre stays open.
+ for(let i=0;i<24;i++){
+  const a=i/24*TAU,point=(r,d)=>[Math.cos(a+d)*r,Math.sin(a+d)*r];
+  const p=[point(4.64,-.045),point(5.78,-.075),point(6.72,-.035),point(7.02,0),point(6.70,.035),point(5.76,.075),point(4.64,.045)];
+  egyptRelief(g,p,0,.10,EGYPT_ART.gold);
+  const q=[point(4.89,-.027),point(5.78,-.052),point(6.68,-.022),point(6.86,0),point(6.68,.022),point(5.78,.052),point(4.89,.027)];
+  egyptRelief(g,q,.105,.035,i%3===0?EGYPT_ART.turquoise:EGYPT_ART.lapis,0);
+  const spine=[point(4.80,0),point(6.82,0)].map(([x,y])=>[x,y,.16]);g.tube(spine,.019,EGYPT_ART.edge,1,5);
+  // Transverse gold ties make each ray a physical assembly, readable at medium size.
+  for(const radius of [5.18,5.57])g.tube([point(radius,-.045),point(radius,.045)].map(([x,y])=>[x,y,.15]),.016,EGYPT_ART.gold,1,4);
+ }
+ g.ring([0,0,.07],4.69,.075,EGYPT_ART.gold,1,'z',96);
+ g.ring([0,0,.13],4.82,.025,EGYPT_ART.turquoise,0,'z',96);
+ return g;
+}
+function egyptianSolarEnvelope(age){
+ // One charge, opening and return. No periodic modulation or repeated flashes.
+ const ease=x=>{x=clamp(x);return x*x*(3-2*x);};
+ return {charge:ease(age/.28),unfold:ease((age-.12)/.48),resolve:1-ease((age-1.12)/.98)};
+}
 
 (async function boot(){let stage='GPU renderer';let app=null;try{
  const force=new URLSearchParams(location.search).has('webgl');$('load-status').textContent='Preparing GPU shaders...';
