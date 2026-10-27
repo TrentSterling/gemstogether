@@ -41,7 +41,9 @@ export async function launch({port,width=1280,height=800,headless=true,mobile=fa
   return closePromise=(async()=>{
    receipt.status='closing';save();
    if(!closed&&ws?.readyState===WebSocket.OPEN){try{await Promise.race([send('Browser.close'),sleep(1500)]);}catch(error){receipt.closeMessage=String(error);}}
-   await Promise.race([closedPromise,sleep(2000)]);
+   // Windows may still be draining browser-owned services after Browser.close.
+   // Allow bounded graceful shutdown; a forced or nonzero exit still fails.
+   await Promise.race([closedPromise,sleep(10000)]);
    if(!closed&&!spawnError){receipt.ownedRootTerminationRequested=true;proc.kill();await Promise.race([closedPromise,sleep(2000)]);}
    ws?.close();rejectPending(Error('Owned Chrome session closed'));
    receipt.status=closed?(spawnError?'launch_failed':'owned_root_exit_verified'):'cleanup_unknown';receipt.finishedUtc=new Date().toISOString();save();
