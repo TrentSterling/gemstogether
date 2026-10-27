@@ -1,3 +1,8 @@
+## 3.4.0 (2026-10-27) Royal Egyptian temple
+
+- Promotes the reviewed Royal temple art and idle-notice placement together. Rules, saves, co-op and selected audio remain unchanged.
+- Release qualification and deployment evidence are recorded in `rounds/2026-10-27-RELEASE.md`.
+
 ## 3.4.0-candidate.2 (2026-10-26) Royal Egyptian temple - unpublished
 
 - Replaces the garden arch silhouette with stepped temple architecture, tall carved pylons and deep enamel cabinet assemblies.

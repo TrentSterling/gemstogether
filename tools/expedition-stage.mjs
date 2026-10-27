@@ -23,5 +23,5 @@ for(const gl of [false,true]){let page;const label=gl?'WebGL':'WebGPU';try{
  await page.eval(`${J}.app.prefs.motion=true;${J}.app.board.score=50010`);await step(4);
  ok(label+' Starfall sends real shooting stars on the beat',await page.eval(`${J}.app.fx.fieldForm===4&&${J}.app.fx.shootingBeat>0&&${J}.app.world.sparks.count>0`));await page.shot(out+'/starfall-'+label+'.png');
  ok(label+' stage travel has no GPU or script errors',await page.eval(`${J}.diagnostics().errors.length===0`)&&!page.logs.some(x=>x.startsWith('EXCEPTION')));
-}catch(error){fail++;console.error(error.stack);}finally{page?.kill();}}
+}catch(error){fail++;console.error(error.stack);if(!page)throw error;}finally{await page?.kill();}}
 writeFileSync(out+'/stage-results.json',JSON.stringify({pass,fail,receipts},null,2));console.log(`${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

@@ -67,6 +67,6 @@ for(const [w,h,gl]of [[1280,800,false],[390,844,false],[1280,800,true],[390,844,
   await p.eval(`${J}.challenge('moves',{seed:1})`);await until(()=>p.eval(`${J}.app.phase==='idle'`),{timeout:20000});await p.eval(`${J}.app.board.moves=29;${J}.swap(1,2)`);await until(()=>p.eval(`${J}.expedition().run.finished`),{timeout:20000,label:'run end'});await p.shot(out+'/'+name+'-end.png');ok(name+' run-end buttons remain usable',await p.eval(`${J}.ui().hits.some(h=>h.id==='exp-endless'&&h.h>=38)`));
   await p.eval(`${J}.app.expedition.enterPhoto();${J}.app.ui.activate('exp-photo-save')`);await until(()=>p.eval(`!!${J}.app.expedition.lastPhoto`),{timeout:12000,label:'export'});ok(name+' PNG capture works',await p.eval(`${J}.app.expedition.lastPhoto.size>10000`));await p.eval(`${J}.app.closePanel()`);
   ok(name+' no GPU or script errors',!(await p.eval(`${J}.diagnostics()`)).errors.length&&!p.logs.some(l=>l.startsWith('EXCEPTION')));
- }catch(error){fail++;console.error(name,error.stack);if(p)console.log(p.logs.slice(-6));}finally{p?.kill();}
+ }catch(error){fail++;console.error(name,error.stack);if(!p)throw error;console.log(p.logs.slice(-6));}finally{await p?.kill();}
 }
 writeFileSync(out+'/visual-panel-readiness.json',JSON.stringify(panelReadiness,null,2));writeFileSync(out+'/visual-results.json',JSON.stringify({pass,fail,receipts},null,2));console.log(`${pass} passed, ${fail} failed`);process.exitCode=fail?1:0;

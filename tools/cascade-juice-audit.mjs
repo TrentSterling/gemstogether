@@ -34,6 +34,6 @@ try{for(const [gl,width,height]of [[false,1280,800],[true,1280,800],[false,390,8
  ok(tag+' same-event duplication suppressed',budget.sameEvent===0);
  ok(tag+' finite particle pool within fixed capacity',budget.finite&&budget.count<=budget.capacity);
  const diagnostic=await p.eval('__jewel.diagnostics()');ok(tag+' no runtime or GPU errors',!diagnostic.errors.length&&!diagnostic.nonfiniteActors.length&&!p.logs.some(x=>x.startsWith('EXCEPTION')),diagnostic);
- runs.push({tag,chain,budget,result:{score:state.score,cells:state.cells},diagnostic});p.kill();p=null;
-}}finally{p?.kill();writeFileSync(out+'/checks.json',JSON.stringify({at:new Date().toISOString(),checks,runs},null,2));}
+ runs.push({tag,chain,budget,result:{score:state.score,cells:state.cells},diagnostic});await p.kill();p=null;
+}}finally{await p?.kill();writeFileSync(out+'/checks.json',JSON.stringify({at:new Date().toISOString(),checks,runs},null,2));}
 console.log(`${checks.filter(c=>c.pass).length} passed, ${checks.filter(c=>!c.pass).length} failed`);if(checks.some(c=>!c.pass))process.exitCode=1;

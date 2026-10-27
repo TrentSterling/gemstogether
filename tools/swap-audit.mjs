@@ -68,7 +68,7 @@ try {
   R.solo.after = await S.eval(STATE);
   R.solo.verdict = judge(R.solo.frames, home, 'solo');
   R.solo.errors = (await S.eval(`${J}.diagnostics()`)).errors;
-  S.kill(); S = null;
+  await S.kill(); S = null;
 
   // ---- co-op: A hosts a private room, B joins ----
   const net = page => page.eval(`(()=>{const n=${J}.net(),c=${J}.app.coop;return {mode:n.mode,role:n.role,code:n.code,connected:n.connected,synced:!!c.synced,hash:n.hash,publicRoom:!!c.publicRoom}})()`);
@@ -123,5 +123,5 @@ try {
   console.log(JSON.stringify({label, solo: R.solo.verdict, soloAfter: R.solo.after, host: R.coop.host.verdict, hostDuring: R.coop.host.during, hostOtherMoved: R.coop.host.otherMoved, peer: R.coop.peer.verdict, peerDuring: R.coop.peer.during, peerOtherMoved: R.coop.peer.otherMoved, hashes: [R.coop.host.hashesMatch, R.coop.peer.hashesMatch], errors: [R.solo.errors, R.coop.host.errors, R.coop.peer.errors]}, null, 1));
 } finally {
   writeFileSync(`${out}/samples.json`, JSON.stringify(R));
-  S?.kill(); A?.kill(); B?.kill();
+  const cleanup=await Promise.allSettled([S?.kill(),A?.kill(),B?.kill()]);for(const r of cleanup)if(r.status==='rejected')throw r.reason;
 }
