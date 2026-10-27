@@ -20,7 +20,7 @@ async function boot(w, h, port) {
   await until(() => page.eval(`!!(${J}&&${J}.ready)`), {timeout: 60000, label: 'boot'});
   await sleep(1500);
   return page;
-  } catch (error) { page.kill(); throw error; }
+  } catch (error) { await page.kill(); throw error; }
 }
 async function pill(page) {
   return page.eval(`(()=>{const r=document.querySelector('#trontAbout>summary,.tront-about>summary')?.getBoundingClientRect();return r&&{x:r.x,y:r.y,w:r.width,h:r.height}})()`);
@@ -106,7 +106,7 @@ try {
   await page.shot('tools/out/qa-desktop.png');
   const d2 = await page.eval(`${J}.diagnostics()`);
   ok('no errors after play', d2.errors.length === 0 && !page.logs.some(l => /EXCEPTION/.test(l)), page.logs.filter(l => /EXC|error/i.test(l)).join(' | ').slice(0, 200));
-} finally { page.kill(); }
+} finally { await page.kill(); }
 
 // ---- phone ----
 page = await boot(390, 844, 9477);
@@ -117,7 +117,7 @@ try {
   const bad = hs.filter(h => p && h.w && overlap(p, h));
   ok('About pill clear of GPU buttons (390x844)', p && bad.length === 0, bad.map(h => h.id || h.label).join(','));
   await page.shot('tools/out/qa-phone.png');
-} finally { page.kill(); }
+} finally { await page.kill(); }
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -1,3 +1,30 @@
+## 3.4.0 (2026-10-27) Royal Egyptian temple
+
+- Promotes the reviewed Royal temple art and idle-notice placement together. Rules, saves, co-op and selected audio remain unchanged.
+- Release qualification and deployment evidence are recorded in `rounds/2026-10-27-RELEASE.md`.
+
+## 3.4.0-candidate.2 (2026-10-26) Royal Egyptian temple - unpublished
+
+- Replaces the garden arch silhouette with stepped temple architecture, tall carved pylons and deep enamel cabinet assemblies.
+- Sculpted scarab, solid sun and layered gold/lapis/turquoise feather ranks.
+- Earned carved seals, opening solar shutters and layered feathered suns charge, unfold and resolve cleanly.
+- Keeps event tier and envelope coherent; preserves rules, progression, saves, co-op, audio and PR26 notices.
+- Keeps the wide crest in its quiet vertical screen lane during camera punch/shake without shrinking it or changing the gameplay camera.
+- Spreads wide-layout feathers horizontally so the crest stays legible beside the pylons; the scarab body and phone presentation remain unchanged.
+- CPU/source and bounded Chrome WebGPU/WebGL art checks. Firefox, input/co-op and publication gates remain held; this is not a release qualification pass.
+
+## 3.4.0-candidate.1 (2026-10-26) Egyptian cabinet and solar feedback - unpublished
+
+- Authored lapis/gold scarab, feather wings, lotus and ankh carvings, collar and courtyard obelisks.
+- Earned mounted light chase, visible rail seals, collar precharge and layered solar payoffs behind the cabinet, with bounded resources and existing comfort settings.
+- Rules, gem silhouettes, saves, progression, co-op, audio and PR26 notice placement are unchanged. Required interaction qualification and publication remain held; see `rounds/2026-10-26-EGYPTIAN-CANDIDATE.md`.
+
+## 3.3.30 / A23 candidate (2026-10-26) Keep cheers clear of playable gems
+
+- Idle cheers and social messages use measured space beside or below the cabinet, keeping playable gems visible.
+- Notices avoid the score, budgets, controls, stage cards and active toasts. Tight layouts yield text while preserving the existing celebration effects and timing.
+- No scoring, save, network or audio changes. Chrome and native Firefox rendering qualification passed; interaction release gates remain pending. See `rounds/2026-10-26-A23.md`.
+
 ## 3.3.29 / A22 (2026-10-25) Give every celebration room
 
 - High cascades and stage-up titles share separate measured space, including narrow layouts. The board clears of these titles as soon as the next move is playable.

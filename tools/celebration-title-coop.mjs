@@ -18,5 +18,5 @@ try{
  stage='idle private cheer';await A.eval('__jewel.cheer()');await until(()=>B.eval('__jewel.app.expedition.announcement?.label==="A LITTLE CHEER"'),{timeout:5000});
  for(const[p,name]of[[A,'host'],[B,'peer']]){const words=await p.eval(`(()=>{const a=__jewel.app,u=a.ui,fn=u.text,words=[];u.text=function(t,...args){words.push(t);return fn.call(this,t,...args)};try{a.draw();return words}finally{u.text=fn}})()`);ok(name+' idle shared cheer still visibly drawn',words.includes('A LITTLE CHEER'));await p.shot(`${out}/${label}-${name}-idle-cheer.png`);}
 }catch(error){checks.push({name:stage,pass:false,error:String(error)});for(const[p,name]of[[A,'host'],[B,'peer']])try{events.push({name,...await snapshot(p)})}catch{}console.error(error.stack);process.exitCode=1;}
-finally{A?.kill();B?.kill();writeFileSync(`${out}/${label}-coop.json`,JSON.stringify({at:new Date().toISOString(),checks,events},null,2))}
+finally{const cleanup=await Promise.allSettled([A?.kill(),B?.kill()]);writeFileSync(`${out}/${label}-coop.json`,JSON.stringify({at:new Date().toISOString(),checks,events},null,2));for(const r of cleanup)if(r.status==='rejected')throw r.reason;}
 console.log(`${checks.filter(c=>c.pass).length} passed, ${checks.filter(c=>!c.pass).length} failed`);if(checks.some(c=>!c.pass))process.exitCode=1;

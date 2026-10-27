@@ -457,7 +457,7 @@ rep(r"""readStorage('gemstogether-settings-v1',{}));
 rep(r"""this.bindUI();this.resize();this.newBoard(43);""", r"""this.bindUI();$('anim-speed').value=Math.round(this.animSpeed*100);this.resize();this.newBoard(43);""")
 
 # Patch 21: the remaining roadmap, built into the same standalone HTML.
-rep("version:'3.2.4'", "version:'3.3.29'")
+rep("version:'3.2.4'", "version:'3.4.0'")
 rep("(async function boot(){", (ROOT / 'tools' / 'expedition.js').read_text(encoding='utf-8') + "\n(async function boot(){")
 rep("app.coop=new GlobalCoopRoom(app);", "app.coop=new GlobalCoopRoom(app);app.expedition=new GemsExpedition(app);")
 rep("if(this.down&&!this.down.dragged&&this.phase==='idle'){", "if(this.down&&!this.down.dragged&&this.phase==='idle'&&!this.prefs.tapOnly){")
@@ -649,6 +649,30 @@ rep("if(age>=0&&age<ann.duration){const {cx,cy,bw}=this.boardBox()", "if(age>=0&
 # Only the large milestone float yields; score floats and idle social cheers remain.
 rep("special:true,size:over?50:46", "milestone:true,special:true,size:over?50:46")
 rep("const age=a.time-f.birth;if(age<0)continue;const [x,y]=project(f.pos", "const age=a.time-f.birth;if(age<0||f.milestone&&(a.phase==='idle'||this.co&&a.time>=this.co.birth&&a.time-this.co.birth<=1.2))continue;const [x,y]=project(f.pos")
+
+# A23: idle social notices use measured spare space without covering gems.
+rep("this.text(ann.label,cx,cy-bw*.28,Math.min(36,bw*.08)*(1+.3*Math.exp(-age*12)),ann.col,'center',bw*1.1,.15,true);", "this.drawSocialNotice(ann,age);")
+rep("(async function boot(){", (ROOT / 'tools' / 'social-notice.js').read_text(encoding='utf-8') + "\n(async function boot(){")
+
+# Replace the garden silhouette with temple architecture while preserving the original
+# scenery RNG sequence. Its legacy geometry is built into a discarded local Geo, so
+# downstream seeded islands/crystals retain their exact original layout.
+garden_start = html.index(' // Monumental garden architecture, built in depth around the board.')
+garden_end = html.index(' // Distant floating gardens are now a reusable animated mesh', garden_start)
+garden = html[garden_start:garden_end]
+html = html[:garden_start] + '{ const g=new Geo();\n' + garden + '}\n' + html[garden_end:]
+
+# Egyptian art candidate: geometry and local presentation, preserving A23 notice lanes.
+rep("(async function boot(){", '\n'.join((ROOT / 'tools' / name).read_text(encoding='utf-8') for name in ['egyptian-art.js','egyptian-hero.js','egyptian-temple.js','egyptian-spectacle.js']) + "\n(async function boot(){")
+rep("const worldMesh=renderer.createMesh(g.data());", "buildEgyptianTempleCabinet(g);const worldMesh=renderer.createMesh(g.data());")
+rep("const crown=renderer.createMesh(gemGeometry(1,7).data(),4);", "const crown=renderer.createMesh(buildEgyptianRoyalCrown().data(),4);")
+rep("this.presentation=new JewelPresentation(this);", "this.presentation=new JewelPresentation(this);this.egyptian=new EgyptianFeedback(this);")
+rep("if(this.presentation)this.presentation.reset();", "if(this.presentation)this.presentation.reset();if(this.egyptian)this.egyptian.reset();")
+rep("const cabinetMeshes=this.presentation.build();", "const cabinetMeshes=this.presentation.build();cabinetMeshes.push(...this.egyptian.build());")
+rep("this.stats.matches++;this.tier(cascade);", "this.stats.matches++;this.tier(cascade);a.egyptian?.match(cascade,t,flash);")
+rep("color('#429dff'),this.juice*.32+this.presentation.crownEnergy,7", "[1,1,1],this.juice*.32+this.presentation.crownEnergy,-1")
+rep("r.upload(this.world.crown,new Float32Array(packedInstance(trs([0,4.98+Math.sin(this.time)*.03,.05],[.06,Math.sin(this.time*.35)*.35,0],[.90,1.23,.9])", "const egyptPose=this.egyptian.pose;r.upload(this.world.crown,new Float32Array(packedInstance(trs([egyptPose.x,egyptPose.y+Math.sin(this.time)*.03*egyptPose.scale,egyptPose.z],[.06,Math.sin(this.time*.35)*.35,0],[.90*egyptPose.scale,1.23*egyptPose.scale,.9*egyptPose.scale])")
+rep("gold=color('#ba8b4b'),paleGold=color('#e6c77e'),darkGold=color('#695033'),stone=color('#23333b')", "gold=color('#c99a43'),paleGold=color('#f0d18a'),darkGold=color('#73532b'),stone=color('#172f50')")
 
 left = [(i + 1, l[:100]) for i, l in enumerate(html.split('\n')) if '—' in l and not l.lstrip().startswith(('/*', '//', '*')) and 'replace(/[' not in l]
 print('em-dash lines outside comments:', left)

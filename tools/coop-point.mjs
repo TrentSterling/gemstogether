@@ -87,7 +87,7 @@ try {
 } catch (e) {
   ok('harness', false, e.message);
 } finally {
-  A?.kill(); B?.kill();
+  const cleanup=await Promise.allSettled([A?.kill(),B?.kill()]);for(const r of cleanup)if(r.status==='rejected')throw r.reason;
 }
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
